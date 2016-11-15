@@ -1,0 +1,438 @@
+\title{IQL Documentation}
+\author{
+        Roman M\"untener \\
+                ZHAW, \underline{Switzerland} \\
+}
+\date{\today}
+
+\documentclass[12pt]{article}
+
+\begin{document}
+\setlength\parindent{0pt}
+\maketitle
+
+%\begin{abstract}
+%This is the paper's abstract \ldots
+%\end{abstract}
+
+\section{IQL}
+
+IQL (Interesting Query Language) is a domain specific query language developed for the Path Transparency Observatory (PTO) of the MAMI project. 
+
+\section{Concepts}
+
+IQL is based on observations where an observation is an n-tuple consisting of at least three values. An observation is a measurement of a value for a key.
+A minimal complete observation is thus \verb|(Key, Name, Value)| where \verb|Name| is the name of the measurement such as for example \textit{TEMPERATURE} or
+\textit{HUMIDITY}. The data type of \verb|Value| depends on \verb|Name|. Additionally an observation may have additional attributes for example time of measurement. 
+
+\section{Syntax}
+
+IQL uses JSON-encoded S-Expressions with a structure of:
+
+\begin{verbatim}
+S-EXP := {<OPERATION> : [<EXP>, <EXP>, ...]}
+EXP := S-EXP | LITERAL
+\end{verbatim}
+
+Measurement names are prefixed with a \verb|$| sign and attributes are prefixed with a \verb|@| sign. This is used to distinguish between strings (e.g. \verb|'foobar'|)
+and the attribute \textit{foobar} (e.g. \verb|'@foobar'|) and the value of a measurement named \textit{foobar} (e.g. \verb|'$foobar'|). This is necessary because JSON only
+supports a few data types natively.
+
+\section{IQL Request}
+
+An IQL Request consists of \verb|settings| and a \verb|query| whereas \verb|settings| is used to specify for example the amount of result sets that shall be returned
+or the order of results that shall be returned as well as which attribute of a tuple the requestee is interested in. 
+
+\begin{verbatim}
+{"settings" : <settings>,
+ "query" : <query>}
+\end{verbatim}
+
+\subsection{Settings}
+
+\subsubsection{Attribute}
+
+\verb|settings.attribute| specifies the attribute that shall be selected from tuples. If set queries return sets of singletons. Some operations require \verb|settings.attribute| to be set. \\
+
+\textbf{Example:}
+\begin{verbatim}
+{"settings" : {"attribute" : "@dip"}}
+\end{verbatim}
+
+\subsubsection{Order}
+
+\verb|settings.order| specifies the order the results shall be returned in. The first argument to order specifies the attribute to sort by and the second argument specifies the direction.
+\verb|'asc'| for ascending and \verb|'desc'| for descending.\\
+
+\textbf{Example:}
+\begin{verbatim}
+{"settings" : {"order" : ['@dip', 'asc']}}
+\end{verbatim}
+
+\subsubsection{Projection}
+
+\verb|settings.projection| allows to set a projection function that shall be applied to the selected attribute as specified in \verb|settings.attribute|. If \verb|settings.projection| is set, 
+\verb|settings.attribute| must be set as well. \\
+
+\textbf{Example:}
+\begin{verbatim}
+{"settings" : {"projection" : "squ"}}
+\end{verbatim}
+
+\subsection{Query}
+
+\verb|query| contains the actual query. A query operation is required. 
+
+\section{Query operations}
+
+\subsection{all}
+
+\begin{verbatim}
+{"all" : [SET]}
+\end{verbatim}
+
+The \verb|all| query operation returns all tuples from its input set.
+
+\subsection{count}
+
+\subsubsection{all tuples}
+
+\begin{verbatim}
+{"count": [SET]}
+\end{verbatim}
+
+Returns the total count of all tuples in the input set. Result is a singleton \verb|(count)|.
+
+\subsubsection{group members}
+
+\begin{verbatim}
+{"count": [[A,...], SET]}
+\end{verbatim}
+
+Groups observations based on the attributes specified in the first argument, then counts the members of each group. 
+Result is an n-tuple with all the attibutes as specified in the first argument plus \verb|count|. 
+
+\subsubsection{group members, overwrite order}
+
+\begin{verbatim}
+{"count": [[A,...], SET, S]}
+\end{verbatim}
+
+Same as \textit{group members} (see above) but overwrites \verb|settings.order|. Third argument is either \verb|'asc'| (ascending)
+or \verb|'desc'| (descending).
+
+\section{Set operations}
+
+\subsection{intersection}
+
+\begin{verbatim}
+{"intersection": [SET,...]}
+\end{verbatim}
+
+Performs a set intersection. Requires \verb|settings.attribute| to be set. Returns set of singletons.
+
+\subsection{lookup}
+
+\subsubsection{without filter}
+
+\begin{verbatim}
+{"lookup": [P, A, SET]}
+\end{verbatim}
+
+First argument temporarily overwrites \verb|settings.projection| and second argument temporarily overwrites \verb|settings.attribute|. These are overwritten
+for the third argument which must be a set operation. When \verb|settings.attribute| is specified this operation returns a set of singletons as expected.
+
+Lookup requires that the second argument is non-empty as the set expected by lookup must be a set of singletons. Lookup will return all tuples 
+where the value of the specified attribute (with an optional projection function applied) is in the set of the third argument. 
+
+\subsubsection{with filter}
+
+\begin{verbatim}
+{"lookup": [P, A, SET, B]}
+\end{verbatim}
+
+Behaves the same as \textit{without filter} (see above) except that it allows for a (post-)filtering which happens after the lookup but before attribute selection (if \verb|settings.attribute| is set, otherwise
+no attribute selection happens).
+
+
+\subsection{simple}
+
+\begin{verbatim}
+{"simple" : [B]} -> SET
+\end{verbatim}
+
+Performs a search through all tuples. First and only argument is an expression of type boolean. Returns all tuples where first expression
+returns true. If \verb|settings.attribute| is set it returns a set of singletons.
+
+\subsection{sieve}
+
+\begin{verbatim}
+{"sieve": [B,...]} -> SET
+\end{verbatim}
+
+Sieve accepts a list of boolean expressions. Requires \verb|settings.attribute| to be set. Sieving happens in steps and always returns a set of singletons.
+
+While sieving it's possible to reference values from \textbf{previous} steps (see Example below) through the use of \verb|:<step>| where \verb|:<step>| is the number of the step.
+\verb|{"gt": ["@time:1", "@time:0"]}| means that the value of the \textit{time} attribute in the tuple of the second step must be larger than the one from the first step.
+
+In the very first step it searches for every tuples matching the first expression. It'll then perform a lookup and produce a tree structure. 
+and the next expression is run on that tree structure. This step is repeated for as many expressions as were specified. \\
+
+\subsubsection{Example}
+
+This example conceptually describes the process but might not accurately reflect they way sieving is implemented! \\
+
+\textbf{Data:} 
+
+\begin{verbatim}
+('L','T',15)
+('L','T',16)
+('L','T',20)
+(Z,'T',15)
+(Z,'T',14)
+\end{verbatim}
+
+Structure: \verb|(CITY,NAME,VALUE)|. \\
+
+\textbf{Sieve:}
+
+\begin{verbatim}
+{"sieve" : [{"eq" : ["$T",15]},
+            {"gt" : ["$T:1,"$T:0]},
+            {"gt" : ["$T:2","$T:1]}]}
+\end{verbatim}
+
+\verb|settings.attribute| is set to \verb|'@CITY'|. \\
+
+\textbf{First step:}
+
+\begin{verbatim}
+('L','T',15)
+(Z,'T',15)
+{- no other tuples match $T = 15 -}
+\end{verbatim}
+
+\textbf{Second step:}
+
+\begin{verbatim}
+('L','T',15) ('L','T',15) {- doesn't match $T:1 > $T:0 -}
+           ('L','T',16) {- matches }
+           ('L','T',20) {- matches }
+
+(Z,'T',15) (Z,'T',15) {- doesn't match -}
+           (Z,'T',14) {- doesn't match -}
+\end{verbatim}
+
+\textbf{Third step:}
+
+\begin{verbatim}
+('L','T',15) ('L','T',16) ('L','T',15) {- doesn't match $T:2 > $T:0 -}
+                      ('L','T',16) {- doesn't match -}
+                      ('L','T',20) {- doesn't match -}
+
+('L','T',15) ('L','T',20) ('L','T',15) {- doesn't match -}
+                      ('L','T',16) {- doesn't match -}
+                      ('L','T',20) {- doesn't match -}                      
+\end{verbatim}
+
+
+\textbf{Result: }
+
+\begin{verbatim}
+(L)
+\end{verbatim}
+
+\subsubsection{Performance notes}
+
+The selectivity of the first argument has performance implications. Queries will be faster the fewer matches the first argument produces. 
+
+\subsection{subtraction}
+
+\begin{verbatim}
+{"subtraction": [SET,...]} -> SET
+\end{verbatim}
+
+Performs a set subtraction (set difference). Requires \verb|settings.attribute| to be set. Returns set of singletons.
+
+\subsection{union}
+
+\begin{verbatim}
+{"union": [SET,...]}
+\end{verbatim}
+
+Performs a set union. If \verb|settings.attribute| is set it returns a set of singletons.
+
+\section{Expression operations}
+
+\subsection{add}
+
+\begin{verbatim}
+{"add": [I, I]}
+{"add": [T, T]}
+\end{verbatim}
+
+Performs addition of integers or timestamps.
+
+\subsection{div}
+
+\begin{verbatim}
+{"div": [I, I]}
+\end{verbatim}
+
+Performs integer division.
+
+\subsection{eq}
+
+\begin{verbatim}
+{"eq": [A, A]} -> B
+\end{verbatim}
+
+Requires both arguments to be of the same type. Returns true of arguments are equal, otherwise false.
+
+\subsection{ge}
+
+\begin{verbatim}
+{"ge": [A, A]} -> B
+\end{verbatim}
+
+Requires both arguments to be of the same type. Returns true if first argument is greater than or equal to the second argument, otherwise false.
+
+\subsection{gt}
+
+\begin{verbatim}
+{"gt": [A, A]} -> B
+\end{verbatim}
+
+Requires both arguments to be of the same type. Returns true if first argument is larger than the second argument. 
+
+\subsection{le}
+
+\begin{verbatim}
+{"le": [A, A]} -> B
+\end{verbatim}
+
+Requires both arguments to be of the same type. Returns true if first argument is less than or equal to the second argument, otherwise false.
+
+\subsection{lt}
+
+\begin{verbatim}
+{"lt": [A, A]} -> B
+\end{verbatim}
+
+Requires both arguments to be of the same type. Returns true if first argument is less than the second argument. 
+
+\subsection{mul}
+
+\begin{verbatim}
+{"mul": [I, I} -> I
+\end{verbatim}
+
+Performs integer multiplication.
+
+\section{Macros}
+
+Macros are operations operating only on constant literals.
+
+\subsection{time}
+
+\begin{verbatim}
+{"time": [S]} -> T
+\end{verbatim}
+
+Converts first argument to timestamp. 
+
+\section{Restrictions}
+
+It is illegal to reference different measurement values within the same sub-expression of a set operation. Thus, the following IQL is illegal:
+
+\begin{verbatim}
+{"simple" : [{"or": [{"eq": ["$ecn.connectivity","broken"]},
+                     {"eq": ["$ecn.negotiated",0]}]}]}
+\end{verbatim}
+
+The first use of \verb|$ecn.connectivity| binds the whole expression to it and thus the reference to \verb|$ecn.negotiated| is illegal. However, the following
+IQL is legal:
+
+\begin{verbatim}
+{"union" : [{"simple": [{"eq" : ["$ecn.connectivity","broken"]}]},
+            {"simple": [{"eq" : ["$ecn.negotiated", 1]}]}]}
+\end{verbatim}
+
+\section{Attribute selection}
+
+When \verb|settings.attribute| is specified set operations will perform attribute selection which selects a single attribute (with an optional projection function applied) 
+and thus these operations will return sets of singletons.
+
+\subsection{Example}
+
+\textbf{Data:}
+
+\begin{verbatim}
+('L','T',15)
+('L','T',16)
+\end{verbatim}
+
+Data structure is: \verb|(CITY,NAME,VALUE)|. \\
+
+\textbf{Request:}
+
+\begin{verbatim}
+{"settings": {"projection" : "squ",
+              "attribute" : "$T"},
+ "query": {"simple": [{"eq":[9,9]}]}}
+\end{verbatim}
+
+IQL itself does not define any projection function except that an empty or non-present projection function must be an identify function \verb|f(x) = x|.
+Projection functions are database specific and thus part of the schema. In this example we'll assume that \verb|squ := f(x) = x * x|. \\
+
+\textbf{Result:}
+
+\begin{verbatim}
+(225)
+(256)
+\end{verbatim}
+
+\section{Examples}
+
+\subsection{E1}
+
+\tiny
+\begin{verbatim}
+{ 'query': { 'count': [ ['@dip', '$ecn.connectivity'],
+                        { 'lookup': [ '',
+                                      '@dip',
+                                      { 'sieve': [ { 'eq': [ '$ecn.connectivity',
+                                                             'works']},
+                                                   { 'eq': [ '$ecn.connectivity',
+                                                             'broken']}]}]}]},
+ 'settings': {'order': ['@dip', 'asc']}}
+\end{verbatim}
+\normalsize
+
+Select all dips (destination IP) where an observation with \verb|ecn.connectivity = broken| exists and an observation with \verb|ecn.connectivity = works| exists. 
+Then group by \verb|(@dip, $ecn.connectivity)| and count \verb|$ecn.connectivity|. Example output (JSON):
+
+\tiny\begin{verbatim}
+{"count": 1, "dip": "101.200.161.203", "value": "broken"}
+{"count": 1, "dip": "101.200.161.203", "value": "works"}
+{"count": 1, "dip": "101.200.208.216", "value": "broken"}
+{"count": 1, "dip": "101.200.208.216", "value": "works"}
+{"count": 1, "dip": "101.201.104.55", "value": "broken"}
+\end{verbatim}\normalsize
+
+\subsection{E2}
+
+\tiny\begin{verbatim}
+{"query" : {"count" : [["@sip","$ecn.connectivity"],{"simple":[{"eq":[1,1]}]},"desc"]}}
+\end{verbatim}\normalsize
+
+Counts how many times each value for \verb|ecn.connectivity| exists for a \verb|sip| (start IP). Example output (JSON):
+
+\tiny\begin{verbatim}
+{"count": 616066, "sip": "139.59.249.205", "value": "works"}
+{"count": 332318, "sip": "104.131.31.32", "value": "works"}
+{"count": 24095, "sip": "2400:6180:0000:00d0:0000:0000:0b76:a001", "value": "works"}
+\end{verbatim}\normalsize
+
+\end{document}
+  
