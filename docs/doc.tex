@@ -226,8 +226,8 @@ accurately reflect they way sieving is implemented!
 ('L','T',15)
 ('L','T',16)
 ('L','T',20)
-(Z,'T',15)
-(Z,'T',14)
+('Z','T',15)
+('Z','T',14)
 \end{verbatim}
 
 Structure: \verb|(CITY,NAME,VALUE)|.
@@ -246,7 +246,7 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 
 \begin{verbatim}
 ('L','T',15)
-(Z,'T',15)
+('Z','T',15)
 {- no other tuples match $T = 15 -}
 \end{verbatim}
 
@@ -254,23 +254,23 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 
 \begin{verbatim}
 ('L','T',15) ('L','T',15) {- doesn't match $T:1 > $T:0 -}
-           ('L','T',16) {- matches }
-           ('L','T',20) {- matches }
+             ('L','T',16) {- matches }
+             ('L','T',20) {- matches }
 
-(Z,'T',15) (Z,'T',15) {- doesn't match -}
-           (Z,'T',14) {- doesn't match -}
+('Z','T',15) ('Z','T',15) {- doesn't match -}
+             ('Z','T',14) {- doesn't match -}
 \end{verbatim}
 
 \paragraph*{Third step:}
 
 \begin{verbatim}
 ('L','T',15) ('L','T',16) ('L','T',15) {- doesn't match $T:2 > $T:0 -}
-                      ('L','T',16) {- doesn't match -}
-                      ('L','T',20) {- doesn't match -}
+                          ('L','T',16) {- doesn't match -}
+                          ('L','T',20) {- doesn't match -}
 
 ('L','T',15) ('L','T',20) ('L','T',15) {- doesn't match -}
-                      ('L','T',16) {- doesn't match -}
-                      ('L','T',20) {- doesn't match -}                      
+                          ('L','T',16) {- doesn't match -}
+                          ('L','T',20) {- doesn't match -}                      
 \end{verbatim}
 
 
