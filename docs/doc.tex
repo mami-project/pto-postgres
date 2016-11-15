@@ -1,6 +1,5 @@
 \documentclass[a4paper]{article}
 
-\usepackage[epsilon,tstt]{backnaur}
 
 \begin{document}
 
@@ -35,13 +34,10 @@ attributes for example time of measurement.
 
 IQL uses JSON-encoded S-Expressions with a structure of:
 
-\begin{bnf*}
-  \bnfprod{S-Exp}
-    {\bnfts{\{} \bnfpn{operation} \bnfts{:} \bnfts{[}
-      \bnfpn{expression} \bnfts{,} \bnfsk \bnfts{]} \bnfts{\}}}\\
-  \bnfprod{expression}
-    { \bnfpn{S-Exp} \bnfor \bnftd{literal} }
-\end{bnf*}
+\begin{verbatim}
+S-EXP := {<OPERATION> : [<EXP>, <EXP>, ...]}
+EXP := S-EXP | LITERAL
+\end{verbatim}
 
 Measurement names are prefixed with a
 \verb|$| sign and attributes are prefixed with a \verb|@| sign. This
