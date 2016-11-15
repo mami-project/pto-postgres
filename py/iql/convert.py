@@ -45,6 +45,39 @@ def convert_simple(exp, context):
 
 
 
+def convert_choice(operands, cur_table, context):
+  """
+  Moo
+  """
+
+  U.expect_array(operands, 0, "`choice'")
+
+  if len(operands) < 2:
+    raise ValueError("`choice' expects array of size 2: " + str(operands))
+
+  if context.msmnt_name != None:
+    raise ValueError("Can't use `choice' because expression is already bound to `" + context.msmnt_name + "': " + str(operands))
+
+  choices = []
+
+  for operand in operands:
+    (sql, return_type, a) = convert_exp(operand, cur_table, context)
+
+    if return_type != "B":
+      raise ValueError("Expected type `B' but found `" + return_type + "': " + str(operand))
+
+    if context.msmnt_name != None:
+      sql = "%s.name = '%s' AND (%s)" % (cur_table, context.msmnt_name, sql)
+
+    context.msmnt_name = None
+
+    choices.append("(%s)" % sql)
+
+  sql = " OR ".join(choices)
+
+  return ("(%s)" % sql, "B", "")
+
+
 def convert(query):
   """
   Converts a query to SQL.
@@ -395,7 +428,7 @@ def convert_exp(exp, cur_table, context):
         context.msmnt_name = exp[1:]
       else:
         if context.msmnt_name != exp[1:]:
-          raise ValueError("Found `" + str(exp) + "' but expected `" + context.msmnt_name + "'")
+          raise ValueError("Found `" + str(exp) + "' but expected `$" + context.msmnt_name + "'")
 
         
       exp = exp[1:]
@@ -422,7 +455,10 @@ def convert_operation(operation, operands, cur_table, context):
   Converts operation to SQL
   """
 
-  if U.is_n_op(operation):
+  if operation == "choice":
+    return convert_choice(operands, cur_table, context)
+
+  elif U.is_n_op(operation):
     return convert_n_op(operation, operands, cur_table, context)
 
   elif U.is_bin_op(operation):
