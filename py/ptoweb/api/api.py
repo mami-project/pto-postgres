@@ -82,7 +82,7 @@ def api_query():
 
 
 def remove_nulls(d):
-  for key in d.keys():
+  for key in list(d.keys()):
     if d[key] == None:
       del d[key]
     elif key.startswith('val_i'):
