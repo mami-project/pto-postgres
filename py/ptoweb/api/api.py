@@ -10,7 +10,7 @@ import iql.convert as iqlc
 import pprint
 
 def get_iql_config():
-  return iqlc.Config(msmnt_types = DICT_MSMNT_TYPES, expected_types = DICT_EXPECTED_TYPES_ATTR)
+  return iqlc.Config(msmnt_types = DICT_MSMNT_TYPES, expected_types = DICT_EXPECTED_TYPES_ATTR, all_sql_attrs = ALL_SQL_ATTRS)
 
 def cors(resp):
   resp.headers['Access-Control-Allow-Origin'] = '*'

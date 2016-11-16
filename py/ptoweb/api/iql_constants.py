@@ -1,7 +1,6 @@
 DICT_EXPECTED_TYPES_ATTR = {
   'time_to' : 'T',
   'time_from' : 'T',
-  'condition' : 'S',
   'path_id' : 'I',
   'dip' : 'S',
   'sip' : 'S',
@@ -14,3 +13,6 @@ DICT_MSMNT_TYPES = {
   'ecn.connectivity' : 'S',
   'ecn.negotiated' : 'I'
 }
+
+ALL_SQL_ATTRS = ['time_to', 'time_from', 'time_to', 'name', 'path_id', 'full_path', 
+                 'dip', 'sip', 'analyzer', 'val_s', 'val_i']
