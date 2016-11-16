@@ -170,6 +170,8 @@ def convert(query, config = Config()):
     if context.order != None:
       sql += "ORDER BY z.%s %s " % context.order
 
+    sql += " LIMIT 128 "
+
     return sql
 
   elif "sieve" in query:
@@ -183,6 +185,8 @@ def convert(query, config = Config()):
 
     if context.order != None:
       sql += "ORDER BY z.%s %s " % context.order
+
+    sql += " LIMIT 128 "
 
     return sql
 
