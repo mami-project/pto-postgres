@@ -11,7 +11,7 @@ import pprint
 
 class CustomEncoder(json.JSONEncoder):
   def default(self, o):
-    if(isinstance(o, datetime.datetime)):
+    if(isinstance(o, datetime)):
       return o.timestamp()
 
 def get_iql_config():
