@@ -71,22 +71,7 @@ def api_query():
 
   for e in dr:
     
-    if ('val_i' in e) and ('val_s' in e):
-      if e['val_i'] != None:
-        e['value'] = e['val_i']
-      elif e['val_s'] != None:
-        e['value'] = e['val_s']
-      else:
-        e['value'] = None
-
-      del e['val_i']
-      del e['val_s']
-    elif 'val_i' in e:
-      e['value'] = e['val_i']
-      del e['val_i']
-    elif 'val_s' in e:
-      e['value'] = e['val_s']
-      del e['val_s']
+    remove_nulls(e)
 
     result_json.append(e)
 
@@ -95,6 +80,19 @@ def api_query():
 
   return json200({"results" : result_json})
 
+
+def remove_nulls(d):
+  for key in d.keys():
+    if d[key] == None:
+      del d[key]
+    elif key.starts_with('val_i'):
+      d[key.replace('val_i','value')] = d[key]
+      del d[key]
+    elif key.starts_with('val_s'):
+      d[key.replace('val_s','value')] = d[key]
+      del d[key]
+
+  return d
 
 
 @app.route('/translate')
@@ -127,28 +125,8 @@ def api_translate():
   i = 0
 
   for e in dr:
-
-    for key in e:
-      if key.lower() in ['time_to' ,'time_from']:
-        e[key] = e[key].timestamp()
-
     
-    if ('val_i' in e) and ('val_s' in e):
-      if e['val_i'] != None:
-        e['value'] = e['val_i']
-      elif e['val_s'] != None:
-        e['value'] = e['val_s']
-      else:
-        e['value'] = None
-
-      del e['val_i']
-      del e['val_s']
-    elif 'val_i' in e:
-      e['value'] = e['val_i']
-      del e['val_i']
-    elif 'val_s' in e:
-      e['value'] = e['val_s']
-      del e['val_s']
+    remove_nulls(e)
 
     result_json += json.dumps(e, cls=CustomEncoder) + "\n"
 
