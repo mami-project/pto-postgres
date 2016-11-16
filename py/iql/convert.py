@@ -1,11 +1,26 @@
 import iql.constants as C
 import iql.util as U
 
+class Config:
+
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data"):
+    self.DICT_MSMNT_TYPES = msmnt_types
+    self.DICT_EXPECTED_TYPES_ATTR = expected_types
+    self.DICT_KNOWN_PROJECTIONS = known_projections
+    self.TBL_NAME = tbl_name
+
+
 class Context:
 
   def __init__(self, projection, attribute):
     self.projection = projection
     self.attribute = attribute
+
+    self.DICT_MSMNT_TYPES = {}
+    self.DICT_EXPECTED_TYPES_ATTR = {}
+    self.DICT_KNOWN_PROJECTIONS = {}
+    self.TBL_NAME = "iql_data"
+
     
     if self.projection == None:
       self.projection = ''
@@ -18,13 +33,19 @@ class Context:
     self.limit = None
     self.order = None
 
+  def config_from(self, config):
+    self.DICT_MSMNT_TYPES = config.DICT_MSMNT_TYPES
+    self.DICT_EXPECTED_TYPES_ATTR = config.DICT_EXPECTED_TYPES_ATTR
+    self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
+    self.TBL_NAME = config.TBL_NAME
+
 
 def convert_simple(exp, context):
   """
   Converts a simple query to SQL.
   """
 
-  (sql, return_type, a) = convert_exp(exp, 'L0', context)
+  (sql, return_type, a) = convert_exp(exp, 'l0', context)
 
   if return_type == '$':
     raise ValueError("Not a boolean expression: " + str(exp))
@@ -33,26 +54,63 @@ def convert_simple(exp, context):
     raise ValueError("Expected type `B' but found `" + return_type + "': " + str(exp))
 
   if context.msmnt_name != None:
-    sql_ = "L0.NAME = '" + context.msmnt_name + "' AND "
+    sql_ = "l0.name = '" + context.msmnt_name + "' AND "
   else:
     sql_ = " "
 
 
   if context.attribute == '' or context.attribute == None:
-    return "SELECT * FROM iql_data L0 WHERE " + sql_ + sql
+    return "SELECT * FROM " + context.TBL_NAME + " l0 WHERE " + sql_ + sql
   else:
-    return ("SELECT %s(L0.%s) AS %s FROM iql_data L0 WHERE " % (context.projection, context.attribute, context.attribute)) + sql_ + sql
+    return ("SELECT %s(l0.%s) AS %s FROM %s l0 WHERE " % (context.projection, context.attribute, context.attribute, context.TBL_NAME)) + sql_ + sql
 
 
 
-def convert(query):
+def convert_choice(operands, cur_table, context):
+  """
+  Moo
+  """
+
+  U.expect_array(operands, 0, "`choice'")
+
+  if len(operands) < 2:
+    raise ValueError("`choice' expects array of size 2: " + str(operands))
+
+  if context.msmnt_name != None:
+    raise ValueError("Can't use `choice' because expression is already bound to `" + context.msmnt_name + "': " + str(operands))
+
+  choices = []
+
+  for operand in operands:
+    (sql, return_type, a) = convert_exp(operand, cur_table, context)
+
+    if return_type != "B":
+      raise ValueError("Expected type `B' but found `" + return_type + "': " + str(operand))
+
+    if context.msmnt_name != None:
+      sql = "%s.name = '%s' AND (%s)" % (cur_table, context.msmnt_name, sql)
+
+    context.msmnt_name = None
+
+    choices.append("(%s)" % sql)
+
+  sql = " OR ".join(choices)
+
+  return ("(%s)" % sql, "B", "")
+
+
+def convert(query, config = Config()):
   """
   Converts a query to SQL.
   """
 
-  # If there's an attribute or projection set we use them
+  
 
   context = Context('', '')
+
+  context.config_from(config)
+
+  # If there's an attribute or projection set we use them
 
   if 'settings' in query:
     settings = query['settings']
@@ -65,8 +123,11 @@ def convert(query):
       else:
         raise ValueError("Invalid value for `settings.projection'. Need string: " + str(query))
 
+      if not U.is_known_projection(context.projection, context):
+        raise ValueError("Unknown projection `" + str(self.projection) + "': " + str(query))
+
     if 'attribute' in settings:
-      context.attribute = U.resolve_attribute(settings['attribute'], "`attribute.settings'")
+      context.attribute = U.resolve_attribute(settings['attribute'], context, "`attribute.settings'")
 
     if 'order' in settings:
       order = settings['order']
@@ -76,7 +137,7 @@ def convert(query):
       attribute = order[0]
       asc_desc = order[1]
 
-      attribute = U.resolve_attribute(attribute, "`settings.order'")
+      attribute = U.resolve_attribute(attribute, context, "`settings.order'")
 
       if context.attribute != None and context.attribute != '':
         if context.attribute != attribute:
@@ -102,10 +163,10 @@ def convert(query):
   
     sql_ = convert_query(query, context)
 
-    sql = "SELECT * FROM (%s) Z " % sql_
+    sql = "SELECT * FROM (%s) z " % sql_
 
     if context.order != None:
-      sql += "ORDER BY Z.%s %s " % context.order
+      sql += "ORDER BY z.%s %s " % context.order
 
     return sql
 
@@ -119,10 +180,10 @@ def convert(query):
 
       sql_ = convert_query(query, context)
 
-      sql = "SELECT COUNT(*) FROM (%s) Z " % sql_
+      sql = "SELECT COUNT(*) FROM (%s) z " % sql_
 
       if context.order != None:
-        sql += "ORDER BY Z.%s %s " % context.order
+        sql += "ORDER BY z.%s %s " % context.order
 
       return sql; 
     
@@ -140,7 +201,7 @@ def convert(query):
         else:
           raise ValueError("`count.0' if array specified the array must not be empty:" + str(query))
 
-      attributes = list(map(lambda a: "Z.%s" % U.resolve_attribute(a, "`count.0.x'"), attributes))
+      attributes = list(map(lambda a: "z.%s" % U.resolve_attribute(a, context, "`count.0.x'"), attributes))
      
       if len(query) == 3:
         order = query[2]
@@ -150,35 +211,35 @@ def convert(query):
 
       query = query[1]
 
-      attribute = U.resolve_attribute(attribute, "`count.0'")
+      attribute = U.resolve_attribute(attribute, context, "`count.0'")
 
       if context.attribute != None:
         if context.attribute != attribute:
           raise ValueError("Can't count `" + attribute + "': " + str(query))
 
       if context.order != None:
-        if not ("Z."+context.order[0]) in attributes:
+        if not ("z."+context.order[0]) in attributes:
           raise ValueError("Can't order by `" + context.order[0] + "' due to `count': " + str(query))
 
 
       sql_ = convert_query(query, context)
 
-      sql = "SELECT " + ",".join(attributes) + ", COUNT(Z.%s) AS count FROM (%s) Z WHERE Z.%s IS NOT NULL\n" % (attribute, sql_, attribute)
+      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z WHERE z.%s IS NOT NULL\n" % (attribute, sql_, attribute)
 
       if raw_attribute.startswith("$"):
         raw_attribute = raw_attribute[1:]
-        sql += "AND Z.name = '%s' " % raw_attribute
+        sql += "AND z.name = '%s' " % raw_attribute
 
       sql += "GROUP BY " + ",".join(attributes) + " "
 
       if context.order != None:
         if not overwrite_order:
-          sql += "ORDER BY Z.%s %s " % context.order
+          sql += "ORDER BY z.%s %s " % context.order
         else:
-          sql += "ORDER BY Z.count %s " % order
+          sql += "ORDER BY z.count %s " % order
       else:
         if overwrite_order:
-          sql += "ORDER BY Z.count %s " % order
+          sql += "ORDER BY z.count %s " % order
 
       return sql; 
 
@@ -257,15 +318,17 @@ def convert_lookup(arguments, context):
   U.expect_str(attribute, "`lookup.1'")
   U.expect_object(query, "`lookup.2")
 
-  attribute = U.resolve_attribute(attribute, "`lookup'")
+  attribute = U.resolve_attribute(attribute, context, "`lookup'")
 
   new_context = Context(projection, attribute)
+  new_context.config_from(context)
   sql = convert_query(query, new_context)
 
   sql_filter = ""
 
   if filter_ != None:
     new_context = Context('','')
+    new_context.config_from(context)
     sql_filter = convert_exp(filter_, "W", new_context)
     if sql_filter[1] != "B":
       raise ValueError("`lookup.3' expects `B': " + str(filter_))
@@ -273,9 +336,9 @@ def convert_lookup(arguments, context):
     sql_filter = " WHERE " + sql_filter[0] + " "
 
   if context.attribute == '' or context.attribute == None:
-    sql = "(SELECT W.* FROM (%s) V JOIN iql_data W ON %s(W.%s) = (V.%s) %s)" % (sql, projection, attribute, attribute, sql_filter)
+    sql = "(SELECT W.* FROM (%s) v JOIN %s w ON %s(w.%s) = (v.%s) %s)" % (sql, context.TBL_NAME, projection, attribute, attribute, sql_filter)
   else:
-    sql = "(SELECT %s(W.%s) FROM (%s) V JOIN iql_data W ON %s(W.%s) = (V.%S) %s)" % (projection, attribute, sql, projection, attribute, attribute, sql_filter)
+    sql = "(SELECT %s(W.%s) FROM (%s) v JOIN %s w ON %s(w.%s) = (v.%S) %s)" % (projection, attribute, sql, context.TBL_NAME, projection, attribute, attribute, sql_filter)
 
   return sql
   
@@ -332,27 +395,27 @@ def convert_sieve(exps, context):
   for exp in exps:
 
     context.msmnt_name = None
-    (sql, return_type, a) = convert_exp(exp, "L" + str(i), context)
+    (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
 
     if return_type != "B":
       raise ValueError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
 
     if context.msmnt_name != None:
-      wheres.append("L" + str(i) + ".NAME = '" + context.msmnt_name + "'")
+      wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
 
     wheres.append(sql)
 
     i += 1
 
 
-  sql = "(SELECT DISTINCT %s(L0.%s) AS %s FROM\n" % (context.projection, context.attribute, context.attribute)
+  sql = "(SELECT DISTINCT %s(l0.%s) AS %s FROM\n" % (context.projection, context.attribute, context.attribute)
 
-  sql += "iql_data L0 "
+  sql += "%s l0 " % (context.TBL_NAME)
   j = 1
 
   while j < i:
-    sql += "JOIN iql_data L%d " % (j)
-    sql += "ON %s(L%d.%s) = %s(L%d.%s)\n" % (context.projection, j-1, context.attribute, context.projection, j, context.attribute)
+    sql += "JOIN %s l%d " % (context.TBL_NAME, j)
+    sql += "ON %s(l%d.%s) = %s(l%d.%s)\n" % (context.projection, j-1, context.attribute, context.projection, j, context.attribute)
     j += 1
 
   sql += "WHERE\n"
@@ -395,22 +458,23 @@ def convert_exp(exp, cur_table, context):
         context.msmnt_name = exp[1:]
       else:
         if context.msmnt_name != exp[1:]:
-          raise ValueError("Found `" + str(exp) + "' but expected `" + context.msmnt_name + "'")
+          raise ValueError("Found `" + str(exp) + "' but expected `$" + context.msmnt_name + "'")
 
         
       exp = exp[1:]
 
-      if exp == "ecn.connectivity":
-        return (exp, "$", "S")
-      else: return (exp, "$", "I")
+      if not U.is_known_msmnt(exp, context):
+        raise ValueError("Unknown measurement name `" + exp + "': " + str(exp))
+
+      return (exp, "$", U.get_msmnt_type(exp, context))
 
     elif exp.startswith('@'):
       attr_name = U.get_attribute_name(exp)[1:]
 
-      if not U.is_known_attribute(U.get_attribute_name(attr_name)):
+      if not U.is_known_attribute(U.get_attribute_name(attr_name), context):
         raise ValueError("`" + exp + "' is unknown: " + str(exp))
 
-      return (exp, U.get_data_type_for_attribute(attr_name), "")
+      return (exp, U.get_data_type_for_attribute(attr_name, context), "")
 
   elif type(exp) == type(0):
     return (str(exp), "I", "")
@@ -422,7 +486,10 @@ def convert_operation(operation, operands, cur_table, context):
   Converts operation to SQL
   """
 
-  if U.is_n_op(operation):
+  if operation == "choice":
+    return convert_choice(operands, cur_table, context)
+
+  elif U.is_n_op(operation):
     return convert_n_op(operation, operands, cur_table, context)
 
   elif U.is_bin_op(operation):
@@ -507,7 +574,7 @@ def to_sql_col_val(value, cur_table):
     if len(parts) != 2:
       raise ValueError("Illegal reference `" + value + "'.")
 
-    return "L" + str(parts[1]) + "." + parts[0]
+    return "l" + str(parts[1]) + "." + parts[0]
 
   return value
 
