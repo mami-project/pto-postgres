@@ -47,7 +47,7 @@ def get_expected_types(operation):
 
 
 
-def get_data_type_for_attribute(attribute):
+def get_data_type_for_attribute(attribute, context):
   """
   Returns the data type for an attribute. 
   """  
