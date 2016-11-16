@@ -150,7 +150,7 @@ def api_translate():
       e['value'] = e['val_s']
       del e['val_s']
 
-    result_json += json.dumps(e) + "\n"
+    result_json += json.dumps(e, cls=CustomEncoder) + "\n"
 
     i += 1
     if(i > 128): break
