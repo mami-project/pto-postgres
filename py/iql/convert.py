@@ -398,7 +398,7 @@ def convert_sieve(exps, context, attributes = None):
   """
 
   if context.attribute == '' or context.attribute == None:
-    if attributes == None: raise ValueError("Sieve operation requires `attribute': " + str(exps))
+    raise ValueError("Sieve operation requires `attribute': " + str(exps))
 
 
   if type(exps) != type([]):
