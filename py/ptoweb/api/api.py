@@ -9,6 +9,11 @@ from datetime import datetime
 import iql.convert as iqlc
 import pprint
 
+class CustomEncoder(json.JSONEncoder):
+  def default(self, o):
+    if(isinstance(o, datetime.datetime)):
+      return o.timestamp()
+
 def get_iql_config():
   return iqlc.Config(msmnt_types = DICT_MSMNT_TYPES, expected_types = DICT_EXPECTED_TYPES_ATTR, all_sql_attrs = ALL_SQL_ATTRS)
 
@@ -17,13 +22,13 @@ def cors(resp):
   return resp
 
 def json200(obj):
-  return cors(Response(json.dumps(obj, default=json_util.default), status=200, mimetype='application/json'))
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=200, mimetype='application/json'))
 
 def json400(obj):
-  return cors(Response(json.dumps(obj, default=json_util.default), status=400, mimetype='application/json'))
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=400, mimetype='application/json'))
 
 def json404(obj):
-  return cors(Response(json.dumps(obj, default=json_util.default), status=404, mimetype='application/json'))
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=404, mimetype='application/json'))
 
 def text200(obj):
   return cors(Response(obj, status=200, mimetype='text/plain'))
@@ -65,11 +70,6 @@ def api_query():
   i = 0
 
   for e in dr:
-
-    for key in e:
-      if key.lower() in ['time_to' ,'time_from']:
-        e[key] = e[key].timestamp()
-
     
     if ('val_i' in e) and ('val_s' in e):
       if e['val_i'] != None:
