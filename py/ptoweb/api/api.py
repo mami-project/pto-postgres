@@ -95,6 +95,27 @@ def remove_nulls(d):
   return d
 
 
+@app.route('/sql')
+def api_sql():
+  iql = request.args.get('q')
+
+  if iql == None or iql == '':
+    return json400({"error" : "Empty query!"})
+
+  try:
+    iql = json.loads(iql)
+  except:
+    return json400({"error" : "Not valid JSON!"})
+
+  try:
+    sql = iqlc.convert(iql, get_iql_config())
+  except ValueError as error:
+    return json400({"error" : str(error)})
+
+  return text200(sql)
+
+
+
 @app.route('/translate')
 def api_translate():
 
