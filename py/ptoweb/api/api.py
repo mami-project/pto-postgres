@@ -85,10 +85,10 @@ def remove_nulls(d):
   for key in d.keys():
     if d[key] == None:
       del d[key]
-    elif key.starts_with('val_i'):
+    elif key.startswith('val_i'):
       d[key.replace('val_i','value')] = d[key]
       del d[key]
-    elif key.starts_with('val_s'):
+    elif key.startswith('val_s'):
       d[key.replace('val_s','value')] = d[key]
       del d[key]
 
