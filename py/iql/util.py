@@ -196,7 +196,7 @@ def resolve_attribute(attribute, context, data):
     if not is_known_msmnt(attribute, context):
       raise ValueError("Unkown measurement name `" + attribute + "': " + str(data))
 
-    attribute = "val_" + get_msmnt_type(attribute).lower()
+    attribute = "val_" + get_msmnt_type(attribute, context).lower()
 
     return attribute
 
