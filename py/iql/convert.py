@@ -39,7 +39,7 @@ class Context:
     self.DICT_EXPECTED_TYPES_ATTR = config.DICT_EXPECTED_TYPES_ATTR
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
     self.TBL_NAME = config.TBL_NAME
-    self.ALL_SQL_ATTRS = all_sql_attrs
+    self.ALL_SQL_ATTRS = config.all_sql_attrs
 
 
 def convert_simple(exp, context):
