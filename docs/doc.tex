@@ -62,6 +62,13 @@ interested in.
 
 \subsection{Settings}
 
+\begin{verbatim}
+{"settings": {
+     "projection" : P,
+     "attribute" : A,
+     "order" : [A, S]}}
+\end{verbatim}
+
 \subsubsection{Attribute}
 
 \verb|settings.attribute| specifies the attribute that shall be selected from tuples. If set queries return sets of singletons. Some operations require \verb|settings.attribute| to be set. \\
@@ -97,24 +104,28 @@ shall be applied to the selected attribute as specified in
 
 \subsection{Query}
 
-\verb|query| contains the actual query. A query operation is required.
+\begin{verbatim}
+{"query" : A_SET}
+\end{verbatim}
 
-\section{Query operations}
+\verb|query| contains the actual query. An aggregation operation is required.
+
+\section{Aggregation operations}
 
 \subsection{all}
 
 \begin{verbatim}
-{"all" : [SET]}
+{"all" : [SET]} -> A_SET
 \end{verbatim}
 
-The \verb|all| query operation returns all tuples from its input set.
+The \verb|all| operation returns all tuples from its input set. It's a pseudo-aggregation.
 
 \subsection{count}
 
 \subsubsection{all tuples}
 
 \begin{verbatim}
-{"count": [SET]}
+{"count": [SET]} -> A_SET
 \end{verbatim}
 
 Returns the total count of all tuples in the input set. Result is a
@@ -123,7 +134,7 @@ singleton \verb|(count)|.
 \subsubsection{group members}
 
 \begin{verbatim}
-{"count": [[A,...], SET]}
+{"count": [[A,...], SET]} -> A_SET
 \end{verbatim}
 
 Groups observations based on the attributes specified in the first
@@ -134,7 +145,7 @@ plus \verb|count|.
 \subsubsection{group members, overwrite order}
 
 \begin{verbatim}
-{"count": [[A,...], SET, S]}
+{"count": [[A,...], SET, S]} -> A_SET
 \end{verbatim}
 
 Same as \textit{group members} (see above) but overwrites \verb|settings.order|. Third argument is either \verb|'asc'| (ascending)
@@ -145,7 +156,7 @@ or \verb|'desc'| (descending).
 \subsection{intersection}
 
 \begin{verbatim}
-{"intersection": [SET,...]}
+{"intersection": [SET,...]} -> SET
 \end{verbatim}
 
 Performs a set intersection. Requires \verb|settings.attribute| to be
@@ -156,7 +167,7 @@ set. Returns set of singletons.
 \subsubsection{without filter}
 
 \begin{verbatim}
-{"lookup": [P, A, SET]}
+{"lookup": [P, A, SET]} -> SET
 \end{verbatim}
 
 First argument temporarily overwrites \verb|settings.projection| and
@@ -173,7 +184,7 @@ projection function applied) is in the set of the third argument.
 \subsubsection{with filter}
 
 \begin{verbatim}
-{"lookup": [P, A, SET, B]}
+{"lookup": [P, A, SET, B]} -> SET
 \end{verbatim}
 
 Behaves the same as \textit{without filter} (see above) except that it
@@ -298,7 +309,7 @@ Performs a set subtraction (set difference). Requires
 \subsection{union}
 
 \begin{verbatim}
-{"union": [SET,...]}
+{"union": [SET,...]} -> SET
 \end{verbatim}
 
 Performs a set union. If \verb|settings.attribute| is set it returns a
@@ -314,6 +325,14 @@ set of singletons.
 \end{verbatim}
 
 Performs addition of integers or timestamps.
+
+\subsection{and}
+
+\begin{verbatim}
+{"and": [B,...]} -> B
+\end{verbatim}
+
+Performs logical and. 
 
 \subsection{div}
 
@@ -377,6 +396,23 @@ argument is less than the second argument.
 \end{verbatim}
 
 Performs integer multiplication.
+
+\subsection{or}
+
+\begin{verbatim}
+{"or": [B,...]} -> B
+\end{verbatim}
+
+Performs logical or. 
+
+\subsection{sub}
+
+\begin{verbatim}
+{"sub": [I, I]}
+{"sub": [T, T]}
+\end{verbatim}
+
+Performs subtraction of integers or timestamps.
 
 \section{Macros}
 
