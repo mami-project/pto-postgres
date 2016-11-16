@@ -3,12 +3,14 @@ from flask import Response, g, request
 from bson import json_util
 import json
 from ptoweb.api.auth import require_auth
+import ptoweb.api.iql_constants as iqlconst
 import re
 from datetime import datetime
 import iql.convert as iqlc
 import pprint
 
-
+def get_iql_config():
+  return iqlc.Config(msmnt_types = iqlconst.DICT_MSMNT_TYPES, expected_types = iqlconst.DICT_EXPECTED_TYPES_ATTR)
 
 def cors(resp):
   resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -53,7 +55,7 @@ def api_query():
     return json400({"error" : "Not valid JSON!"})
 
   try:
-    sql = iqlc.convert(iql)
+    sql = iqlc.convert(iql, get_iql_config())
   except ValueError as error:
     return json400({"error" : str(error)})
 
@@ -109,7 +111,7 @@ def api_translate():
     return json400({"error" : "Not valid JSON!"})
 
   try:
-    sql = iqlc.convert(iql)
+    sql = iqlc.convert(iql, get_iql_config())
   except ValueError as error:
     return json400({"error" : str(error)})
 

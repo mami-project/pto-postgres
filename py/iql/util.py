@@ -52,7 +52,7 @@ def get_data_type_for_attribute(attribute):
   Returns the data type for an attribute. 
   """  
 
-  return C.DICT_EXPECTED_TYPES_ATTR[attribute]
+  return context.DICT_EXPECTED_TYPES_ATTR[attribute]
 
 
 
@@ -91,30 +91,42 @@ def get_attribute_name(attribute):
 
 
 
-def is_known_attribute(attribute):
+def is_known_attribute(attribute, context):
   """
   Returns true if the attribute is known.
   """
 
-  return attribute in C.DICT_EXPECTED_TYPES_ATTR
+  return attribute in context.DICT_EXPECTED_TYPES_ATTR
 
 
 
-def get_msmnt_type(msmnt_name):
+def get_msmnt_type(msmnt_name, context):
   """
   Returns the type of a measurement.
   """
 
-  return C.DICT_MSMNT_TYPES[msmnt_name]
+  return context.DICT_MSMNT_TYPES[msmnt_name]
 
 
 
-def is_known_msmnt(msmnt_name):
+def is_known_msmnt(msmnt_name, context):
   """
   Returns true if the measurement is known.
   """
 
-  return msmnt_name in C.DICT_MSMNT_TYPES
+  return msmnt_name in context.DICT_MSMNT_TYPES
+
+
+
+def is_known_projection(proj, context):
+  """
+  Returns true if the projection is known.
+  """
+
+  if proj == '':
+    return True
+
+  return proj in context.DICT_KNOWN_PROJECTIONS
 
 
 
@@ -173,7 +185,7 @@ def split_s_exp(a, data):
 
 
 
-def resolve_attribute(attribute, data):
+def resolve_attribute(attribute, context, data):
   expect_str(attribute, data)
 
   attribute = attribute.lower()
@@ -181,7 +193,7 @@ def resolve_attribute(attribute, data):
   if attribute.startswith("$"):
     attribute = attribute[1:]
 
-    if not is_known_msmnt(attribute):
+    if not is_known_msmnt(attribute, context):
       raise ValueError("Unkown measurement name `" + attribute + "': " + str(data))
 
     attribute = "val_" + get_msmnt_type(attribute).lower()
@@ -191,7 +203,7 @@ def resolve_attribute(attribute, data):
   elif attribute.startswith("@"):
     attribute = attribute[1:]
 
-    if not is_known_attribute(attribute):
+    if not is_known_attribute(attribute, context):
       raise ValueError("Unknown attribute `" + attribute + "': " + str(data))
 
     return attribute
