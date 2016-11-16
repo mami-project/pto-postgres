@@ -321,12 +321,14 @@ def convert_lookup(arguments, context):
   attribute = U.resolve_attribute(attribute, context, "`lookup'")
 
   new_context = Context(projection, attribute)
+  new_context.config_from(context)
   sql = convert_query(query, new_context)
 
   sql_filter = ""
 
   if filter_ != None:
     new_context = Context('','')
+    new_context.config_from(context)
     sql_filter = convert_exp(filter_, "W", new_context)
     if sql_filter[1] != "B":
       raise ValueError("`lookup.3' expects `B': " + str(filter_))
