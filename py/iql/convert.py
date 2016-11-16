@@ -430,7 +430,7 @@ def convert_sieve(exps, context, attributes = None):
     q = 0
     sql_attrs_selects = []
     while q < i:
-      sql_attrs = list(map(lambda a: "%s(l%d.%s) as \"%s:%d\"" % (context.projection if a == context.attribute else '',q,a,a,q), attributes))
+      sql_attrs = ",".join(list(map(lambda a: "%s(l%d.%s) as \"%s:%d\"" % (context.projection if a == context.attribute else '',q,a,a,q), attributes)))
       sql_attrs_selects.append(sql_attrs)
       q += 1
 
