@@ -127,7 +127,7 @@ def convert(query, config = Config()):
         raise ValueError("Unknown projection `" + str(self.projection) + "': " + str(query))
 
     if 'attribute' in settings:
-      context.attribute = U.resolve_attribute(settings['attribute'], "`attribute.settings'")
+      context.attribute = U.resolve_attribute(settings['attribute'], context, "`attribute.settings'")
 
     if 'order' in settings:
       order = settings['order']
@@ -137,7 +137,7 @@ def convert(query, config = Config()):
       attribute = order[0]
       asc_desc = order[1]
 
-      attribute = U.resolve_attribute(attribute, "`settings.order'")
+      attribute = U.resolve_attribute(attribute, context, "`settings.order'")
 
       if context.attribute != None and context.attribute != '':
         if context.attribute != attribute:
@@ -201,7 +201,7 @@ def convert(query, config = Config()):
         else:
           raise ValueError("`count.0' if array specified the array must not be empty:" + str(query))
 
-      attributes = list(map(lambda a: "z.%s" % U.resolve_attribute(a, "`count.0.x'"), attributes))
+      attributes = list(map(lambda a: "z.%s" % U.resolve_attribute(a, context, "`count.0.x'"), attributes))
      
       if len(query) == 3:
         order = query[2]
@@ -211,7 +211,7 @@ def convert(query, config = Config()):
 
       query = query[1]
 
-      attribute = U.resolve_attribute(attribute, "`count.0'")
+      attribute = U.resolve_attribute(attribute, context, "`count.0'")
 
       if context.attribute != None:
         if context.attribute != attribute:
@@ -318,7 +318,7 @@ def convert_lookup(arguments, context):
   U.expect_str(attribute, "`lookup.1'")
   U.expect_object(query, "`lookup.2")
 
-  attribute = U.resolve_attribute(attribute, "`lookup'")
+  attribute = U.resolve_attribute(attribute, context, "`lookup'")
 
   new_context = Context(projection, attribute)
   sql = convert_query(query, new_context)
