@@ -3,11 +3,12 @@ import iql.util as U
 
 class Config:
 
-  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data"):
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None):
     self.DICT_MSMNT_TYPES = msmnt_types
     self.DICT_EXPECTED_TYPES_ATTR = expected_types
     self.DICT_KNOWN_PROJECTIONS = known_projections
     self.TBL_NAME = tbl_name
+    self.ALL_SQL_ATTRS = all_sql_attrs
 
 
 class Context:
@@ -38,6 +39,7 @@ class Context:
     self.DICT_EXPECTED_TYPES_ATTR = config.DICT_EXPECTED_TYPES_ATTR
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
     self.TBL_NAME = config.TBL_NAME
+    self.ALL_SQL_ATTRS = all_sql_attrs
 
 
 def convert_simple(exp, context):
@@ -162,6 +164,20 @@ def convert(query, config = Config()):
     query = query[0]
   
     sql_ = convert_query(query, context)
+
+    sql = "SELECT * FROM (%s) z " % sql_
+
+    if context.order != None:
+      sql += "ORDER BY z.%s %s " % context.order
+
+    return sql
+
+  elif "sieve" in query:
+    query = query['sieve']
+
+    U.expect_array(query, 0, "`sieve'")
+
+    sql_ = convert_sieve(query, context, attributes = context.ALL_SQL_ATTRS)
 
     sql = "SELECT * FROM (%s) z " % sql_
 
@@ -376,7 +392,7 @@ def convert_set_op(queries, set_op, context):
 
 
 
-def convert_sieve(exps, context):
+def convert_sieve(exps, context, attributes = None):
   """
   Converts a sieve operation query to SQL.
   """
@@ -408,7 +424,19 @@ def convert_sieve(exps, context):
     i += 1
 
 
-  sql = "(SELECT DISTINCT %s(l0.%s) AS %s FROM\n" % (context.projection, context.attribute, context.attribute)
+  if attributes == None:
+    sql = "(SELECT DISTINCT %s(l0.%s) AS %s FROM\n" % (context.projection, context.attribute, context.attribute)
+  else:
+    q = 0
+    sql_attrs_selects = []
+    while q < i:
+      sql_attrs = map(lambda a: "%s(l%d.%s) as \"%s:%d\"" % (context.projection if a == context.attribute else '',q,a,a,q), attributes)
+      sql_attrs_selects.append(sql_attrs)
+      q += 1
+
+    sql_attrs_select_line = ",".join(sql_attrs_selects)
+
+    sql = "(SELECT %s FROM\n" % sql_attrs_select_line
 
   sql += "%s l0 " % (context.TBL_NAME)
   j = 1
