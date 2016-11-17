@@ -7,7 +7,7 @@ DICT_BINOP_TO_OP = {
   "add" : "+",
   "sub" : "-",
   "mul" : "*",
-  "div" : "/"
+  "div" : "/",
 }
 
 DICT_QUERY_OPS = {
@@ -24,8 +24,8 @@ DICT_EXPECTED_TYPES = {
   'gt' : None,
   'le' : None,
   'ge' : None,
-  'add' : 'IT',
-  'sub' : 'IT',
+  'add' : ['I','T'],
+  'sub' : ['I','T'],
   'mul' : 'I',
   'div' : 'I',
 }
@@ -36,6 +36,7 @@ DICT_RETURN_TYPES = {
   'gt' : 'B',
   'le' : 'B',
   'ge' : 'B',
+  'contains' : 'B',
   'add' : None,
   'sub' : None,
   'mul' : None,
@@ -74,5 +75,6 @@ DICT_BIN_OPS = {
   "add" : True,
   "sub" : True,
   "div" : True,
-  "mul" : True
+  "mul" : True,
+  "contains" : True,
 }

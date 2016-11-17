@@ -525,6 +525,9 @@ def convert_operation(operation, operands, cur_table, context):
     return convert_n_op(operation, operands, cur_table, context)
 
   elif U.is_bin_op(operation):
+    if operation == 'contains':
+      return convert_contains(operands, cur_table, context)
+
     return convert_bin_op(operation, operands, cur_table, context)
 
   elif U.is_uni_op(operation):
@@ -574,7 +577,7 @@ def convert_date_part(operation, operands, cur_table, context):
   if data_type != "T":
     raise ValueError("Expected `T' but found `%s' in `%s': %s" % (data_type, operation, str(operands)))
 
-  return ("(date_part('%s',%s)::INT)" % (operation, to_sql_col_val(sql, cur_table)),"I","")
+  return ("(date_part('%s',%s)::INT)" % (operation, to_sql_col_val(sql, cur_table, data_type)),"I","")
 
 
 
@@ -614,7 +617,7 @@ def convert_n_op(operation, operands, cur_table, context):
 
 
 
-def to_sql_col_val(value, cur_table):
+def to_sql_col_val(value, cur_table, data_type = ''):
   """
   Converts value to SQL.
   """
@@ -635,7 +638,7 @@ def to_sql_col_val(value, cur_table):
   elif value.startswith("$"):
 
     if not ":" in value[1:]:
-      return cur_table + "." + "VAL_"
+      return cur_table + "." + "VAL_" + data_type
 
     value = value[1:]
     parts = value.split(":")
@@ -648,6 +651,32 @@ def to_sql_col_val(value, cur_table):
   return value
 
 
+
+def convert_contains(operands, cur_table, context):
+  """
+  Convert contains operation
+  """
+
+  U.expect_array(operands, 2, "`contains'")
+
+  (sql_0, data_type_0, cond_type_0) = convert_exp(operand[0], cur_table, context)
+  if data_type_0 == "$": data_type_0 = cond_type_0
+
+  (sql_1, data_type_1, cond_type_1) = convert_exp(operands[1], cur_table, context)
+  if data_type_1 == "$": data_type_1 = cond_type_1
+
+  if not data_type_0.startswith("*"):
+    raise ValueError("`contains.0' must be of type *a: " + str(operands))
+
+  if not data_type_1 == data_type_0[1:]:
+    raise ValueError("`%s' is incompatible with `%s' for `contains': %s" % (data_type_1, data_type_0, str(operands)))
+
+  if data_type_0 == '*S':
+    return ("(%s @> ARRAY[%s]::VARCHAR[])" % (sql_0, sql_1), "B", "")
+  elif data_type_0 == '*I':
+    return ("(%s @> ARRAY[%s]::INT[])" % (sql_0, sql_1), "B", "") 
+  else:
+    raise ValueError("Unsupported type `%s': %s" % (data_type_0, str(operands)))
 
 
 

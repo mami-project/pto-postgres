@@ -6,7 +6,8 @@ DICT_EXPECTED_TYPES_ATTR = {
   'sip' : 'S',
   'full_path' : 'S',
   'path_id' : 'I',
-  'analyzer' : 'S'
+  'analyzer' : 'S',
+  'path_nodes' : '*S'
 }
 
 DICT_MSMNT_TYPES = {
@@ -15,4 +16,4 @@ DICT_MSMNT_TYPES = {
 }
 
 ALL_SQL_ATTRS = ['time_to', 'time_from', 'time_to', 'name', 'path_id', 'full_path', 
-                 'dip', 'sip', 'analyzer', 'val_s', 'val_i']
+                 'dip', 'sip', 'analyzer', 'val_s', 'val_i', 'path_nodes']
