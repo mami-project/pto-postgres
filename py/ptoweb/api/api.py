@@ -34,6 +34,18 @@ def text200(obj):
   return cors(Response(obj, status=200, mimetype='text/plain'))
 
 
+@app.route('/iql_info')
+def api_iql_info():
+
+  data_structure = {"ecn.connectivity" : {"type" : "S", "values" : ["works","broken","offline","transient"]},
+                    "ecn.negotiated" : {"type" : "I", "values" : [0,1]}}
+
+  for e_types in DICT_EXPECTED_TYPES_ATTR:
+    data_structure[e_types] = {"type" : DICT_EXPECTED_TYPES_ATTR[e_types]}
+
+  return json200(data_structure)
+
+
 @app.route('/')
 def api_index():
   """
