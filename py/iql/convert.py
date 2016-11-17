@@ -672,9 +672,9 @@ def convert_contains(operands, cur_table, context):
     raise ValueError("`%s' is incompatible with `%s' for `contains': %s" % (data_type_1, data_type_0, str(operands)))
 
   if data_type_0 == '*S':
-    return ("(%s @> ARRAY[%s]::VARCHAR[])" % (sql_0, sql_1), "B", "")
+    return ("(%s @> ARRAY[%s]::VARCHAR[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
   elif data_type_0 == '*I':
-    return ("(%s @> ARRAY[%s]::INT[])" % (sql_0, sql_1), "B", "") 
+    return ("(%s @> ARRAY[%s]::INT[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
   else:
     raise ValueError("Unsupported type `%s': %s" % (data_type_0, str(operands)))
 
