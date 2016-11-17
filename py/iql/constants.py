@@ -15,6 +15,7 @@ DICT_QUERY_OPS = {
   'simple' : True,
   'intersection' : True,
   'union' : True,
+  'union-nub' : True,
   'subtraction' : True
 }
 

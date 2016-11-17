@@ -309,6 +309,11 @@ def convert_query(query, context):
     subqueries = query["union"]
     return convert_set_op(subqueries, 'UNION ALL', context)
 
+  elif "union-nub" in query:
+  
+    subqueries = query['union-nub']
+    return convert_set_op(subqueries, 'UNION', context)
+
   elif "subtraction" in query:
 
     subqueries = query["subtraction"]
