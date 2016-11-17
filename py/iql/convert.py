@@ -498,7 +498,7 @@ def convert_exp(exp, cur_table, context):
       if not U.is_known_msmnt(exp, context):
         raise ValueError("Unknown measurement name `" + exp + "': " + str(exp))
 
-      return (exp, "$", U.get_msmnt_type(exp, context))
+      return ("$" + exp, "$", U.get_msmnt_type(exp, context))
 
     elif exp.startswith('@'):
       attr_name = U.get_attribute_name(exp)[1:]
@@ -552,6 +552,30 @@ def convert_uni_op(operation, operands, cur_table, context):
       raise ValueError("Literal of type `S' expected: " + str(operands))
 
     return ("'" + operands[0] + "'", "T", "")
+
+  elif operation in ['year','date','month','hour','minute','second']:
+    return convert_date_part(operation, operands, cur_table, context)
+
+
+
+def convert_date_part(operation, operands, cur_table, context):
+  """
+  Date functions
+  """
+
+  U.expect_array(operands, 1, "`%s'" % operation)
+
+  operand = operands[0]
+
+  (sql, data_type, cond_type) = convert_exp(operand, cur_table, context)
+
+  if data_type == "$": data_type = cond_type
+
+  if data_type != "T":
+    raise ValueError("Expected `T' but found `%s' in `%s': %s" % (data_type, operation, str(operands)))
+
+  return ("(date_part('%s',%s)::INT)" % (operation, to_sql_col_val(sql, cur_table)),"I","")
+
 
 
 
@@ -608,7 +632,22 @@ def to_sql_col_val(value, cur_table):
 
     return "l" + str(parts[1]) + "." + parts[0]
 
+  elif value.startswith("$"):
+
+    if not ":" in value[1:]:
+      return cur_table + "." + "VAL_"
+
+    value = value[1:]
+    parts = value.split(":")
+    
+    if len(parts) != 2:
+      raise ValueError("Illegal reference `" + value + "'.")
+
+    return "l" + str(parts[1]) + ".VAL_"
+
   return value
+
+
 
 
 
@@ -666,13 +705,13 @@ def convert_bin_op(operation, operands, cur_table, context):
   elif exps[0][1] == "$":
     # Left argument is a measurement value
 
-    sql = "(" + cur_table + ".VAL_" + exps[0][2] + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + ")"
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + exps[0][2] + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + ")"
     return (sql, return_type, "")
 
   elif exps[1][1] == "$":
     # Right argument is a measurement value
 
-    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + " " + operator + " " + cur_table + ".VAL_" + exps[1][2] + ")"
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + " " + operator + " " + to_sql_col_val(exps[1][0]) + exps[1][2] + ")"
     return (sql, return_type, "")
 
   else:
