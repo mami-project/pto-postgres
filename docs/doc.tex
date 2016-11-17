@@ -317,7 +317,9 @@ set of singletons.
 
 \section{Expression operations}
 
-\subsection{add}
+\subsection{Basic operations}
+
+\subsubsection{add}
 
 \begin{verbatim}
 {"add": [I, I]}
@@ -326,7 +328,7 @@ set of singletons.
 
 Performs addition of integers or timestamps.
 
-\subsection{and}
+\subsubsection{and}
 
 \begin{verbatim}
 {"and": [B,...]} -> B
@@ -334,7 +336,7 @@ Performs addition of integers or timestamps.
 
 Performs logical and. 
 
-\subsection{div}
+\subsubsection{div}
 
 \begin{verbatim}
 {"div": [I, I]}
@@ -342,7 +344,7 @@ Performs logical and.
 
 Performs integer division.
 
-\subsection{eq}
+\subsubsection{eq}
 
 \begin{verbatim}
 {"eq": [A, A]} -> B
@@ -351,7 +353,7 @@ Performs integer division.
 Requires both arguments to be of the same type. Returns true of
 arguments are equal, otherwise false.
 
-\subsection{ge}
+\subsubsection{ge}
 
 \begin{verbatim}
 {"ge": [A, A]} -> B
@@ -361,7 +363,7 @@ Requires both arguments to be of the same type. Returns true if first
 argument is greater than or equal to the second argument, otherwise
 false.
 
-\subsection{gt}
+\subsubsection{gt}
 
 \begin{verbatim}
 {"gt": [A, A]} -> B
@@ -370,7 +372,7 @@ false.
 Requires both arguments to be of the same type. Returns true if first
 argument is larger than the second argument.
 
-\subsection{le}
+\subsubsection{le}
 
 \begin{verbatim}
 {"le": [A, A]} -> B
@@ -380,7 +382,7 @@ Requires both arguments to be of the same type. Returns true if first
 argument is less than or equal to the second argument, otherwise
 false.
 
-\subsection{lt}
+\subsubsection{lt}
 
 \begin{verbatim}
 {"lt": [A, A]} -> B
@@ -389,7 +391,7 @@ false.
 Requires both arguments to be of the same type. Returns true if first
 argument is less than the second argument.
 
-\subsection{mul}
+\subsubsection{mul}
 
 \begin{verbatim}
 {"mul": [I, I} -> I
@@ -397,7 +399,7 @@ argument is less than the second argument.
 
 Performs integer multiplication.
 
-\subsection{or}
+\subsubsection{or}
 
 \begin{verbatim}
 {"or": [B,...]} -> B
@@ -405,7 +407,7 @@ Performs integer multiplication.
 
 Performs logical or. 
 
-\subsection{sub}
+\subsubsection{sub}
 
 \begin{verbatim}
 {"sub": [I, I]}
@@ -413,6 +415,56 @@ Performs logical or.
 \end{verbatim}
 
 Performs subtraction of integers or timestamps.
+
+\subsection{Date/time operations}
+
+\subsubsection{day}
+
+\begin{verbatim}
+{"day": [T]} -> I
+\end{verbatim}
+
+Returns the day (of month) of a timestamp.
+
+\subsubsection{hour}
+
+\begin{verbatim}
+{"hour": [T]} -> I
+\end{verbatim}
+
+Returns the hour part of a timestamp.
+
+\subsubsection{minute}
+
+\begin{verbatim}
+{"minute": [T]} -> I
+\end{verbatim}
+
+Returns the minute part of a timestamp.
+
+\subsubsection{month}
+
+\begin{verbatim}
+{"month": [T]} -> I
+\end{verbatim}
+
+Returns the month part of a timestamp.
+
+\subsubsection{second}
+
+\begin{verbatim}
+{"second": [T]} -> I
+\end{verbatim}
+
+Returns the second part of a timestamp.
+
+\subsubsection{year}
+
+\begin{verbatim}
+{"year": [T]} -> I
+\end{verbatim}
+
+Returns the year part of a timestamp.
 
 \section{Macros}
 

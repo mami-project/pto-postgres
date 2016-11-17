@@ -39,7 +39,14 @@ DICT_RETURN_TYPES = {
   'add' : None,
   'sub' : None,
   'mul' : None,
-  'div' : None
+  'div' : None,
+  'time' : 'T',
+  'year' : 'I',
+  'month' : 'I',
+  'day' : 'I',
+  'hour' : 'I',
+  'minute' : 'I',
+  'second' : 'I'
 }
 
 DICT_N_OPS = {
@@ -48,7 +55,14 @@ DICT_N_OPS = {
 }
 
 DICT_UNI_OPS = {
-  'time' : True
+  'time' : True,
+  'year' : True,
+  'year' : True,
+  'month' : True,
+  'day' : True,
+  'hour' : True,
+  'minute' : True,
+  'second' : True
 }
 
 DICT_BIN_OPS = {
