@@ -659,7 +659,7 @@ def convert_contains(operands, cur_table, context):
 
   U.expect_array(operands, 2, "`contains'")
 
-  (sql_0, data_type_0, cond_type_0) = convert_exp(operand[0], cur_table, context)
+  (sql_0, data_type_0, cond_type_0) = convert_exp(operands[0], cur_table, context)
   if data_type_0 == "$": data_type_0 = cond_type_0
 
   (sql_1, data_type_1, cond_type_1) = convert_exp(operands[1], cur_table, context)
