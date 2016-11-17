@@ -184,7 +184,7 @@ def convert(query, config = Config()):
     sql = "SELECT * FROM (%s) z " % sql_
 
     if context.order != None:
-      sql += "ORDER BY z.%s %s " % context.order
+      sql += "ORDER BY z.(\"%s:0\") %s " % context.order
 
     sql += " LIMIT 128 "
 

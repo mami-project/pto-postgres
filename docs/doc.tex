@@ -151,6 +151,19 @@ plus \verb|count|.
 Same as \textit{group members} (see above) but overwrites \verb|settings.order|. Third argument is either \verb|'asc'| (ascending)
 or \verb|'desc'| (descending).
 
+\subsection{sieve}
+
+\begin{verbatim}
+{"sieve": [B,...]} -> A_SET
+\end{verbatim}
+
+Behaves similar to the \verb|sieve| set operation (see below) but it returns all paths from the sieve tree as tuples.
+The attribute names of the result tuples will use \verb|:<number>| suffixes. \verb|settings.attribute| must be set (as it is required for a sieving operation)
+but no final attribute selection happens meaning that \verb|settings.attribute| has no effect on the data structure of the result set. 
+
+If you sieve over a data structure \verb|(a,b,c)| with three steps the data structure of the result set is \verb|(a:0,b:0,c:0,a:1,b:1,c:1,a:2,b:2,c:2)|. 
+Ordering is done on attributes of the first step only.
+
 \section{Set operations}
 
 \subsection{intersection}
@@ -526,7 +539,7 @@ Data structure is: \verb|(CITY,NAME,VALUE)|. \\
 \end{verbatim}
 
 IQL itself does not define any projection function except that an
-empty or non-present projection function must be an identify function
+empty or non-present projection function must be an identity function
 \verb|f(x) = x|.
 Projection functions are database specific and thus part of the schema. In this example we'll assume that \verb|squ := f(x) = x * x|. \\
 
