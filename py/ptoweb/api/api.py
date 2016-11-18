@@ -37,11 +37,11 @@ def text200(obj):
 @app.route('/iql_info')
 def api_iql_info():
 
-  data_structure = {"ecn.connectivity" : {"measurement" : True, "type" : "S", "values" : ["works","broken","offline","transient"]},
-                    "ecn.negotiated" : {"measurement" : True, "type" : "I", "values" : [0,1]}}
+  data_structure = [{"name":"ecn.connectivity","measurement" : True, "type" : "S", "values" : ["works","broken","offline","transient"]},
+                   {"name":"ecn.negotiated", "measurement" : True, "type" : "I", "values" : [0,1]}]
 
   for e_types in DICT_EXPECTED_TYPES_ATTR:
-    data_structure[e_types] = {"measurement" : False, "type" : DICT_EXPECTED_TYPES_ATTR[e_types]}
+    data_structure.append ( {"name" : e_types, "measurement" : False, "type" : DICT_EXPECTED_TYPES_ATTR[e_types]} )
 
   return json200(data_structure)
 
