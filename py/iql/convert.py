@@ -392,6 +392,8 @@ def convert_lookup(arguments, context):
 
   sql_filter = ""
 
+  distinct = 'DISTINCT' if context.nub else ''
+
   if filter_ != None:
     new_context = Context('','')
     new_context.config_from(context)
@@ -404,7 +406,7 @@ def convert_lookup(arguments, context):
   if context.attribute == '' or context.attribute == None:
     sql = "(SELECT W.* FROM (%s) v JOIN %s w ON %s(w.%s) = (v.%s) %s)" % (sql, context.TBL_NAME, projection, attribute, attribute, sql_filter)
   else:
-    sql = "(SELECT %s(W.%s) FROM (%s) v JOIN %s w ON %s(w.%s) = (v.%S) %s)" % (projection, attribute, sql, context.TBL_NAME, projection, attribute, attribute, sql_filter)
+    sql = "(SELECT %s %s(W.%s) FROM (%s) v JOIN %s w ON %s(w.%s) = (v.%S) %s)" % (distinct, projection, attribute, sql, context.TBL_NAME, projection, attribute, attribute, sql_filter)
 
   return sql
   

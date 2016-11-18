@@ -177,6 +177,9 @@ set. Returns set of singletons.
 
 \subsection{lookup}
 
+Returns a true set if \verb|settings.attribute| is set unless overriden by
+\verb|settings.nub|.
+
 \subsubsection{without filter}
 
 \begin{verbatim}
@@ -205,6 +208,14 @@ allows for a (post-)filtering which happens after the lookup but
 before attribute selection (if \verb|settings.attribute| is set,
 otherwise no attribute selection happens).
 
+\subsection{nub}
+
+\begin{verbatim}
+{"nub: " [SET]} -> SET
+\end{verbatim}
+
+Removes duplicates in the set thus converting it to a true set.
+
 
 \subsection{simple}
 
@@ -214,8 +225,8 @@ otherwise no attribute selection happens).
 
 Performs a search through all tuples. First and only argument is an
 expression of type boolean. Returns all tuples where first expression
-returns true. If \verb|settings.attribute| is set it returns a set of
-singletons.
+returns true. If \verb|settings.attribute| is set it returns a true set of
+singletons unless overriden by \verb|settings.nub|.
 
 \subsection{sieve}
 
@@ -238,6 +249,8 @@ In the very first step it searches for every tuples matching the first
 expression. It'll then perform a lookup and produce a tree structure.
 and the next expression is run on that tree structure. This step is
 repeated for as many expressions as were specified.
+
+Returns a true set unless overriden by \verb|settings.nub|.
 
 \subsubsection{Example}
 
@@ -317,7 +330,7 @@ argument produces.
 \end{verbatim}
 
 Performs a set subtraction (set difference). Requires
-\verb|settings.attribute| to be set. Returns set of singletons.
+\verb|settings.attribute| to be set. Returns a true set of singletons.
 
 \subsection{union}
 
@@ -325,8 +338,17 @@ Performs a set subtraction (set difference). Requires
 {"union": [SET,...]} -> SET
 \end{verbatim}
 
-Performs a set union. If \verb|settings.attribute| is set it returns a
+Performs a set union. If \verb|settings.attribute| is set it returns true a
 set of singletons.
+
+\subsection{union-ls}
+
+\begin{verbatim}
+{"union": [SET,...]} -> SET
+\end{verbatim}
+
+Performs a set union. If \verb|settings.attribute| is set it returns a
+set of singletons. \verb|settings.nub| has no effect on this operation. 
 
 \section{Expression operations}
 
