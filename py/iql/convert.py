@@ -63,11 +63,12 @@ def convert_simple(exp, context):
   else:
     sql_ = " "
 
+  distinct = 'DISTINCT' if context.nub else ''
 
   if context.attribute == '' or context.attribute == None:
     return "SELECT * FROM " + context.TBL_NAME + " l0 WHERE " + sql_ + sql
   else:
-    return ("SELECT %s(l0.%s) AS %s FROM %s l0 WHERE " % (context.projection, context.attribute, context.attribute, context.TBL_NAME)) + sql_ + sql
+    return ("SELECT %s %s(l0.%s) AS %s FROM %s l0 WHERE " % (distinct, context.projection, context.attribute, context.attribute, context.TBL_NAME)) + sql_ + sql
 
 
 
@@ -128,8 +129,8 @@ def convert(query, config = Config()):
     settings = query['settings']
   
     if 'nub' in settings:
-      context.nub = True
-    else: context.nub = False
+      context.nub = not(not(settings['nub']))
+    else: context.nub = True
 
     if 'limit' in settings:
       U.expect_int(settings['limit'], "`settings.limit'")
