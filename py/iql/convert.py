@@ -31,7 +31,8 @@ class Context:
 
     self.msmnt_name = None
 
-    self.limit = None
+    self.limit = 128
+    self.skip = 0
     self.order = None
 
   def config_from(self, config):
@@ -103,6 +104,13 @@ def convert_choice(operands, cur_table, context):
   return ("(%s)" % sql, "B", "")
 
 
+def get_limit_clause(context):
+  if context.skip <= 0:
+    return " LIMIT %d " % context.limit
+  else:
+    return " LIMIT %d OFFSET %d " % (context.limit, context.skip)
+
+
 def convert(query, config = Config()):
   """
   Converts a query to SQL.
@@ -122,6 +130,17 @@ def convert(query, config = Config()):
     if 'nub' in settings:
       context.nub = True
     else: context.nub = False
+
+    if 'limit' in settings:
+      U.expect_int(settings['limit'], "`settings.limit'")
+      context.limit = settings['limit']
+
+      if context.limit >= 500 or context.limit <= 0:
+        context.limit = 500
+
+      if 'skip' in settings:
+        U.expect_int(settings['skip'], "`settings.skip'")
+        context.skip = settings['skip']
 
     if 'projection' in settings:
       projection = settings['projection']
@@ -176,7 +195,7 @@ def convert(query, config = Config()):
     if context.order != None:
       sql += "ORDER BY z.%s %s " % context.order
 
-    sql += " LIMIT 128 "
+    sql += get_limit_clause(context)
 
     return sql
 
@@ -192,7 +211,7 @@ def convert(query, config = Config()):
     if context.order != None:
       sql += "ORDER BY z.(\"%s:0\") %s " % context.order
 
-    sql += " LIMIT 128 "
+    sql += get_limit_clause(context)
 
     return sql
 
@@ -210,6 +229,8 @@ def convert(query, config = Config()):
 
       if context.order != None:
         sql += "ORDER BY z.%s %s " % context.order
+
+      sql += get_limit_clause(context)
 
       return sql; 
     
@@ -266,6 +287,8 @@ def convert(query, config = Config()):
       else:
         if overwrite_order:
           sql += "ORDER BY z.count %s " % order
+
+      sql += get_limit_clause(context)
 
       return sql; 
 

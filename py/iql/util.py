@@ -130,6 +130,11 @@ def is_known_projection(proj, context):
 
 
 
+def is_int(a):
+  return type(a) == type(0)
+
+
+
 def is_str(a):
   return type(a) == type('')
 
@@ -154,6 +159,12 @@ def expect_object(a, data):
 def expect_str(a, data = 'n/a'):
   if not is_str(a):
     raise ValueError("`" + str(a) + "' is not a string: " + str(data))
+
+
+
+def expect_int(a, data = 'n/a'):
+  if not is_int(a):
+    raise ValueError("`" + str(a) + "' is not an int: " + str(data))
 
 
 
