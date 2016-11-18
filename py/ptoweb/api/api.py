@@ -34,7 +34,7 @@ def text200(obj):
   return cors(Response(obj, status=200, mimetype='text/plain'))
 
 
-@app.route('/iql_info')
+@app.route('/attributes')
 def api_iql_info():
 
   data_structure = [{"name":"ecn.connectivity","measurement" : True, "type" : "S", "values" : ["works","broken","offline","transient"]},
