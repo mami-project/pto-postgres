@@ -321,6 +321,12 @@ def convert_query(query, context):
   elif "lookup" in query:
     return convert_lookup(query['lookup'], context)
 
+  elif "nub" in query:
+    query = query["nub"]
+    U.expect_array(query, 1, "`nub'")
+
+    return "(SELECT DISTINCT * FROM (%s))" % convert_query(query, context)
+
   elif "simple" in query:
 
     query = query["simple"]
@@ -342,12 +348,12 @@ def convert_query(query, context):
   elif "union" in query:
 
     subqueries = query["union"]
-    return convert_set_op(subqueries, 'UNION ALL', context)
-
-  elif "union-nub" in query:
-  
-    subqueries = query['union-nub']
     return convert_set_op(subqueries, 'UNION', context)
+
+  elif "union-ls" in query:
+  
+    subqueries = query['union-ls']
+    return convert_set_op(subqueries, 'UNION ALL', context)
 
   elif "subtraction" in query:
 
