@@ -3,7 +3,7 @@ import iql.util as U
 
 class Config:
 
-  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None):
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, nub = True):
     self.DICT_MSMNT_TYPES = msmnt_types
     self.DICT_EXPECTED_TYPES_ATTR = expected_types
     self.DICT_KNOWN_PROJECTIONS = known_projections
@@ -40,6 +40,8 @@ class Context:
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
     self.TBL_NAME = config.TBL_NAME
     self.ALL_SQL_ATTRS = config.ALL_SQL_ATTRS
+    if isinstance(config, Context):
+      self.nub = config.nub
 
 
 def convert_simple(exp, context):
@@ -117,6 +119,10 @@ def convert(query, config = Config()):
   if 'settings' in query:
     settings = query['settings']
   
+    if 'nub' in settings:
+      context.nub = True
+    else: context.nub = False
+
     if 'projection' in settings:
       projection = settings['projection']
 
@@ -283,6 +289,11 @@ def convert_query(query, context):
     exps = query["sieve"]
     return convert_sieve(exps, context)
 
+  elif "sieve-ex" in query:
+
+    exps = query["sieve-ex"]
+    return convert_sieve_ex(exps, context)
+
   elif "lookup" in query:
     return convert_lookup(query['lookup'], context)
 
@@ -375,7 +386,7 @@ def convert_set_op(queries, set_op, context):
   """  
 
   if context.attribute == '' or context.attribute == None:
-    raise ValueError("Set operations require `attribute': " + str(queries))
+    if not set_op.startswith("UNION "): raise ValueError("Set operations require `attribute': " + str(queries))
 
   if type(queries) != type([]):
       raise ValueError("Error: Expected Array but not found: " + str(exps))
@@ -400,6 +411,88 @@ def convert_set_op(queries, set_op, context):
   return sql
 
 
+def convert_sieve_ex(exps, context):
+  """
+  Ex-Sieve
+  """
+
+  U.expect_array(exps, 0, "`sieve-ex'")
+
+  if len(exps) < 3:
+    raise ValueError("`sieve-ex' requires array of at least size 3: "  + str(exps))
+
+  projection_function = exps[0]
+  attribute = exps[1]
+
+  U.expect_str(projection_function, "`sieve-ex.0'")
+  U.expect_str(projection_function, "`sieve-ex.1'")
+
+  if not U.is_known_projection(projection_function, context):
+    raise ValueError("Unkown projection function `%s': %s" % (projection, str(exps)))
+
+  attribute = U.resolve_attribute(attribute, context, "`sieve-ex.1'")
+
+  exps = exps[2:]
+
+  i = 0
+
+  wheres = []
+
+  for exp in exps:
+
+    context.msmnt_name = None
+    (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
+
+    if return_type != "B":
+      raise ValueError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
+
+    if context.msmnt_name != None:
+      wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
+
+    wheres.append(sql)
+
+    i += 1
+
+  sql_unnests = []
+  for sql_attribute in context.ALL_SQL_ATTRS:
+    q = 0
+    sqlb = "unnest(ARRAY[%s]) as %s"
+    sqlbattrs = []
+    while q < i:
+      sqlbattrs.append("(l%d.%s)" % (q, sql_attribute))
+      q += 1
+    sqlb = sqlb % (",".join(sqlbattrs), sql_attribute)
+    sql_unnests.append(sqlb)
+
+  if context.attribute == '' or context.attribute == None:
+    sql = "(SELECT %s FROM " % (',\n'.join(sql_unnests))
+  else:
+    distinct = 'DISTINCT' if context.nub else ''
+    sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
+
+  sql += "%s l0 " % (context.TBL_NAME)
+  j = 1
+
+  while j < i:
+    sql += "JOIN %s l%d " % (context.TBL_NAME, j)
+    sql += "ON %s(l%d.%s) = %s(l%d.%s)\n" % (projection_function, j-1, attribute, projection_function, j, attribute)
+    j += 1
+
+  sql += "WHERE\n"
+  
+  j = 0
+
+  i = len(wheres)
+
+  while j < i:
+    sql += wheres[j] + " "
+    if(j != i - 1):
+      sql += "AND\n"
+    j += 1
+
+  return sql + ")"
+    
+  return sql
 
 def convert_sieve(exps, context, attributes = None):
   """
@@ -407,7 +500,7 @@ def convert_sieve(exps, context, attributes = None):
   """
 
   if context.attribute == '' or context.attribute == None:
-    raise ValueError("Sieve operation requires `attribute': " + str(exps))
+    raise ValueError("`sieve' requires `settings.attribute': " + str(exps))
 
 
   if type(exps) != type([]):
@@ -432,9 +525,10 @@ def convert_sieve(exps, context, attributes = None):
 
     i += 1
 
+  distinct = 'DISTINCT' if context.NUB else ''
 
   if attributes == None:
-    sql = "(SELECT DISTINCT %s(l0.%s) AS %s FROM\n" % (context.projection, context.attribute, context.attribute)
+    sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
   else:
     q = 0
     sql_attrs_selects = []
