@@ -94,23 +94,22 @@ for doc in it:
     sql = None
     if(condition == "ecn.negotiated"):
       condition = "ecn.negotiated"
-      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,%s)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 1, "NULL"))
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,NULL,NULL,NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 1))
     elif(condition == "ecn.not_negotiated"):
       condition = "ecn.negotiated"
-      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,%s)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 0, "NULL"))
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,NULL,NULL,NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 0))
     elif(condition.startswith("ecn.connectivity.")):
       value = condition[17:]
       condition = "ecn.connectivity"
-      observation_values.append("(%d,%d,%d,'%s','%s','%s',%s,'%s')" % (obsId, pathId, analyzerId, t_from, t_to, condition, "NULL", value))
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',NULL,'%s',NULL, NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, value))
+    elif condition == "ecn.path_dependent" or condition == "ecn.site_dependent":
+      value = doc['value']['sips']
+      bservation_values.append("(%d,%d,%d,'%s','%s','%s',NULL,NULL,ARRAY[%s]::VARCHAR[], NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, ",".join(value)))
 
-  print("INSERT INTO OBSERVATION(ID,PATH_ID,ANALYZER_ID,TIME_FROM,TIME_TO,CONDITION,VAL_I,VAL_S) VALUES %s;" % (",".join(observation_values)))
+  print("INSERT INTO OBSERVATION(ID,PATH_ID,ANALYZER_ID,TIME_FROM,TIME_TO,CONDITION,VAL_N,VAL_S,VAL_A_S,VAL_A_N) VALUES %s;" % (",".join(observation_values)))
 
   if (i % 1000) == 999:
     print("COMMIT;")
-  
-  i += 1
-  if(i > 1000000):
-    break
 
 print("COMMIT;")
 print("-- END")
