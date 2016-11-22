@@ -110,6 +110,10 @@ for doc in it:
 
   if (i % 1000) == 999:
     print("COMMIT;")
+  
+  i += 1
+  #if(i > 1000000):
+  #  break
 
 print("COMMIT;")
 print("-- END")
