@@ -2,8 +2,10 @@ CREATE MATERIALIZED VIEW iql_data
 AS
  SELECT observation.id AS oid,
     observation.condition AS name,
-    observation.val_i,
+    observation.val_n,
     observation.val_s,
+    observation.val_a_n,
+    observation.val_a_s,
     observation.time_to,
     observation.time_from,
     observation.path_id,
@@ -18,10 +20,12 @@ AS
 
 CREATE INDEX idx_dip ON iql_data(dip);
 CREATE INDEX idx_name ON iql_data(name);
-CREATE INDEX idx_name_val_i ON iql_data(name, val_i);
+CREATE INDEX idx_name_val_n ON iql_data(name, val_n);
 CREATE INDEX idx_name_val_s ON iql_data(name, val_s);
 CREATE INDEX idx_path_id ON iql_data(path_id);
 CREATE INDEX idx_sip ON iql_data(sip);
-CREATE INDEX idx_val_i ON iql_data(val_i);
+CREATE INDEX idx_val_n ON iql_data(val_n);
 CREATE INDEX idx_val_s ON iql_data(val_s);
+CREATE INDEX idx_val_a_n ON iql_data USING GIN(val_a_n);
+CREATE INDEX idx_val_a_s ON iql_data USING GIN(val_a_s);
 CREATE INDEX idx_path_nodes ON iql_data USING GIN(path_nodes);

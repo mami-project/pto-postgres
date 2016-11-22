@@ -11,7 +11,7 @@ lastObservationId=1
 lastValueId=1
 lastNodeId=1
 nodes = {}
-analyzers = {'analyzer-ecnspider1' : 1, 'analyzer-ecnspider1-vp' : 2}
+analyzers = {'analyzer-ecnspider1' : 1, 'analyzer-ecnspider-vp' : 2}
 lastObservationId=1
 
 print("-- BEGIN")
