@@ -41,7 +41,7 @@ for doc in it:
   #
   if(fullPath in paths):
     pathId = paths[fullPath]
-    print('-- ' + fullPath + ' exists id = ' + str(pathId))
+    #print('-- ' + fullPath + ' exists id = ' + str(pathId))
   else:
     paths[fullPath] = pathId
     lastPathId += 1
@@ -50,51 +50,60 @@ for doc in it:
     sql = "INSERT INTO PATH(ID, FULL_PATH, SIP, DIP) VALUES(%d, '%s', '%s', '%s');"
     print(sql % (pathId, fullPath, path[0], path[-1]))
 
+    node_values = []
+    path_node_values = []
+
     # Create nodes
     pos = 0
     for node in path:
       nodeId = lastNodeId
       if node in nodes:
         nodeId = nodes[node]
-        print('-- ' + node + ' exists id = ' + str(nodeId))
+        #print('-- ' + node + ' exists id = ' + str(nodeId))
       else:
         nodes[node] = nodeId
         lastNodeId += 1
 
         # Create node
-        sql = "INSERT INTO NODE(ID, NAME) VALUES(%d,'%s');"
-        print(sql % (nodeId, node))
+        node_values.append("(%d,'%s')" % (nodeId, node))
 
       # Create path_node
-      sql = "INSERT INTO PATH_NODE(PATH_ID, NODE_ID, POS) VALUES(%d, %d, %d);"
-      print(sql % (pathId, nodeId, pos))
+      path_node_values.append("(%d,%d,%d)" % (pathId, nodeId, pos))
       
       pos += 1
+
+    if len(node_values) > 0:
+      print("INSERT INTO NODE(ID,NAME) VALUES %s;" % (",".join(node_values)))
+
+    if len(path_node_values) > 0:
+      print("INSERT INTO PATH_NODE(PATH_ID,NODE_ID,POS) VALUES %s;" % (",".join(path_node_values)))
 
   # Create observations
   t_from = doc['time']['from'].isoformat()
   t_to = doc['time']['to'].isoformat()
 
   
-  
+  observation_values = []
 
   for condition in doc['conditions']:
     obsId = lastObservationId
     lastObservationId += 1    
 
+    
+
     sql = None
     if(condition == "ecn.negotiated"):
       condition = "ecn.negotiated"
-      sql = "INSERT INTO OBSERVATION(ID, PATH_ID, ANALYZER_ID, TIME_FROM, TIME_TO, CONDITION, VAL_I) VALUES(%d, %d, %d, '%s','%s', '%s', %d);" % (obsId, pathId, analyzerId, t_from, t_to, condition, 1)
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,%s)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 1, "NULL"))
     elif(condition == "ecn.not_negotiated"):
       condition = "ecn.negotiated"
-      sql = "INSERT INTO OBSERVATION(ID, PATH_ID, ANALYZER_ID, TIME_FROM, TIME_TO, CONDITION, VAL_I) VALUES(%d, %d, %d, '%s','%s', '%s', %d);" % (obsId, pathId, analyzerId, t_from, t_to, condition, 0)
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',%d,%s)" % (obsId, pathId, analyzerId, t_from, t_to, condition, 0, "NULL"))
     elif(condition.startswith("ecn.connectivity.")):
       value = condition[17:]
       condition = "ecn.connectivity"
-      sql = "INSERT INTO OBSERVATION(ID, PATH_ID, ANALYZER_ID, TIME_FROM, TIME_TO, CONDITION, VAL_S) VALUES(%d, %d, %d, '%s','%s', '%s', '%s');" % (obsId, pathId, analyzerId, t_from, t_to, condition, value)
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',%s,'%s')" % (obsId, pathId, analyzerId, t_from, t_to, condition, "NULL", value))
 
-    print(sql)
+  print("INSERT INTO OBSERVATION(ID,PATH_ID,ANALYZER_ID,TIME_FROM,TIME_TO,CONDITION,VAL_I,VAL_S) VALUES %s;" % (",".join(observation_values)))
 
   if (i % 1000) == 999:
     print("COMMIT;")
