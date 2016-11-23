@@ -271,7 +271,7 @@ def convert(query, config = Config()):
 
       sql_ = convert_query(query, context)
 
-      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z WHERE\n" % (attribute, sql_, attribute)
+      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z WHERE\n" % (attribute, sql_)
 
       if raw_attribute.startswith("$"):
         raw_attribute = raw_attribute[1:]
