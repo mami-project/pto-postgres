@@ -271,11 +271,11 @@ def convert(query, config = Config()):
 
       sql_ = convert_query(query, context)
 
-      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z WHERE z.%s IS NOT NULL\n" % (attribute, sql_, attribute)
+      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z WHERE\n" % (attribute, sql_, attribute)
 
       if raw_attribute.startswith("$"):
         raw_attribute = raw_attribute[1:]
-        sql += "AND z.name = '%s' " % raw_attribute
+        sql += "z.name = '%s' " % raw_attribute
 
       sql += "GROUP BY " + ",".join(attributes) + " "
 
