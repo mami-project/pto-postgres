@@ -186,7 +186,8 @@ def expect_real(a, data = 'n/a'):
 
 def expect_num(a, data = 'n/'):
   if not is_num(a):
-    raise ValueError("`" + str(a) + "' is not a number: " + str(data)
+    raise ValueError("`" + str(a) + "' is not a number: " + str(data))
+
 
 
 def expect_array(a, size = 0, data  = 'n/a'):
