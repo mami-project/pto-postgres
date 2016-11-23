@@ -271,7 +271,7 @@ def convert(query, config = Config()):
 
       sql_ = convert_query(query, context)
 
-      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count_ FROM (%s) z\n" % (attribute, sql_)
+      sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
 
       if raw_attribute.startswith("$"):
         raw_attribute = raw_attribute[1:]
@@ -283,10 +283,10 @@ def convert(query, config = Config()):
         if not overwrite_order:
           sql += "ORDER BY z.%s %s " % context.order
         else:
-          sql += "ORDER BY count_ %s " % order
+          sql += "ORDER BY count %s " % order
       else:
         if overwrite_order:
-          sql += "ORDER BY count_ %s " % order
+          sql += "ORDER BY count %s " % order
 
       sql += get_limit_clause(context)
 
