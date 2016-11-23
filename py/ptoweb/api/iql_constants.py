@@ -1,18 +1,20 @@
 DICT_EXPECTED_TYPES_ATTR = {
   'time_to' : 'T',
   'time_from' : 'T',
-  'path_id' : 'I',
+  'path_id' : 'N',
   'dip' : 'S',
   'sip' : 'S',
   'full_path' : 'S',
-  'path_id' : 'I',
+  'path_id' : 'N',
   'analyzer' : 'S',
-  'path_nodes' : '*S'
+  'path_nodes' : '*S',
+  'oid' : 'N',
+  'name' : 'S'
 }
 
 DICT_MSMNT_TYPES = {
   'ecn.connectivity' : 'S',
-  'ecn.negotiated' : 'I',
+  'ecn.negotiated' : 'N',
   'ecn.site_dependent' : '*S',
   'ecn.path_dependent' : '*S'
 }

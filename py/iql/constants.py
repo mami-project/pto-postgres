@@ -25,10 +25,10 @@ DICT_EXPECTED_TYPES = {
   'gt' : None,
   'le' : None,
   'ge' : None,
-  'add' : ['I','T'],
-  'sub' : ['I','T'],
-  'mul' : 'I',
-  'div' : 'I',
+  'add' : ['N','T'],
+  'sub' : ['N','T'],
+  'mul' : 'N',
+  'div' : 'N',
 }
 
 DICT_RETURN_TYPES = {
@@ -43,12 +43,12 @@ DICT_RETURN_TYPES = {
   'mul' : None,
   'div' : None,
   'time' : 'T',
-  'year' : 'I',
-  'month' : 'I',
-  'day' : 'I',
-  'hour' : 'I',
-  'minute' : 'I',
-  'second' : 'I',
+  'year' : 'N',
+  'month' : 'N',
+  'day' : 'N',
+  'hour' : 'N',
+  'minute' : 'N',
+  'second' : 'N',
   'exists' : 'B'
 }
 

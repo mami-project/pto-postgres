@@ -638,8 +638,8 @@ def convert_exp(exp, cur_table, context):
 
       return (exp, U.get_data_type_for_attribute(attr_name, context), "")
 
-  elif type(exp) == type(0):
-    return (str(exp), "I", "")
+  elif U.is_num(exp):
+    return (str(exp), "N", "")
 
 
 
@@ -720,7 +720,7 @@ def convert_date_part(operation, operands, cur_table, context):
   if data_type != "T":
     raise ValueError("Expected `T' but found `%s' in `%s': %s" % (data_type, operation, str(operands)))
 
-  return ("(date_part('%s',%s)::INT)" % (operation, to_sql_col_val(sql, cur_table, data_type)),"I","")
+  return ("(date_part('%s',%s)::REAL)" % (operation, to_sql_col_val(sql, cur_table, data_type)),"N","")
 
 
 
@@ -816,8 +816,8 @@ def convert_contains(operands, cur_table, context):
 
   if data_type_0 == '*S':
     return ("(%s @> ARRAY[%s]::VARCHAR[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
-  elif data_type_0 == '*I':
-    return ("(%s @> ARRAY[%s]::INT[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
+  elif data_type_0 == '*N':
+    return ("(%s @> ARRAY[%s]::REAL[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
   else:
     raise ValueError("Unsupported type `%s': %s" % (data_type_0, str(operands)))
 
