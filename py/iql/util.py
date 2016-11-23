@@ -135,6 +135,16 @@ def is_int(a):
 
 
 
+def is_real(a):
+  return type(a) == type(0.0)
+
+
+
+def is_num(a):
+  return is_int(a) or is_real(a)
+
+
+
 def is_str(a):
   return type(a) == type('')
 
@@ -166,6 +176,17 @@ def expect_int(a, data = 'n/a'):
   if not is_int(a):
     raise ValueError("`" + str(a) + "' is not an int: " + str(data))
 
+
+
+def expect_real(a, data = 'n/a'):
+  if not is_real(a):
+    raise ValueError("`" + str(a) + "' is not a real: " + str(data))
+
+
+
+def expect_num(a, data = 'n/'):
+  if not is_num(a):
+    raise ValueError("`" + str(a) + "' is not a number: " + str(data)
 
 
 def expect_array(a, size = 0, data  = 'n/a'):

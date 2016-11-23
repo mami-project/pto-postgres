@@ -104,7 +104,7 @@ for doc in it:
       observation_values.append("(%d,%d,%d,'%s','%s','%s',NULL,'%s',NULL, NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, value))
     elif condition == "ecn.path_dependent" or condition == "ecn.site_dependent":
       value = doc['value']['sips']
-      bservation_values.append("(%d,%d,%d,'%s','%s','%s',NULL,NULL,ARRAY[%s]::VARCHAR[], NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, ",".join(value)))
+      observation_values.append("(%d,%d,%d,'%s','%s','%s',NULL,NULL,ARRAY[%s]::VARCHAR[], NULL)" % (obsId, pathId, analyzerId, t_from, t_to, condition, ",".join(value)))
 
   print("INSERT INTO OBSERVATION(ID,PATH_ID,ANALYZER_ID,TIME_FROM,TIME_TO,CONDITION,VAL_N,VAL_S,VAL_A_S,VAL_A_N) VALUES %s;" % (",".join(observation_values)))
 

@@ -681,10 +681,23 @@ def convert_uni_op(operation, operands, cur_table, context):
 
   if operation == 'time':
 
-    if type(operands[0]) != type(""):
-      raise ValueError("Literal of type `S' expected: " + str(operands))
+    if(U.is_str(operands[0])):
+      dt = datetime.datetime.strptime(operands[0],'%Y-%m-%d %H:%M:%S')
 
-    return ("'" + operands[0] + "'", "T", "")
+      return ("('" + operands[0] + "'::TIMESTAMP WITHOUT TIME ZONE)", "T", "")
+    elif(U.is_num(operands[0])):
+      return ("(to_timestamp(%s)::TIMESTAMP WITHOUT TIME ZONE)", "T", "")
+    else:
+      raise ValueError("`time' expects literal of type `N' or `S': " + str(operands))
+
+  elif operation == 'exists':
+
+    U.expect_str(operands[0])
+
+    if not U.is_known_msmnt(operands[0], context):
+      raise ValueError("Unknown measurement name: " + str(operands[0]))
+
+    return ("(%s.name = '%s')" % (cur_table, operands[0]), "B", "")
 
   elif operation in ['year','date','month','hour','minute','second']:
     return convert_date_part(operation, operands, cur_table, context)
