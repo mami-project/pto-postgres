@@ -459,7 +459,7 @@ def convert_sieve_ex(exps, context):
   U.expect_str(projection_function, "`sieve-ex.1'")
 
   if not U.is_known_projection(projection_function, context):
-    raise ValueError("Unkown projection function `%s': %s" % (projection, str(exps)))
+    raise ValueError("Unknown projection function `%s': %s" % (projection, str(exps)))
 
   attribute = U.resolve_attribute(attribute, context, "`sieve-ex.1'")
 
@@ -667,7 +667,7 @@ def convert_operation(operation, operands, cur_table, context):
     raise ValueError("`" + operation + "' is not allowed in expressions: " + str(operands))
 
   else:
-    raise ValueError("Unknonw operation `" + operation + "': " + str(operands))
+    raise ValueError("Unknown operation `" + operation + "': " + str(operands))
 
 
 
