@@ -15,7 +15,7 @@ DICT_QUERY_OPS = {
   'simple' : True,
   'intersection' : True,
   'union' : True,
-  'union-nub' : True,
+  'union-ls' : True,
   'subtraction' : True
 }
 
@@ -48,7 +48,8 @@ DICT_RETURN_TYPES = {
   'day' : 'I',
   'hour' : 'I',
   'minute' : 'I',
-  'second' : 'I'
+  'second' : 'I',
+  'exists' : 'B'
 }
 
 DICT_N_OPS = {
@@ -64,7 +65,8 @@ DICT_UNI_OPS = {
   'day' : True,
   'hour' : True,
   'minute' : True,
-  'second' : True
+  'second' : True,
+  'exists' : True,
 }
 
 DICT_BIN_OPS = {
