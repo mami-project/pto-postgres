@@ -34,6 +34,7 @@ class Context:
     self.limit = 128
     self.skip = 0
     self.order = None
+    self.nub = False
 
   def config_from(self, config):
     self.DICT_MSMNT_TYPES = config.DICT_MSMNT_TYPES
@@ -41,8 +42,6 @@ class Context:
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
     self.TBL_NAME = config.TBL_NAME
     self.ALL_SQL_ATTRS = config.ALL_SQL_ATTRS
-    if isinstance(config, Context):
-      self.nub = config.nub
 
 
 def convert_simple(exp, context):
@@ -557,7 +556,7 @@ def convert_sieve(exps, context, attributes = None):
 
     i += 1
 
-  distinct = 'DISTINCT' if context.NUB else ''
+  distinct = 'DISTINCT' if context.nub else ''
 
   if attributes == None:
     sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
