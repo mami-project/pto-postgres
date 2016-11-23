@@ -286,7 +286,7 @@ def convert(query, config = Config()):
           sql += "ORDER BY count_ %s " % order
       else:
         if overwrite_order:
-          sql += "ORDER BY count %s " % order
+          sql += "ORDER BY count_ %s " % order
 
       sql += get_limit_clause(context)
 
