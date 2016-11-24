@@ -650,6 +650,8 @@ def convert_operation(operation, operands, cur_table, context):
 
   if operation == "choice":
     return convert_choice(operands, cur_table, context)
+  elif operation == "array":
+    return convert_array(operands, cur_table, context)
 
   elif U.is_n_op(operation):
     return convert_n_op(operation, operands, cur_table, context)
@@ -697,6 +699,8 @@ def convert_uni_op(operation, operands, cur_table, context):
     if not U.is_known_msmnt(operands[0], context):
       raise ValueError("Unknown measurement name: " + str(operands[0]))
 
+    context.msmnt_name = operands[0]
+
     return ("(%s.name = '%s')" % (cur_table, operands[0]), "B", "")
 
   elif operation in ['year','date','month','hour','minute','second']:
@@ -724,6 +728,37 @@ def convert_date_part(operation, operands, cur_table, context):
 
 
 
+def convert_array(operands, cur_table, context):
+  """
+  Convert array.
+  """
+
+  U.expect_array(operands, 0, "`array'")
+
+  values = []
+  expected_type = None
+
+  for operand in operands:
+    (sql, data_type, cond_data_type) = convert_exp(operand, cur_table, context)
+
+    if data_type == '$': data_type = cond_data_type
+
+    if expected_type != None:
+      if data_type != expected_type:
+        raise ValueError("Expected type `%s' but found `%s': %s" % (expected_type, data_type, str(operand)))
+    else:
+      expected_type = data_type
+
+    values.append(sql)
+
+  if expected_type not in ['S','N']:
+    raise ValueError("Currently only `*S' and `*N' are supported: %s": str(operands))
+
+  if expected_type == 'S':
+    return "(ARRAY[%s]::VARCHAR[])" % (",".join(values))
+  elif expected_type == 'N':
+    return "(ARRAY[%s]::REAL[])" % (",".join(values))
+
 
 def convert_n_op(operation, operands, cur_table, context):
   """
@@ -732,11 +767,12 @@ def convert_n_op(operation, operands, cur_table, context):
 
   exps = []
 
-  expected_type = None
+  expected_type = U.get_expected_types(operation)
   
   for operand in operands:
     operand_ = convert_exp(operand, cur_table, context)
     (sql, data_type, cond_data_type) = operand_
+
 
     if data_type != "B":
       raise ValueError("Expected `B' but found `" + data_type + "': " + str(operands))
@@ -764,6 +800,11 @@ def to_sql_col_val(value, cur_table, data_type = ''):
   """
   Converts value to SQL.
   """
+
+  if data_type == '*S':
+    data_type = 'A_S'
+  elif data_type == '*N':
+    data_type = 'A_N'
 
   if value.startswith("@"): 
 
@@ -855,7 +896,10 @@ def convert_bin_op(operation, operands, cur_table, context):
       expected_type = data_type
     else:
       if data_type not in expected_type:
-        raise ValueError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
+        if not U.is_array(expected_type):
+          raise ValueError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
+        else:
+          raise ValueError("Unexpected type `%s' for `%s': %s" % (data_type, operation, str(operand)))
       else:
         expected_type = data_type
 
@@ -870,9 +914,8 @@ def convert_bin_op(operation, operands, cur_table, context):
   # what the type of the measurement actually is.
 
   if exps[0][1] == "$" and exps[1][1] == "$":
-    # This should never happen because this is checked earlier but just in case
-    # we messed something up maybe this helps us detecting that we messed up.
-    raise ValueError("Impossibru :(")
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + exps[0][2] + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + exps[1][2] + ")"
+    return (sql, return_type, "")
 
   elif exps[0][1] == "$":
     # Left argument is a measurement value

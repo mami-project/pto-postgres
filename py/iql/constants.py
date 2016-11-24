@@ -29,6 +29,8 @@ DICT_EXPECTED_TYPES = {
   'sub' : ['N','T'],
   'mul' : 'N',
   'div' : 'N',
+  'or' : 'B',
+  'and' : 'B'
 }
 
 DICT_RETURN_TYPES = {
