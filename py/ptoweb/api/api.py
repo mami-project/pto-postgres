@@ -116,10 +116,10 @@ def api_sql():
   except:
     return json400({"error" : "Not valid JSON!"})
 
-  try:
-    sql = iqlc.convert(iql, get_iql_config())
-  except ValueError as error:
-    return json400({"error" : str(error)})
+  #try:
+  sql = iqlc.convert(iql, get_iql_config())
+  #except ValueError as error:
+  #  return json400({"error" : str(error)})
 
   return text200(sql)
 
