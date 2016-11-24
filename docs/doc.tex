@@ -47,6 +47,12 @@ attribute \textit{foobar} (e.g. \verb|'@foobar'|) and the value of a
 measurement named \textit{foobar} (e.g. \verb|'$foobar'|). This is
 necessary because JSON only supports a few data types natively.
 
+\section{Types}
+
+\verb|A| refers to an attribute (pseudo or not). \verb|P| refers to a projection function.
+\verb|N| is a number and \verb|S| is a string. Arrays are prefixed with \verb|*| thus \verb|*S| is a string
+of arrays. Nested arrays are currently not (fully) supported in the reference implementation.
+
 \section{IQL Request}
 
 An IQL Request consists of \verb|settings| and a \verb|query| whereas
@@ -357,7 +363,7 @@ set of singletons. \verb|settings.nub| has no effect on this operation.
 \subsubsection{add}
 
 \begin{verbatim}
-{"add": [I, I]}
+{"add": [N, N]}
 {"add": [T, T]}
 \end{verbatim}
 
@@ -374,7 +380,7 @@ Performs logical and.
 \subsubsection{div}
 
 \begin{verbatim}
-{"div": [I, I]}
+{"div": [N, N]}
 \end{verbatim}
 
 Performs integer division.
@@ -382,16 +388,25 @@ Performs integer division.
 \subsubsection{eq}
 
 \begin{verbatim}
-{"eq": [A, A]} -> B
+{"eq": [a, a]} -> B
 \end{verbatim}
 
 Requires both arguments to be of the same type. Returns true of
 arguments are equal, otherwise false.
 
+\subsubsection{exists}
+
+\begin{verbatim}
+{"exists": [S]} -> B
+\end{verbatim}
+
+Returns true if the measurement value has any defined value. Argument is a string which means \verb|$|-prefix
+is unwanted. 
+
 \subsubsection{ge}
 
 \begin{verbatim}
-{"ge": [A, A]} -> B
+{"ge": [a, a]} -> B
 \end{verbatim}
 
 Requires both arguments to be of the same type. Returns true if first
@@ -401,7 +416,7 @@ false.
 \subsubsection{gt}
 
 \begin{verbatim}
-{"gt": [A, A]} -> B
+{"gt": [a, a]} -> B
 \end{verbatim}
 
 Requires both arguments to be of the same type. Returns true if first
@@ -410,7 +425,7 @@ argument is larger than the second argument.
 \subsubsection{le}
 
 \begin{verbatim}
-{"le": [A, A]} -> B
+{"le": [a, a]} -> B
 \end{verbatim}
 
 Requires both arguments to be of the same type. Returns true if first
@@ -420,7 +435,7 @@ false.
 \subsubsection{lt}
 
 \begin{verbatim}
-{"lt": [A, A]} -> B
+{"lt": [a, a]} -> B
 \end{verbatim}
 
 Requires both arguments to be of the same type. Returns true if first
@@ -429,7 +444,7 @@ argument is less than the second argument.
 \subsubsection{mul}
 
 \begin{verbatim}
-{"mul": [I, I} -> I
+{"mul": [N, N} -> N
 \end{verbatim}
 
 Performs integer multiplication.
@@ -445,18 +460,38 @@ Performs logical or.
 \subsubsection{sub}
 
 \begin{verbatim}
-{"sub": [I, I]}
+{"sub": [N, N]}
 {"sub": [T, T]}
 \end{verbatim}
 
 Performs subtraction of integers or timestamps.
+
+\subsection{Array operations}
+
+\subsubsection{array}
+
+\begin{verbatim}
+{"array": [S, ...]} -> *S
+{"array": [N, ...]} -> *N
+\end{verbatim}
+
+Pack values into an array. At least one argument is required because otherwise the type of the array can not be determined.
+
+\subsubsection{contains}
+
+\begin{verbatim}
+{"contains": [*S, S]} -> B
+{"contains": [*N, N]} -> B
+\end{verbatim}
+
+Returns true if the second argument is contained within the array of the first argument. 
 
 \subsection{Date/time operations}
 
 \subsubsection{day}
 
 \begin{verbatim}
-{"day": [T]} -> I
+{"day": [T]} -> N
 \end{verbatim}
 
 Returns the day (of month) of a timestamp.
@@ -464,7 +499,7 @@ Returns the day (of month) of a timestamp.
 \subsubsection{hour}
 
 \begin{verbatim}
-{"hour": [T]} -> I
+{"hour": [T]} -> N
 \end{verbatim}
 
 Returns the hour part of a timestamp.
@@ -472,7 +507,7 @@ Returns the hour part of a timestamp.
 \subsubsection{minute}
 
 \begin{verbatim}
-{"minute": [T]} -> I
+{"minute": [T]} -> N
 \end{verbatim}
 
 Returns the minute part of a timestamp.
@@ -480,7 +515,7 @@ Returns the minute part of a timestamp.
 \subsubsection{month}
 
 \begin{verbatim}
-{"month": [T]} -> I
+{"month": [T]} -> N
 \end{verbatim}
 
 Returns the month part of a timestamp.
@@ -488,7 +523,7 @@ Returns the month part of a timestamp.
 \subsubsection{second}
 
 \begin{verbatim}
-{"second": [T]} -> I
+{"second": [T]} -> N
 \end{verbatim}
 
 Returns the second part of a timestamp.
@@ -496,7 +531,7 @@ Returns the second part of a timestamp.
 \subsubsection{year}
 
 \begin{verbatim}
-{"year": [T]} -> I
+{"year": [T]} -> N
 \end{verbatim}
 
 Returns the year part of a timestamp.
@@ -509,9 +544,11 @@ Macros are operations operating only on constant literals.
 
 \begin{verbatim}
 {"time": [S]} -> T
+{"time": [N]} -> T
 \end{verbatim}
 
-Converts first argument to timestamp. 
+Converts first argument to timestamp. Input formats are either unix timestamp (as \verb|N|) or a
+string of the format \verb|YYYY-MM-DD HH:mm:ss|. 
 
 \section{Restrictions}
 
