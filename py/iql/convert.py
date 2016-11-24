@@ -641,6 +641,8 @@ def convert_exp(exp, cur_table, context):
   elif U.is_num(exp):
     return (str(exp), "N", "")
 
+  raise ValueError("BUG: %s" % str(exp))
+
 
 
 def convert_operation(operation, operands, cur_table, context):
@@ -755,9 +757,9 @@ def convert_array(operands, cur_table, context):
     raise ValueError("Currently only `*S' and `*N' are supported: %s" % str(operands))
 
   if expected_type == 'S':
-    return "(ARRAY[%s]::VARCHAR[])" % (",".join(values))
+    return ("(ARRAY[%s]::VARCHAR[])" % (",".join(values)), "*S", "")
   elif expected_type == 'N':
-    return "(ARRAY[%s]::REAL[])" % (",".join(values))
+    return ("(ARRAY[%s]::REAL[])" % (",".join(values)), "*N", "")
 
 
 def convert_n_op(operation, operands, cur_table, context):
