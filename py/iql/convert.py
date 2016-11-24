@@ -914,19 +914,19 @@ def convert_bin_op(operation, operands, cur_table, context):
   # what the type of the measurement actually is.
 
   if exps[0][1] == "$" and exps[1][1] == "$":
-    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + exps[0][2] + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + exps[1][2] + ")"
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table, expected_type) + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table, expected_type) + ")"
     return (sql, return_type, "")
 
   elif exps[0][1] == "$":
     # Left argument is a measurement value
 
-    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + exps[0][2] + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + ")"
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table, expected_type)  + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table) + ")"
     return (sql, return_type, "")
 
   elif exps[1][1] == "$":
     # Right argument is a measurement value
 
-    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + " " + operator + " " + to_sql_col_val(exps[1][0]) + exps[1][2] + ")"
+    sql = "(" + to_sql_col_val(exps[0][0], cur_table) + " " + operator + " " + to_sql_col_val(exps[1][0], cur_table, expected_type) + ")"
     return (sql, return_type, "")
 
   else:
