@@ -903,8 +903,6 @@ def convert_bin_op(operation, operands, cur_table, context):
         expected_type = data_type
       elif expected_type != data_type:
          raise ValueError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
-      else:
-        raise ValueError("BUG")
 
     exps.append(operand_)
 
