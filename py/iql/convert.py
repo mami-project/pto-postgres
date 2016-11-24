@@ -895,7 +895,7 @@ def convert_bin_op(operation, operands, cur_table, context):
     if expected_type == None:
       expected_type = data_type
     else:
-      if data_type not in expected_type:
+      if U.is_array(expected_type) and data_type not in expected_type:
         if not U.is_array(expected_type):
           raise ValueError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
         else:
