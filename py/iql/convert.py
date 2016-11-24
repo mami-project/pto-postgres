@@ -752,7 +752,7 @@ def convert_array(operands, cur_table, context):
     values.append(sql)
 
   if expected_type not in ['S','N']:
-    raise ValueError("Currently only `*S' and `*N' are supported: %s": str(operands))
+    raise ValueError("Currently only `*S' and `*N' are supported: %s" % str(operands))
 
   if expected_type == 'S':
     return "(ARRAY[%s]::VARCHAR[])" % (",".join(values))
