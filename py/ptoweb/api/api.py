@@ -38,7 +38,9 @@ def text200(obj):
 def api_iql_info():
 
   data_structure = [{"name":"ecn.connectivity","measurement" : True, "type" : "S", "values" : ["works","broken","offline","transient"]},
-                   {"name":"ecn.negotiated", "measurement" : True, "type" : "I", "values" : [0,1]}]
+                    {"name":"ecn.negotiated", "measurement" : True, "type" : "I", "values" : [0,1]},
+                    {"name":"ecn.site_dependent", "measurement" : True, "type" : "*S"},
+                    {"name":"ecn.path_dependent", "measurement" : True, "type" : "*S"}]
 
   for e_types in DICT_EXPECTED_TYPES_ATTR:
     data_structure.append ( {"name" : e_types, "measurement" : False, "type" : DICT_EXPECTED_TYPES_ATTR[e_types]} )
