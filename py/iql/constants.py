@@ -80,6 +80,7 @@ DICT_BIN_OPS = {
   "gt" : True,
   "le" : True,
   "ge" : True,
+  "ne" : True,
   "add" : True,
   "sub" : True,
   "div" : True,
