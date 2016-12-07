@@ -1,5 +1,6 @@
 DICT_BINOP_TO_OP = {
   "eq" : "=",
+  "ne" : "!=",
   "lt" : "<",
   "gt" : ">",
   "le" : "<=",
@@ -39,6 +40,7 @@ DICT_RETURN_TYPES = {
   'gt' : 'B',
   'le' : 'B',
   'ge' : 'B',
+  'ne' : 'B',
   'contains' : 'B',
   'add' : None,
   'sub' : None,
