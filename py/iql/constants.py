@@ -26,6 +26,7 @@ DICT_EXPECTED_TYPES = {
   'gt' : None,
   'le' : None,
   'ge' : None,
+  'ne' : None,
   'add' : ['N','T'],
   'sub' : ['N','T'],
   'mul' : 'N',
