@@ -111,8 +111,30 @@ def api_old():
   iql_query_parts.append({"ge":["@time_from", {"time":[time_from]}]})
   iql_query_parts.append({"le":["@time_to", {"time":[time_to]}]})
 
-  return json200({"query":{"all":[{"simple":[{"and":iql_query_parts}]}]}})
-      
+  
+
+  iql_query = ({"query":{"all":[{"simple":[{"and":iql_query_parts}]}]}})
+  
+  try:
+    sql = iqlc.convert(iql_query, get_iql_config())
+  except ValueError as error:
+    return json400({"error" : str(error)})
+
+  dr = get_db().query(sql).dictresult()
+  result_json = []
+
+  i = 0
+
+  for e in dr:
+    
+    remove_nulls(e)
+
+    result_json.append(e)
+
+    i += 1
+    if(i > 128): break
+
+  return json200({"results" : result_json})
   
   
   
