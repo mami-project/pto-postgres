@@ -690,7 +690,7 @@ def convert_uni_op(operation, operands, cur_table, context):
 
       return ("('" + operands[0] + "'::TIMESTAMP WITHOUT TIME ZONE)", "T", "")
     elif(U.is_num(operands[0])):
-      return ("(to_timestamp(%s)::TIMESTAMP WITHOUT TIME ZONE)", "T", "")
+      return ("(to_timestamp(%d)::TIMESTAMP WITHOUT TIME ZONE)" % operands[0], "T", "")
     else:
       raise ValueError("`time' expects literal of type `N' or `S': " + str(operands))
 
