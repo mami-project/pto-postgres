@@ -76,6 +76,27 @@ def convert_row(row):
       elif row['value'] == 1:
         row['conditions'] = ['ecn.negotiated']
     del row['name']
+    del row['value']
+
+  if 'time_to' in row and 'time_from' in row:
+    time_to = row['time_to']
+    time_from = row['time_from']
+
+    row['time'] = {'to' : {'$date' : time_to * 1000}, 'from' : {'$date' : {time_from * 1000}}}
+    del row['time_to']
+    del row['time_from']
+
+  if 'oid' in row:
+    row['id'] = {'$oid' : str(row['oid'])}
+
+
+  del row['full_path']
+  row['path'] = row['path_nodes']
+  del row['path_nodes']
+
+  row['sources'] = {}
+  row['value'] = {}
+    
 
 
 @app.route('/old')
