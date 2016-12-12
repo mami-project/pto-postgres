@@ -33,6 +33,12 @@ def json404(obj):
 def text200(obj):
   return cors(Response(obj, status=200, mimetype='text/plain'))
 
+def to_int(value):
+  try:
+    return int(value, 10)
+  except:
+    return 0
+
 
 @app.route('/attributes')
 def api_iql_info():
@@ -58,6 +64,58 @@ def api_index():
     print(e)
 
   return json200({'status':'running'})
+
+
+@app.route('/old')
+def api_old():
+  sip = request.args.get('sip')
+  dip = request.args.get('dip')
+
+  on_path = request.args.get('on_path')
+
+  if on_path:
+    on_path = on_path.split(',')
+
+  time_from = int(to_int(request.args.get('from')) / 1000.0)
+  time_to = int(to_int(request.args.get('to')) / 1000.0)
+
+  conditions = request.args.get('conditions')
+
+  dnf = []
+
+  if conditions:
+    and_terms = conditions.split(',')
+    for and_term in and_terms:
+      and_term = and_term.split(':')
+      dnf.append(and_term)
+
+  iql_ands = []
+  for and_term in dnf:
+    ands = []
+    for condition in and_term:
+      if condition.startswith('ecn.connectivity'):
+        value = condition[17:]
+        ands.append({"eq":["$ecn.connectivity", value]})
+    iql_ands.append({"and":ands})
+
+  iql_dnf = {"or": iql_ands}
+
+  iql_query_parts = [iql_dnf]
+
+  if sip:
+    iql_query_parts.append({"eq":["@sip", sip]})
+
+  if dip:
+    iql_query_parts.append({"eq":["@dip", dip]})
+
+  iql_query_parts.append({"ge":["@time_from", {"time":[time_from]}]})
+  iql_query_parts.append({"le":["@time_to", {"time":[time_to]}]})
+
+  return json200({"query":{"all":[{"simple":[{"and":iql_query_parts}]}]}})
+      
+  
+  
+  
 
 
 @app.route('/query')
