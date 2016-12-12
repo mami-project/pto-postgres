@@ -66,6 +66,18 @@ def api_index():
   return json200({'status':'running'})
 
 
+def convert_row(row):
+  if 'name' in row:
+    if row['name'] == 'ecn.connectivity':
+      row['conditions'] = ["ecn.connectivity." + row['value']]
+    elif row['name'] == 'ecn.negotiated':
+      if row['value'] == 0:
+        row['conditions'] = ['ecn.not_negiotiated']
+      elif row['value'] == 1:
+        row['conditions'] = ['ecn.negotiated']
+    del row['name']
+
+
 @app.route('/old')
 def api_old():
   sip = request.args.get('sip')
@@ -128,13 +140,14 @@ def api_old():
   for e in dr:
     
     remove_nulls(e)
+    convert_row(e)
 
     result_json.append(e)
 
     i += 1
     if(i > 128): break
 
-  return json200({"results" : result_json})
+  return json200({"count": len(result_json), "results" : result_json})
   
   
   
