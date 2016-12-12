@@ -82,7 +82,7 @@ def convert_row(row):
     time_to = row['time_to']
     time_from = row['time_from']
 
-    row['time'] = {'to' : {'$date' : time_to.timestamp()*1000}, 'from' : {'$date' : time_to.timestamp()*1000}}
+    row['time'] = {'to' : {'$date' : time_to.timestamp()*1000}, 'from' : {'$date' : time_from.timestamp()*1000}}
     del row['time_to']
     del row['time_from']
 
