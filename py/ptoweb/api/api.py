@@ -82,12 +82,15 @@ def convert_row(row):
     time_to = row['time_to']
     time_from = row['time_from']
 
-    row['time'] = {'to' : {'$date' : time_to.timestamp()}, 'from' : {'$date' : time_to.timestamp()}}
+    row['time'] = {'to' : {'$date' : time_to.timestamp()*1000}, 'from' : {'$date' : time_to.timestamp()*1000}}
     del row['time_to']
     del row['time_from']
 
   if 'oid' in row:
     row['id'] = {'$oid' : str(row['oid'])}
+
+  del row['oid']
+  del row['path_id']
 
 
   del row['full_path']
