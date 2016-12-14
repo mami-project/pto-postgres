@@ -101,6 +101,97 @@ def convert_row(row):
   row['value'] = {}
     
 
+def convert_condition_to_eq(condition):
+  if condition.startswith('ecn.connectivity'):
+    value = condition[17:]
+    return ({"eq":["$ecn.connectivity", value]})
+  elif condition == 'ecn.negotiated':
+    return ({"eq":["$ecn.negotiated",1]})
+  elif condition == 'ecn.not_negotiated':
+    return ({"eq":["$ecn.negotiated",0]})
+
+
+@app.route('/old_grouped')
+def api_old_groupeD():
+  sip = request.args.get('sip')
+  dip = request.args.get('dip')
+
+  on_path = request.args.get('on_path')
+
+  if on_path:
+    on_path = on_path.split(',')
+
+  time_from = int(to_int(request.args.get('from')) / 1000.0)
+  time_to = int(to_int(request.args.get('to')) / 1000.0)
+
+  conditions = request.args.get('conditions')
+
+  dnf = []
+
+  if conditions:
+    and_terms = conditions.split(',')
+    for and_term in and_terms:
+      and_term = and_term.split(':')
+      dnf.append(and_term)
+
+  iql_unions = []
+  for and_term in dnf:
+    ands = []
+    stages = []
+    for condition in and_term:
+      ands.append(convert_condition_to_eq(condition))
+    for and_ in ands:
+      stage = [
+        and_,
+        {"ge":["@time_from", {"time":[time_from]}]},
+        {"le":["@time_to", {"time":[time_to]}]}
+      ]
+
+      if sip:
+        stage.append({"eq":["@sip", sip]})
+
+      if dip:
+        stage.append({"eq":["@dip", dip]})
+
+      stages.append({"and":stage})
+
+    iql_unions.append({"sieve-ex":["","@path_id"]+stages})
+
+  iql_query = ({"query":{"all":[{"union-ls" : iql_unions}]}})
+
+  try:
+    sql = iqlc.convert(iql_query, get_iql_config())
+  except ValueError as error:
+    return json400({"error" : str(error)})
+
+  dr = get_db().query(sql).dictresult()
+  rows = []
+
+  i = 0
+
+  for e in dr:
+    
+    remove_nulls(e)
+    convert_row(e)
+
+    rows.append(e)
+
+    i += 1
+    if(i > 128): break
+
+  groups = {}
+  for row in rows:
+    if row['path'] in groups:
+      groups[row['path']].append(row)
+    else:
+      groups[row['path']] = [row]
+
+  results = []
+  for group in groups:
+    results.append({"id":group, "observations" : groups[group]})
+
+  return json200({"results":results, "count":len(results)})
+
 
 @app.route('/old')
 def api_old():
@@ -129,9 +220,7 @@ def api_old():
   for and_term in dnf:
     ands = []
     for condition in and_term:
-      if condition.startswith('ecn.connectivity'):
-        value = condition[17:]
-        ands.append({"eq":["$ecn.connectivity", value]})
+      ands.append(convert_condition_to_eq(condition))
     iql_ands.append({"and":ands})
 
   iql_dnf = {"or": iql_ands}
