@@ -115,7 +115,7 @@ def convert_condition_to_eq(condition):
 def api_old_single():
   oid = request.args.get('oid')
 
-  iql_query = {"query":{"all":[{"simple":{"eq",["@oid",oid]}}]}}
+  iql_query = {"query":{"all":[{"simple":{"eq":["@oid",oid]}}]}}
 
   try:
     sql = iqlc.convert(iql_query, get_iql_config())
