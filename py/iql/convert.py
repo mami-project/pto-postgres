@@ -422,6 +422,9 @@ def convert_set_op(queries, set_op, context):
   if type(queries) != type([]):
       raise ValueError("Error: Expected Array but not found: " + str(exps))
 
+  if len(queries) < 1:
+    raise ValueError("Set operations require at least one argument!")
+
   subqueries = []
 
   for query in queries:
