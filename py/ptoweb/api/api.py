@@ -113,7 +113,7 @@ def convert_condition_to_eq(condition):
 
 @app.route('/old_single')
 def api_old_single():
-  oid = request.args.get('oid')
+  oid = to_int(request.args.get('oid'))
 
   iql_query = {"query":{"all":[{"simple":{"eq":["@oid",oid]}}]}}
 
