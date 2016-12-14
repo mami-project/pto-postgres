@@ -181,14 +181,15 @@ def api_old_groupeD():
 
   groups = {}
   for row in rows:
-    if row['path'] in groups:
-      groups[row['path']].append(row)
+    key = '\t'.join(row['path'])
+    if key in groups:
+      groups[key].append(row)
     else:
-      groups[row['path']] = [row]
+      groups[key] = [row]
 
   results = []
   for group in groups:
-    results.append({"id":group, "observations" : groups[group]})
+    results.append({"id":group.split('\t'), "observations" : groups[group]})
 
   return json200({"results":results, "count":len(results)})
 
