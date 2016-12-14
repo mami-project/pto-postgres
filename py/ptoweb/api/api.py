@@ -111,8 +111,32 @@ def convert_condition_to_eq(condition):
     return ({"eq":["$ecn.negotiated",0]})
 
 
+@app.route('/old_single')
+def api_old_single():
+  oid = request.args.get('oid')
+
+  iql_query = {"query":{"all":[{"simple":{"eq",["@oid",oid]}}]}}
+
+  try:
+    sql = iqlc.convert(iql_query, get_iql_config())
+  except ValueError as error:
+    return json400({"error" : str(error)})
+
+  dr = get_db().query(sql).dictresult()
+
+  for e in dr:
+    
+    remove_nulls(e)
+    convert_row(e)
+
+    return json200({"result":e})
+
+  return json404({"error":"Not found"})  
+  
+
+
 @app.route('/old_grouped')
-def api_old_groupeD():
+def api_old_grouped():
   sip = request.args.get('sip')
   dip = request.args.get('dip')
 
