@@ -485,7 +485,7 @@ def convert_sieve_ex(exps, context):
     i += 1
 
   sql_unnests = []
-  for sql_attribute in context.ALL_SQL_ATTRS:
+  for sql_attribute in ['oid']: # only unnest oid (bugfix)
     q = 0
     sqlb = "unnest(ARRAY[%s]) as %s"
     sqlbattrs = []
@@ -521,7 +521,12 @@ def convert_sieve_ex(exps, context):
       sql += "AND\n"
     j += 1
 
-  return sql + ")"
+  sql = sql + ")"
+
+  if context.attribute == '' or context.attribute == None: #need to back join (bugfix)
+    print('moo')
+    sql_ = "(SELECT T.* FROM (%s) F JOIN %s T ON F.oid = T.oid)" % (sql, context.TBL_NAME)
+    sql = sql_
     
   return sql
 
