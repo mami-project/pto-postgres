@@ -129,9 +129,9 @@ def api_old_single():
     remove_nulls(e)
     convert_row(e)
 
-    return json200({"result":e})
+    return json200({"iql":iql_query, "result":e})
 
-  return json404({"error":"Not found"})  
+  return json404({"iql":iql_query, "error":"Not found"})  
   
 
 
@@ -186,7 +186,7 @@ def api_old_grouped():
   try:
     sql = iqlc.convert(iql_query, get_iql_config())
   except ValueError as error:
-    return json400({"error" : str(error)})
+    return json400({"iql":iql_query, "error" : str(error)})
 
   dr = get_db().query(sql).dictresult()
   rows = []
@@ -215,7 +215,7 @@ def api_old_grouped():
   for group in groups:
     results.append({"id":group.split('\t'),"path" : group.split("\t"), "observations" : groups[group]})
 
-  return json200({"results":results, "count":len(results)})
+  return json200({"iql":iql_query, "results":results, "count":len(results)})
 
 
 @app.route('/old')
@@ -268,7 +268,7 @@ def api_old():
   try:
     sql = iqlc.convert(iql_query, get_iql_config())
   except ValueError as error:
-    return json400({"error" : str(error)})
+    return json400({"iql":iql_query, "error" : str(error)})
 
   dr = get_db().query(sql).dictresult()
   result_json = []
@@ -285,7 +285,7 @@ def api_old():
     i += 1
     if(i > 128): break
 
-  return json200({"count": len(result_json), "results" : result_json})
+  return json200({"iql":iql_query, "count": len(result_json), "results" : result_json})
   
   
   
