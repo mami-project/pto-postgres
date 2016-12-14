@@ -775,6 +775,9 @@ def convert_n_op(operation, operands, cur_table, context):
   exps = []
 
   expected_type = U.get_expected_types(operation)
+
+  if len(operands) < 1:
+    raise ValueError("`%s' needs at least one argument!" % operation)
   
   for operand in operands:
     operand_ = convert_exp(operand, cur_table, context)
