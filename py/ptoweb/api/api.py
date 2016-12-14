@@ -213,7 +213,7 @@ def api_old_grouped():
 
   results = []
   for group in groups:
-    results.append({"id":group.split('\t'), "observations" : groups[group]})
+    results.append({"id":group.split('\t'),"path" : group.split("\t"), "observations" : groups[group]})
 
   return json200({"results":results, "count":len(results)})
 
