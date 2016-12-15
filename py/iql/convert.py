@@ -34,7 +34,7 @@ class Context:
     self.limit = 128
     self.skip = 0
     self.order = None
-    self.nub = False
+    self.nub = True
 
   def config_from(self, config):
     self.DICT_MSMNT_TYPES = config.DICT_MSMNT_TYPES
@@ -387,6 +387,7 @@ def convert_lookup(arguments, context):
 
   new_context = Context(projection, attribute)
   new_context.config_from(context)
+  new_context.nub = context.nub
   sql = convert_query(query, new_context)
 
   sql_filter = ""
