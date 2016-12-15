@@ -307,9 +307,9 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 \paragraph*{Third step:}
 
 \begin{verbatim}
-('L','T',15) ('L','T',16) ('L','T',15) {- doesn't match $T:2 > $T:0 -}
+('L','T',15) ('L','T',16) ('L','T',15) {- doesn't match $T:2 > $T:1 -}
                           ('L','T',16) {- doesn't match -}
-                          ('L','T',20) {- doesn't match -}
+                          ('L','T',20) {- matches -}
 
 ('L','T',15) ('L','T',20) ('L','T',15) {- doesn't match -}
                           ('L','T',16) {- doesn't match -}
@@ -320,7 +320,7 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 \paragraph*{Result: }
 
 \begin{verbatim}
-(L)
+('L')
 \end{verbatim}
 
 \subsubsection{Performance notes}
@@ -328,6 +328,27 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 The selectivity of the first argument has performance
 implications. Queries will be faster the fewer matches the first
 argument produces.
+
+\subsection{sieve-ex}
+
+\begin{verbatim}
+{"sieve-ex": [P,A,B,...]} -> SET
+\end{verbatim}
+
+The extended sieve operation behaves almost identical to the regular \verb|sieve| operation but does not perform an attribute selection based on the sieve attribute.
+That is, if you use a regular sieve with a sieve attribute \verb|sip| your result will be a set of \verb|sip|s. With \verb|sieve-ex| you get all the nodes from the sieve
+path. 
+
+\subsubsection{Example}
+
+\begin{verbatim}
+('L','T',15) ('L','T',16) ('L','T',15) {- doesn't match $T:2 > $T:1 -}
+                          ('L','T',16) {- doesn't match -}
+                          ('L','T',20) {- matches -}
+\end{verbatim}
+
+With a regular sieve with the first attribute it would return \verb|('L')| as a result. However, with \verb|sieve-ex| it will return
+three results \verb|('L','T',15) ('L','T',16) ('L','T',20)|.
 
 \subsection{subtraction}
 
