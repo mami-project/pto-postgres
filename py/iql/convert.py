@@ -498,10 +498,11 @@ def convert_sieve_ex(exps, context):
     sqlb = sqlb % (",".join(sqlbattrs), sql_attribute)
     sql_unnests.append(sqlb)
 
+  distinct = 'DISTINCT' if context.nub else ''
+
   if context.attribute == '' or context.attribute == None:
-    sql = "(SELECT %s FROM " % (',\n'.join(sql_unnests))
+    sql = "(SELECT %s %s FROM " % (distinct, ',\n'.join(sql_unnests))
   else:
-    distinct = 'DISTINCT' if context.nub else ''
     sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
 
   sql += "%s l0 " % (context.TBL_NAME)
