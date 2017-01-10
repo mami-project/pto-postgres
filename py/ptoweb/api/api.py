@@ -310,7 +310,7 @@ def api_aquery():
   try:
     iqlc.convert(iql, get_iql_config())
   except ValueError as error:
-    return json400({"iql":iql_query, "error" : str(error)})
+    return json400({"iql":iql, "error" : str(error)})
 
   query_hash = sha1_hash(iqls)
 
