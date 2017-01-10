@@ -303,7 +303,7 @@ def api_aquery():
 
   try:
     iql = json.loads(iql)
-    iqls = json.dumps(sort_keys = True)
+    iqls = json.dumps(iql, sort_keys = True)
   except:
     return json400({"error" : "Not valid JSON!"})
 
