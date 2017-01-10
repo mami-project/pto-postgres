@@ -8,6 +8,11 @@ import re
 from datetime import datetime
 import iql.convert as iqlc
 import pprint
+import hashlib
+from pg import escape_string
+
+def sha1_hash(s):
+  return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
 class CustomEncoder(json.JSONEncoder):
   def default(self, o):
@@ -288,7 +293,35 @@ def api_old():
   return json200({"iql":iql_query, "count": len(result_json), "results" : result_json})
   
   
-  
+@app.route('/aquery')
+def api_aquery():
+
+  iql = request.args.get('q')
+
+  if iql == None or iql == '':
+    return json400({"error" : "Empty query!"})
+
+  try:
+    iql = json.loads(iql)
+    iqls = json.dumps(sort_keys = True)
+  except:
+    return json400({"error" : "Not valid JSON!"})
+
+  query_hash = sha1_hash(iqls)
+
+  sql = "SELECT * FROM query_queue WHERE sha = '%s';" % (escape_string(query_hash))
+
+  dr = get_db().query(sql).dictresult()
+
+  if len(dr) > 0:
+    first = dr[0]
+    return json200({"query_id": first["id"]})
+
+  sql = "INSERT INTO query_queue(id, iql, result, state) VALUES('%s', '%s'::JSON, NULL, 'new');" % (escape_string(query_hash), escape_string(iqls))
+
+  get_db().query(sql)
+
+  return json200({"query_id" : query_hash})
 
 
 @app.route('/query')
