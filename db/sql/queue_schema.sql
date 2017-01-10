@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS query_queue;
 
-CREATE TABLE query_quey (
+CREATE TABLE query_queue(
   ID INT NOT NULL,
   SHA VARCHAR(255) NOT NULL,
   IQL JSON NOT NULL,
