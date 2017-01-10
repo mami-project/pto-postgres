@@ -293,6 +293,20 @@ def api_old():
   return json200({"iql":iql_query, "count": len(result_json), "results" : result_json})
   
   
+@app.route("/result")
+def api_result():
+  query_id = request.args.get('id')
+
+  sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_id))
+
+  dr = get_db().query(sql).dictresult()
+
+  if len(dr) <= 0:
+    return json404({"error":"Not found!"})
+
+  return json200(dr[0])
+
+
 @app.route('/aquery')
 def api_aquery():
 
