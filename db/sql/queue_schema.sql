@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS query_queue;
+
+CREATE TABLE query_quey (
+  ID INT NOT NULL,
+  SHA VARCHAR(255) NOT NULL,
+  IQL JSON NOT NULL,
+  RESULT JSON NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_query_queue_id ON query_queue (id);
