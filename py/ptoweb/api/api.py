@@ -328,17 +328,30 @@ def api_aquery():
 
   query_hash = sha1_hash(iqls)
 
+  get_db().query("BEGIN;")
+
   sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_hash))
 
-  dr = get_db().query(sql).dictresult()
+  try:
+    dr = get_db().query(sql).dictresult()
+  except error:
+    get_db().query("ROLLBACK;")
+    return json500({"error":"Internal Server Error"})
 
   if len(dr) > 0:
     first = dr[0]
+    get_db().query("COMMIT")
     return json200({"query_id": first["id"]})
 
   sql = "INSERT INTO query_queue(id, iql, result, state) VALUES('%s', '%s'::JSON, NULL, 'new');" % (escape_string(query_hash), escape_string(iqls))
 
-  get_db().query(sql)
+  try:
+    get_db().query(sql)
+  except:
+    get_db().query("ROLLBACK;")
+    return json500({"error":"Internal Server Error"})
+
+  get_db().query("COMMIT;")
 
   return json200({"query_id" : query_hash})
 
