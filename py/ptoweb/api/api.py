@@ -309,7 +309,7 @@ def api_aquery():
 
   query_hash = sha1_hash(iqls)
 
-  sql = "SELECT * FROM query_queue WHERE sha = '%s';" % (escape_string(query_hash))
+  sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_hash))
 
   dr = get_db().query(sql).dictresult()
 
