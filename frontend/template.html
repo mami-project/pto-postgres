@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Path Transparency Observatory</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="results.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="nav">
+        <ul>
+          <li><a href="#">PTO</a></li>
+          <li><a href="#">Observatory</a></li>
+          <li><a href="#">Upload statistics</a></li>
+        </ul>
+      </div>
+      <div id="main">
+        <form action="javascript:getResults($('#result_id').val());">
+          <input id="result_id" type="text" value="a90b011d9ccb713104ce1148e155602a0dbeb8c1"/>
+          <input type="submit" value="Poll">
+        </form>
+        <h1>Query Result View</h1>
+        <h2>Chart</h2>
+        <div class="figure">
+          <div class="title">title</div>
+	        <svg class="chart">
+	        </svg>
+          <div class="legend">legend</span></div>
+        </div>
+     
+        <h2>Raw table</h2>
+        <table class="table">
+        </table>
+        <h2>Query</h2>
+        <code id="raw_query"></code>
+        <h2>Raw response</h2>
+        <code id="raw_results"></code>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Path Transparency Observatory</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="qui.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="nav">
+        <ul>
+          <li><a href="#">PTO</a></li>
+          <li><a href="#">Observatory</a></li>
+          <li><a href="#">Upload statistics</a></li>
+        </ul>
+      </div>
+      <div id="main">
+        <h1>Query</h1>
+        <form action="javascript:runQuery();">
+          <fieldset>
+            <legend>Conditions</legend>
+            <div class="row-2">
+              <div class="cell">
+                <label>Conditions</label>
+              </div>
+              <div class="cell">
+                <select id="i_conditions">
+                  <option value="ecn">ecn.*</option>
+                  <option value="ecn.connectivity">ecn.connectivity.*</option>
+                  <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.*</option>
+                </select>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="cell">
+                <label>Group by</label>
+              </div>
+              <div class="cell">
+                <select id="i_group_by">
+                  <option value="observation_set">Observation set</option>
+                  <option value="full_path">Path</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Time window</legend>
+            <div class="row-2">
+              <div class="cell">
+                <label>From</label>
+              </div>
+              <div class="cell">
+                <input id="i_time_from" type="text"/><br>
+                <span class="input_info">Leave blank for no restriction</span>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="cell">
+                <label>To</label>
+              </div>
+              <div class="cell">
+                <input id="i_time_to" type="text"/><br>
+                <span class="input_info">Leave blank for no restriction</span>
+              </div>
+            </div>
+          </fieldset>
+          <div class="margin-top-bottom">
+          <button type="submit">Run query</button>
+          </div>
+        </form>
+        <div class="msg" id="query_msg">
+          Please specify your query criteria and then click on 'Run Query' to submit the query. Your query
+          will be submitted to a queue and you'll be provided a link to retrieve the results. 
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

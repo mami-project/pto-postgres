@@ -1,0 +1,230 @@
+* { 
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  background-color: #FBFBFB;
+  font-family: sans-serif;
+  font-size: 1em;
+}
+
+#container {
+  padding: 2rem;
+  max-width: 65rem;
+}
+
+#nav ul {
+  list-style-type: none;
+}
+
+#nav ul::after {
+  clear: both;
+  display: table;
+  content: '';
+}
+
+#nav ul li {
+  display: block;
+  float: left;
+}
+
+#nav ul li a {
+  display: block;
+}
+
+#nav ul li + li {
+  margin-left: 1rem;
+}
+
+#nav ul li a, 
+#nav ul li a:hover,
+#nav ul li a:active,
+#nav ul li a:focus {
+  text-decoration: none;
+  color: red;
+}
+
+#nav ul li a:hover, 
+#nav ul li a:focus {
+  text-decoration: underline;
+}
+
+#nav {
+  border-bottom: solid 0.2rem darkgray;
+  padding-bottom: 0.2rem;
+}
+
+.figure {
+  box-sizing: border-box;
+  margin: 1rem;
+  padding: 1rem;
+  border: solid 0.1rem darkslategray;
+  background-color: whitesmoke;
+  text-align: center;
+  border-radius: 1rem;
+}
+
+.figure .title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.figure .legend {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.table {
+  box-sizing: border-box;
+  padding: 1em;
+  margin-top: 1em;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table tr:first-child {
+  border-bottom: solid 0.1em black;
+}
+
+.table tr {
+  border-bottom: solid 0.1em lightgray;
+}
+
+.table th {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.table th {
+  text-align: left;
+}
+
+.table th + th {
+  text-align: center;
+}
+
+.table td {
+  text-align: left;
+  color: dimgray;
+}
+
+.table td {
+  padding: 0.2em;
+}
+
+.table td + td {
+  text-align: right;
+}
+
+h1,h2,h3,h4,h5 { margin-bottom: 1rem; margin-top: 1rem; }
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+h4 {
+  font-size: 1.05rem;
+  text-decoration: underline;
+}
+
+h5 {
+  font-size: 1.05rem;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+code {
+  padding: 1rem;
+  display: block;
+  border-radius: 1rem;
+  font-family: monospace, monospace;
+  color: steelblue;
+}
+
+code {
+  overflow: auto;
+}
+
+.row-2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.row-2 .cell {
+  flex: 1;
+  padding: 0.1rem;
+  box-sizing: border-box;
+}
+
+fieldset {
+  box-sizing: border-box;
+  padding: 0.5rem;
+}
+
+legend { 
+  padding: 0.2rem;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+}
+
+select, input, textarea, button {
+  padding: 0.5em;
+  border: solid 0.2em lightgray;
+  background-color: white;
+  box-shadow: none;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.8em;
+}
+
+button {
+  background-color: salmon;
+  color: white;
+  border: solid 0.2em indianred;
+  font-weight: bold;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: indianred;
+}
+
+input:focus, select:focus, textarea:focus, button:focus {
+  border: solid 0.2em indianred;
+  box-shadow: none;
+}
+
+input:hover, select:hover, textarea:hover, button:hover {
+  border: solid 0.2em salmon;
+  box-shadow: none;
+}
+
+.input_info {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.margin-top-bottom {
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.msg {
+  background-color: #DBDBDB;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
