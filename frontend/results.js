@@ -157,7 +157,7 @@ function table(data) {
 
 }
 
-function trim(str) {
+function trim_long(str) {
   if(str.length > 35)
     return str.substring(0,32) + "...";
   return str;
@@ -221,7 +221,7 @@ bar.append("text")
         else
           return "font-size: 15px; text-anchor: start";
       })
-    .text(function(d) { return trim(d[counted_attribute]) + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
+    .text(function(d) { return trim_long(d[counted_attribute]) + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
 
 
 
