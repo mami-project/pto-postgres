@@ -204,7 +204,7 @@ bar.append("rect")
 
 bar.append("text")
     .attr("x", function(d) {
-         if(x(d.count) > 255)
+         if(x(d.count) > width/2)
            return x(d.count)-5;
          else
            return x(d.count)+5;
