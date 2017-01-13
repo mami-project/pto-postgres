@@ -115,7 +115,8 @@ function renderResults(results) {
       renderCounts(results, query['count'][0]);
   }
 
-  
+  if(results.length > 0)
+    table(results);
 }
 
 
