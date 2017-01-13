@@ -139,7 +139,7 @@ function table(data) {
   var table = d3.select(".table");
 
   var cols = Object.keys(data[0]);
-
+  cols.sort();
 
 
   var hrow = table.append("tr");
