@@ -212,7 +212,7 @@ bar.append("text")
         else return "black";
       })
     .attr("style", function(d) {
-        if(x(d.count) > 255)
+        if(x(d.count) > 355)
           return "font-size: 15px; text-anchor: end";
         else
           return "font-size: 15px; text-anchor: start";
