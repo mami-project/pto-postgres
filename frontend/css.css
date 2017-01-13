@@ -232,3 +232,5 @@ input:hover, select:hover, textarea:hover, button:hover {
 .auto-overflow {
   overflow: auto;
 }
+
+#chart_section { display: none; }

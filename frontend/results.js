@@ -160,6 +160,8 @@ function chart(data, title, counted_attribute) {
 
 console.log('chart',data);
 
+document.getElementById('chart_section').style.display = 'block';
+
 var counts = [];
 
 for(var i = 0; i < data.length; i++) 
