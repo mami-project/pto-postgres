@@ -158,6 +158,7 @@ function table(data) {
 }
 
 function trim_long(str) {
+  str = str.toString();
   if(str.length > 35)
     return str.substring(0,32) + "...";
   return str;
