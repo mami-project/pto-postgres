@@ -85,7 +85,7 @@ html {
 }
 
 .table tr:first-child {
-  border-bottom: solid 0.2rem salmon;
+  border-bottom: solid 0.2rem black;
 }
 
 .table tr {
@@ -117,7 +117,7 @@ html {
 
 .table td + td {
   text-align: left;
-  border-left: solid 0.2rem salmon;
+  border-left: solid 0.15rem darkgray;
 }
 
 
