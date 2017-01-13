@@ -212,15 +212,15 @@ bar.append("text")
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
     .attr("fill", function(d) {
-        if(x(d.count) > 355)
+        if(x(d.count) > width/2)
           return "white";
         else return "black";
       })
     .attr("style", function(d) {
-        if(x(d.count) > 355)
-          return "font-family: monospace, monospace; font-size: 15px; text-anchor: end";
+        if(x(d.count) > width/2)
+          return "font-family: monospace, monospace; font-size: 12px; text-anchor: end";
         else
-          return "font-family: monospace, monospace; font-size: 15px; text-anchor: start";
+          return "font-family: monospace, monospace; font-size: 12px; text-anchor: start";
       })
     .text(function(d) { return trim_long(d[counted_attribute]) + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
 
