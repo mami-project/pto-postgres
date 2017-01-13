@@ -228,3 +228,7 @@ input:hover, select:hover, textarea:hover, button:hover {
   padding: 0.5rem;
   box-sizing: border-box;
 }
+
+#table_section {
+  overflow: auto;
+}
