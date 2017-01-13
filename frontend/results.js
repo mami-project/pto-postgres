@@ -157,6 +157,7 @@ function table(data) {
 
 }
 
+function hover(that) { alert(that); }
 
 function chart(data, title, counted_attribute) {
 
@@ -173,6 +174,7 @@ var width = 720,
     barHeight = 30;
 
 var max_count = d3.max(counts);
+var sum_count = d3.sum(counts);
 
 var x = d3.scale.linear()
     .domain([0, max_count])
@@ -215,7 +217,7 @@ bar.append("text")
         else
           return "text-anchor: start";
       })
-    .text(function(d) { return d[counted_attribute]; });
+    .text(function(d) { return d[counted_attribute] + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
 
 
 
@@ -225,8 +227,8 @@ var footer = chart.append("g")
   .attr("transform", function() { return "translate(0," + (data.length * (5+barHeight)) + ")"; });
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*data.length -5).attr("fill","black").attr("x",width-2);
-    footer.append("text").attr("x",0).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return "< 0"; }).attr("fill","black");
+    footer.append("text").attr("x",0).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return "0"; }).attr("fill","black");
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*data.length -5).attr("x", 0).attr("fill","black");
-    footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_count + ">"; }).attr("fill","black").attr("style","text-anchor: end;");
+    footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_count + ""; }).attr("fill","black").attr("style","text-anchor: end;");
 }
