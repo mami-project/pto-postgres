@@ -218,9 +218,9 @@ bar.append("text")
       })
     .attr("style", function(d) {
         if(x(d.count) > width/2)
-          return "font-family: monospace, monospace; font-size: 12px; text-anchor: end";
+          return "font-family: monospace, monospace; font-size: 13px; text-anchor: end";
         else
-          return "font-family: monospace, monospace; font-size: 12px; text-anchor: start";
+          return "font-family: monospace, monospace; font-size: 13px; text-anchor: start";
       })
     .text(function(d) { return trim_long(d[counted_attribute]) + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
 
