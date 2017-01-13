@@ -1,4 +1,4 @@
-var api_base = 'https://observatory.mami-project.eu';
+var api_base = 'https://observatory.mami-project.eu/papi';
 
 function is_prefix(xs, ys) {
   if (xs.length > ys.length) {
