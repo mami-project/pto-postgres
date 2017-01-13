@@ -78,23 +78,24 @@ html {
 
 .table {
   box-sizing: border-box;
-  padding: 1em;
-  margin-top: 1em;
+  padding: 1rem;
+  margin-top: 1rem;
   border-collapse: collapse;
   width: 100%;
 }
 
 .table tr:first-child {
-  border-bottom: solid 0.1em black;
+  border-bottom: solid 0.1rem black;
 }
 
 .table tr {
-  border-bottom: solid 0.1em lightgray;
+  border-bottom: solid 0.1rem lightgray;
 }
 
 .table th {
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: 1.1rem;
+  padding: 0.2rem;
 }
 
 .table th {
@@ -111,7 +112,7 @@ html {
 }
 
 .table td {
-  padding: 0.2em;
+  padding: 0.2rem;
 }
 
 .table td + td {
@@ -182,19 +183,19 @@ label {
 }
 
 select, input, textarea, button {
-  padding: 0.5em;
-  border: solid 0.2em lightgray;
+  padding: 0.5rem;
+  border: solid 0.2rem lightgray;
   background-color: white;
   box-shadow: none;
   width: 100%;
   box-sizing: border-box;
-  font-size: 0.8em;
+  font-size: 0.8rem;
 }
 
 button {
   background-color: salmon;
   color: white;
-  border: solid 0.2em indianred;
+  border: solid 0.2rem indianred;
   font-weight: bold;
 }
 
@@ -204,12 +205,12 @@ button:hover {
 }
 
 input:focus, select:focus, textarea:focus, button:focus {
-  border: solid 0.2em indianred;
+  border: solid 0.2rem indianred;
   box-shadow: none;
 }
 
 input:hover, select:hover, textarea:hover, button:hover {
-  border: solid 0.2em salmon;
+  border: solid 0.2rem salmon;
   box-shadow: none;
 }
 
