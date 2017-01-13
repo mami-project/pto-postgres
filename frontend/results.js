@@ -36,6 +36,12 @@ var attr_display_names = {
   "count" : "Count"
 };
 
+function attr_name_to_display(name) {
+  if(name in attr_display_names)
+    return attr_display_names[name];
+  return name;
+}
+
 function renderCounts(results, group_order) {
   if(!Array.isArray(group_order)) {
     console.log("group_order not an array");
@@ -80,7 +86,7 @@ function renderCounts(results, group_order) {
     var group_keys = Object.keys(groups);
 
     for(var i = 0; i < group_keys.length; i++) {
-      chart(groups[group_keys[i]], attr_display_names[group_by] + ": " + group_keys[i], counted_attribute);
+      chart(groups[group_keys[i]], attr_name_to_display(group_by) + ": " + group_keys[i], counted_attribute);
     }
 
   }
@@ -138,7 +144,7 @@ function table(data) {
   var hrow = table.append("tr");
 
   for(var i = 0; i < cols.length; i++) {
-    hrow.append("th").text(function() { return attr_display_names[cols[i]]; });
+    hrow.append("th").text(function() { return attr_name_to_display(cols[i]); });
   }
 
   var row = table.selectAll(".row").data(data).enter().append("tr");
