@@ -1,4 +1,4 @@
-var api_base = 'http://localhost:5000';
+var api_base = 'https://observatory.mami-project.eu';
 
 function is_prefix(xs, ys) {
   if (xs.length > ys.length) {
