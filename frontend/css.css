@@ -229,6 +229,6 @@ input:hover, select:hover, textarea:hover, button:hover {
   box-sizing: border-box;
 }
 
-#table_section {
+.auto-overflow {
   overflow: auto;
 }
