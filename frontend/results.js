@@ -207,7 +207,7 @@ bar.append("text")
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
     .attr("fill", function(d) {
-        if(x(d.count) > 255)
+        if(x(d.count) > 355)
           return "white";
         else return "black";
       })
