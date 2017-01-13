@@ -103,7 +103,7 @@ html {
 }
 
 .table th + th {
-  text-align: center;
+  text-align: left;
 }
 
 .table td {
@@ -116,8 +116,10 @@ html {
 }
 
 .table td + td {
-  text-align: right;
+  text-align: left;
+  border-left: solid 0.1rem salmon;
 }
+
 
 h1,h2,h3,h4,h5 { margin-bottom: 1rem; margin-top: 1rem; }
 

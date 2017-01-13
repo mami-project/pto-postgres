@@ -135,6 +135,7 @@ function getResults(id) {
      .fail(function() { alert('fail :('); });
 }
 
+
 function table(data) {
   var table = d3.select(".table");
 
