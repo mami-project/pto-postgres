@@ -62,6 +62,7 @@ function renderCounts(results, group_order) {
   }
 
   var cols = Object.keys(results[0]);
+  cols.sort();
 
   console.log('group_order', group_order);
   console.log('results.length', results.length);
