@@ -1,5 +1,6 @@
 import iql.constants as C
 import iql.util as U
+from pg import escape_string
 
 class Config:
 
@@ -623,7 +624,7 @@ def convert_exp(exp, cur_table, context):
   elif type(exp) == type(""):
 
     if not exp.startswith("$") and not exp.startswith("@"):
-      return ("'" + exp + "'", "S", "")
+      return ("'" + escape_string(exp) + "'", "S", "")
     elif exp.startswith("$"):
 
       if context.msmnt_name == None:
