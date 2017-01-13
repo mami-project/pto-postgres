@@ -31,8 +31,63 @@ function loadResults() {
 
 var attr_display_names = {
   "observation_set" : "Observation set",
-  "full_path" : "Path"
+  "full_path" : "Path",
+  "name" : "Condition",
+  "count" : "Count"
 };
+
+function renderCounts(results, group_order) {
+  if(!Array.isArray(group_order)) {
+    console.log("group_order not an array");
+    return;
+  }
+
+  if(results.length < 0) {
+    console.log("empty result set");
+    return;
+  }
+
+  var counted_attribute = group_order[group_order.length-1].substring(1);
+
+  group_order.pop();
+
+  for(var i = 0; i < group_order.length; i++) {
+    group_order[i] = group_order[i].substring(1);
+  }
+
+  var cols = Object.keys(results[0]);
+
+  console.log('group_order', group_order);
+  console.log('results.length', results.length);
+  console.log('cols', cols);
+  console.log('counted_attribute', counted_attribute);
+
+  if(group_order.length == 1) {
+
+    var group_by = group_order[0];
+    var groups = {};
+
+    for(var i = 0; i < results.length; i++) {
+      var k = results[i][group_by];
+
+      if(k in groups) {
+        groups[k].push(results[i]);
+      }
+      else
+        groups[k] = [results[i]];
+    }
+
+    var group_keys = Object.keys(groups);
+
+    for(var i = 0; i < group_keys.length; i++) {
+      chart(groups[group_keys[i]], attr_display_names[group_by] + ": " + group_keys[i], counted_attribute);
+    }
+
+  }
+  else if(group_order.length == 0) {
+    chart(results, "Counts", counted_attribute);
+  }
+}
 
 
 function renderResults(results) {
@@ -46,46 +101,21 @@ function renderResults(results) {
 
   results = result['results'];
 
-  console.log('results.length', results.length);
 
-  if(results.length > 0) {
-    var cols = Object.keys(results[0])
-    console.log('cols', cols);
+  console.log('iql', JSON.stringify(iql));
 
-    if(cols.indexOf('name') >= 0 && cols.indexOf('count') >= 0) {
-      if(cols.length == 2) {
-        chart(results);
-      }
-      else if(cols.length == 3) {
-        var group_by = "";
-
-        for(var i = 0; i < cols.length; i++) {
-          if(cols[i] != 'name' &&  cols[i] != 'count')
-            group_by = cols[i];
-        }
-
-        console.log('group_by', group_by);
-
-        var groups = {};
-
-        for(var i = 0; i < results.length; i++) {
-          var k = results[i][group_by];
-
-          if(k in groups) {
-            groups[k].push(results[i]);
-          }
-          else
-            groups[k] = [results[i]];
-        }
-
-        var group_keys = Object.keys(groups);
-
-        for(var i = 0; i < group_keys.length; i++) {
-          chart(groups[group_keys[i]], attr_display_names[group_by] + ": " + group_keys[i]);
-        }
-      }
-    }
+  if(!('query' in iql)) {
+    return; //abort. something's more than fishy
   }
+
+
+  var query = iql['query'];
+
+  if('count' in query) {
+      renderCounts(results, query['count'][0]);
+  }
+
+  
 }
 
 
@@ -97,8 +127,29 @@ function getResults(id) {
      .fail(function() { alert('fail :('); });
 }
 
+function table(data) {
+  var table = d3.select(".table");
 
-function chart(data, title) {
+  var cols = Object.keys(data[0]);
+
+
+
+  var hrow = table.append("tr");
+
+  for(var i = 0; i < cols.length; i++) {
+    hrow.append("th").text(function() { return attr_display_names[cols[i]]; });
+  }
+
+  var row = table.selectAll(".row").data(data).enter().append("tr");
+
+  for(var i = 0; i < cols.length; i++) {
+    row.append("td").text(function(d) { return d[cols[i]] });
+  }
+
+}
+
+
+function chart(data, title, counted_attribute) {
 
 console.log('chart',data);
 
@@ -153,7 +204,7 @@ bar.append("text")
         else
           return "text-anchor: start";
       })
-    .text(function(d) { return d.name; });
+    .text(function(d) { return d[counted_attribute]; });
 
 
 
@@ -167,14 +218,4 @@ var footer = chart.append("g")
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*data.length -5).attr("x", 0).attr("fill","black");
     footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_count + ">"; }).attr("fill","black").attr("style","text-anchor: end;");
-
-var table = d3.select(".table");
-
-var hrow = table.append("tr");
-    hrow.append("th").text(function() { return "Condition"; });
-    hrow.append("th").text(function() { return "Count"; } );
-
-var row = table.selectAll(".row").data(data).enter().append("tr");
-    row.append("td").text(function(d) { return d.name; });
-    row.append("td").text(function(d) { return d.count; });
 }

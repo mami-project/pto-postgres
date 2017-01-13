@@ -39,12 +39,20 @@ function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
   var time_from = $("#i_time_from").val();
-  var time_to = $("#i_time_to");
+  var time_to = $("#i_time_to").val();
+  var count = $("#i_count").val();
+
+
+  if((time_from != "" && isNaN(Date.parse(time_from))) || (time_to != "" && isNaN(Date.parse(time_to)))) {
+    $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
+    return;
+  }
 
   console.log("conditions",conditions);
   console.log("group_by", group_by);
   console.log("time_from", time_from);
   console.log("time_to", time_to);
+  console.log("count", count);
 
   var all_conditions = [
     {"path":["ecn","connectivity","works"],"id":2},
@@ -81,7 +89,31 @@ function runQuery() {
 
   console.log('iql_condition_parts', JSON.stringify(iql_condition_parts));
 
-  var query = {"query":{"count":[['@' + group_by, '@name'], {"simple":[{"or":iql_condition_parts}]}]}};
+  iql_time_parts = [];
+
+  if(time_from != "")
+    iql_time_parts.push({"ge":[{"time":[Date.parse(time_from)]},"@time_from"]})
+
+  if(time_to != "")
+    iql_time_parts.push({"le":[{"time":[Date.parse(time_to)]},"@time_to"]})
+
+  var exp_ = {"or":iql_condition_parts};
+
+  if(iql_time_parts.length == 0) {
+    exp_ = exp_;
+  }
+  else if(iql_time_parts.length == 1) {
+    exp_ = {"and":[exp_,iql_time_parts[0]]};
+  }
+  else if(iql_time_parts.length == 2) {
+    exp_ = {"and":[exp_,iql_time_parts[0],iql_time_parts[1]]};
+  }
+
+  
+  var query = {"query":{"count":[['@' + group_by, '@'+count], {"simple":[exp_]}]}};
+
+  if(group_by == 'no') 
+    query = {"query":{"count":[['@'+count], {"simple":[exp_]}]}};
   
   var str_query = JSON.stringify(query);
 
