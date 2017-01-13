@@ -85,7 +85,7 @@ html {
 }
 
 .table tr:first-child {
-  border-bottom: solid 0.2rem black;
+  border-bottom: solid 0.2rem salmon;
 }
 
 .table tr {
