@@ -157,7 +157,11 @@ function table(data) {
 
 }
 
-function hover(that) { alert(that); }
+function trim(str) {
+  if(str.length > 35)
+    return str.substring(0,32) + "...";
+  return str;
+}
 
 function chart(data, title, counted_attribute) {
 
@@ -217,7 +221,7 @@ bar.append("text")
         else
           return "font-size: 15px; text-anchor: start";
       })
-    .text(function(d) { return d[counted_attribute] + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
+    .text(function(d) { return trim(d[counted_attribute]) + " [" + Math.round((100*d.count/sum_count)*10)/10 + "%]"; });
 
 
 
