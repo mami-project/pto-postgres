@@ -42,7 +42,7 @@ function attr_name_to_display(name) {
   return name;
 }
 
-function renderCounts(results, group_order) {
+function renderCounts(results, group_order, distinct) {
   if(!Array.isArray(group_order)) {
     console.log("group_order not an array");
     return;
@@ -54,8 +54,12 @@ function renderCounts(results, group_order) {
   }
 
   var counted_attribute = group_order[group_order.length-1].substring(1);
+  var distinct_attribute = counted_attribute;
 
   group_order.pop();
+
+  if(distinct === true)
+    counted_attribute = group_order.pop().substring(1);
 
   for(var i = 0; i < group_order.length; i++) {
     group_order[i] = group_order[i].substring(1);
@@ -89,7 +93,14 @@ function renderCounts(results, group_order) {
     //for(var i = 0; i < group_keys.length; i++) {
     //  chart(groups[group_keys[i]], attr_name_to_display(group_by) + ": " + group_keys[i], counted_attribute);
     //}
-    hbar_stacked(groups, "Counts of '" + attr_name_to_display(counted_attribute) + "' grouped by '" + attr_name_to_display(group_by) + "'", counted_attribute, group_by);
+
+    var title = "Counts of observations per <i>" + attr_name_to_display(counted_attribute) + "</i> grouped by <i>" + attr_name_to_display(group_by) + "</i>";
+
+    if(distinct === true) {
+      title = "Counts of distinct <i>" + attr_name_to_display(distinct_attribute) + "s</i> per <i>" + attr_name_to_display(counted_attribute) + "</i> grouped by <i>" + attr_name_to_display(group_by) + "</i>";
+    }
+
+    hbar_stacked(groups, title, counted_attribute, group_by);
 
   }
   else if(group_order.length == 0) {
@@ -121,6 +132,9 @@ function renderResults(results) {
 
   if('count' in query) {
       renderCounts(results, query['count'][0]);
+  }
+  else if('count-distinct' in query) {
+      renderCounts(results, query['count-distinct'][0], true);
   }
 
   if(results.length > 0)
@@ -202,7 +216,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
       .range([0, width-200]);
 
   var figure = d3.select("#figures").append("div").attr("class","figure");
-      figure.append("div").attr("class","title").text(title);
+      figure.append("div").attr("class","title").html(title);
 
   var chart = figure.append("svg")
       .attr("width", width)
