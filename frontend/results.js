@@ -86,9 +86,10 @@ function renderCounts(results, group_order) {
 
     var group_keys = Object.keys(groups);
 
-    for(var i = 0; i < group_keys.length; i++) {
-      chart(groups[group_keys[i]], attr_name_to_display(group_by) + ": " + group_keys[i], counted_attribute);
-    }
+    //for(var i = 0; i < group_keys.length; i++) {
+    //  chart(groups[group_keys[i]], attr_name_to_display(group_by) + ": " + group_keys[i], counted_attribute);
+    //}
+    hbar_stacked(groups, "Counts of '" + attr_name_to_display(counted_attribute) + "' grouped by '" + attr_name_to_display(group_by) + "'", counted_attribute, group_by);
 
   }
   else if(group_order.length == 0) {
@@ -162,6 +163,126 @@ function trim_long(str) {
   if(str.length > 35)
     return str.substring(0,32) + "...";
   return str;
+}
+
+function hbar_stacked(groups, title, counted_attribute, group_by) {
+  console.log('hbar_stacked', groups, title, counted_attribute);
+
+  document.getElementById('chart_section').style.display = 'block';
+
+  var group_keys = Object.keys(groups);
+  var max_overall = 0;
+  var cols = [];
+
+  for(var i = 0; i < group_keys.length; i++) {
+    var data = groups[group_keys[i]];
+    var temp = 0;
+    for(var j = 0; j < data.length; j++) {
+      temp += data[j]['count'];
+
+      if(cols.indexOf(data[j][counted_attribute]) < 0)
+        cols.push(data[j][counted_attribute]);
+    }
+
+    max_overall = d3.max([max_overall, temp]);
+  }
+
+  cols.sort();
+  console.log('cols', cols);
+  console.log('max_overall', max_overall);
+
+  var width = 720,
+      barHeight = 30;
+
+  var colors = ['salmon','steelblue','peru','mediumorchid','red','darkgray','green','black','magenta','maroon','blue','darkgreen','burlywood','indigo'];
+
+
+  var x = d3.scale.linear()
+      .domain([0, max_overall])
+      .range([0, width-200]);
+
+  var figure = d3.select("#figures").append("div").attr("class","figure");
+      figure.append("div").attr("class","title").text(title);
+
+  var chart = figure.append("svg")
+      .attr("width", width)
+      .attr("height", (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2)));
+
+
+  for(var i = 0; i < group_keys.length; i++) {
+    var data = groups[group_keys[i]];
+
+    var region = chart.append("g").attr("transform","translate(0," + i*(5+barHeight) + ")");
+    
+    data.sort(function (a,b) { 
+     if(a[counted_attribute] > b[counted_attribute]) return 1;
+     if(a[counted_attribute] < b[counted_attribute]) return -1;
+     return 0;
+    });
+
+    console.log('data',data);
+
+    var offset_x = 200;
+
+    region.append("text")
+      .attr("y", barHeight /2).attr("dy", ".35em").text(group_keys[i])
+      .attr("style","font-family: sans-serif; font-size: 14px; text-anchor: start");
+
+    for(var j = 0; j < data.length; j++) {
+      region.append("rect")
+      .attr("width", x(data[j].count))
+      .attr("height", barHeight)
+      .attr("fill", colors[cols.indexOf(data[j][counted_attribute])])
+      .attr("x", offset_x);
+      offset_x += x(data[j].count);
+    }
+
+    offset_x = 200;
+
+    for(var j = 0; j < data.length; j++) {
+      region.append("rect")
+      .attr("width", 2)
+      .attr("height", barHeight)
+      .attr("fill","black")
+      .attr("x", offset_x);
+      offset_x += x(data[j].count);
+    }
+
+    region.append("rect")
+      .attr("width", 2)
+      .attr("height", barHeight)
+      .attr("fill","black")
+      .attr("x", offset_x-2);
+  }
+
+  var lines = chart.append("g");
+
+  var footer = chart.append("g")
+    .attr("transform", function() { return "translate(0," + (group_keys.length * (5+barHeight)) + ")"; });
+
+    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("fill","black").attr("x",width-2);
+    footer.append("text").attr("x",200).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return "0"; }).attr("fill","black");
+
+    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x", 200).attr("fill","black");
+    footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
+
+  var legend = chart.append("g");
+      legend.attr("transform", "translate(0," + ((group_keys.length+1) * (5+barHeight)) + ")");
+
+  offset_x = 0;
+  offset_y = 0;
+
+  for(var i = 0; i < cols.length; i++) {
+    legend.append("rect").attr("y", offset_y).attr("x",offset_x + 0).attr("width", barHeight).attr("height", barHeight).attr("fill", colors[i]);
+    legend.append("text").attr("x",offset_x + barHeight+5).attr("y", offset_y + barHeight /2).attr("dy", ".35em").text(cols[i])
+     .attr("style","font-family: sans-serif; font-size: 14px; text-anchor: start;")
+     .attr("fill", colors[i]);
+    offset_x += 350;
+    if(i % 2 == 1) {
+      offset_y += barHeight+5;
+      offset_x = 0;
+    }
+  }
 }
 
 function chart(data, title, counted_attribute) {
