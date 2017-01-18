@@ -282,7 +282,7 @@ def convert(query, config = Config()):
       else:
         select_attributes = attributes[:-1]
         if(len(select_attributes) > 0):
-          sql = "SELECT " + ",".join(attributes) + ", COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
+          sql = "SELECT " + ",".join(select_attributes) + ", COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
         else:
           sql = "SELECT COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
 
