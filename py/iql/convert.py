@@ -280,7 +280,11 @@ def convert(query, config = Config()):
       if not distinct:
         sql = "SELECT " + ",".join(attributes) + ", COUNT(z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
       else:
-        sql = "SELECT " + ",".join(attributes) + ", COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
+        select_attributes = attributes[:-1]
+        if(len(select_attributes) > 0):
+          sql = "SELECT " + ",".join(attributes) + ", COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
+        else:
+          sql = "SELECT COUNT(DISTINCT z.%s) AS count FROM (%s) z\n" % (attribute, sql_)
 
       if raw_attribute.startswith("$"):
         raw_attribute = raw_attribute[1:]
@@ -289,9 +293,9 @@ def convert(query, config = Config()):
       if not distinct:
         sql += "GROUP BY " + ",".join(attributes) + " "
       else:
-        attributes = attributes[:-1]
-        if(len(attributes) > 0):
-          sql += "GROUP BY " + ",".join(attributes) + " "
+        group_attributes = attributes[:-1]
+        if(len(group_attributes) > 0):
+          sql += "GROUP BY " + ",".join(group_attributes) + " "
 
       if context.order != None:
         if not overwrite_order:
