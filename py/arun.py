@@ -4,6 +4,8 @@
 #
 
 import iql.convert
+import pgdb
+import pg
 
 class BaseAnalysisContext:
     """
@@ -13,10 +15,11 @@ class BaseAnalysisContext:
 
     def __init__(self, conn):
         self._conn = conn
+        self._dbw = pg.DB(self._conn)
 
-    def create_observation_set(self):
-        pass
-
+    def create_observation_set(self, name):
+        obset = self._dbw.insert("observation", name=name)
+        return ObservationSetWriter(self, obset.id)
 
 class RawAnalysisContext(BaseAnalysisContext):
     """
@@ -45,17 +48,17 @@ class ObservationAnalysisContext(BaseAnalysisContext):
         sql = iql.convert.convert(iql_ast)
 
         # create a cursor and execute the query
-        cursor = self._conn.cursor()
-        cursor.execute(sql)
+        c = self._conn.cursor()
+        c.execute(sql)
 
         # wrap the cursor in an iterator
-        return CursorIterator(cursor)
+        return CursorIterator(c)
 
 class CursorIterator:
 
-    def __init__(self, cursor):
+    def __init__(self, c):
         # execute the IQL query, store the cursor
-        self._c = cursor
+        self._c = c
 
     def __iter__(self):
         row = self._c.fetchone()
@@ -66,31 +69,19 @@ class CursorIterator:
 
 
 class ObservationSetWriter:
+    
+    def __init__(self, context, set_id):
+        self._context = context
+        self.osid = osid
 
-    def observe(self, start, end, path, condition, value):
-        pass
+    def observe(self, start_time, end_time, path, condition, value=None):
+        self.context._dbw.insert('observation', full_path=path, time_from=start, time_to=end, condition=condition, val_n=value, observation_set=self.osid)
 
     def complete(self):
         """
         Finish writing observations to this observation set
         """
         pass
-
-
-
-
-class ObservationSetReader:
-
-    def __init__(self):
-
-
-    def __iter__(self):
-        """
-        Iterate over observations in this observation set
-        """
-        return ObservationSetIterator(self)
-
-
 
 class RawAnalyzer:
     def run(self, context):

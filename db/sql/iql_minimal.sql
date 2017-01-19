@@ -7,8 +7,8 @@ DROP TABLE IF EXISTS observation_set;
 
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL,
-  toc INT NOT NULL,
-  toi INT NOT NULL
+  name VARCHAR(255) NOT NULL,
+  toi INT
 );
 
 CREATE UNIQUE INDEX idx_observation_set_unique_osid ON observation_set (osid);
