@@ -180,6 +180,16 @@ function trim_long(str) {
   return str;
 }
 
+function to_e(num) {
+  if(num < 10000)
+    return num;
+  var lg = Math.floor(Math.log10(num));
+  var b = num / (Math.pow(10,lg));
+      b = Math.round(10*b)/10;
+  return "" + b + "e" + lg;
+}
+
+
 function hbar_stacked(groups, title, counted_attribute, group_by) {
   console.log('hbar_stacked', groups, title, counted_attribute);
 
@@ -190,6 +200,8 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
   var max_overall = 0;
   var cols = [];
 
+  var counted_total = {};
+
   for(var i = 0; i < group_keys.length; i++) {
     var data = groups[group_keys[i]];
     var temp = 0;
@@ -198,6 +210,13 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
 
       if(cols.indexOf(data[j][counted_attribute]) < 0)
         cols.push(data[j][counted_attribute]);
+
+      if(data[j][counted_attribute] in counted_total) {
+        counted_total[data[j][counted_attribute]] += data[j]['count'];
+      }
+      else {
+        counted_total[data[j][counted_attribute]] = 0;
+      }
     }
 
     max_overall = d3.max([max_overall, temp]);
@@ -241,7 +260,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
     var offset_x = 200;
 
     region.append("text")
-      .attr("y", barHeight /2).attr("dy", ".35em").text(group_keys[i])
+      .attr("y", barHeight /2).attr("dy", ".35em").text(trim_long(group_keys[i]))
       .attr("style","font-family: sans-serif; font-size: 14px; text-anchor: start");
 
     for(var j = 0; j < data.length; j++) {
@@ -290,10 +309,10 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
 
   for(var i = 0; i < cols.length; i++) {
     legend.append("rect").attr("y", offset_y).attr("x",offset_x + 0).attr("width", barHeight).attr("height", barHeight).attr("fill", colors[i]);
-    legend.append("text").attr("x",offset_x + barHeight+5).attr("y", offset_y + barHeight /2).attr("dy", ".35em").text(cols[i])
+    legend.append("text").attr("x",offset_x + barHeight+5).attr("y", offset_y + barHeight /2).attr("dy", ".35em").text(trim_long(cols[i]) + " (" + to_e(counted_total[cols[i]]) +")")
      .attr("style","font-family: sans-serif; font-size: 14px; text-anchor: start;")
      .attr("fill", colors[i]);
-    offset_x += 350;
+    offset_x += Math.floor(width / 2);
     if(i % 2 == 1) {
       offset_y += barHeight+5;
       offset_x = 0;
