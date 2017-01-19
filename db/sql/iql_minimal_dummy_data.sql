@@ -1,8 +1,8 @@
-INSERT INTO observation_set(osid, toc, toi)
- VALUES(0, 0, 999999);
+INSERT INTO observation_set(osid, name, toi)
+ VALUES(0, 'test0', 999999);
 
-INSERT INTO observation_set(osid, toc, toi)
- VALUES(1, 1, 999999);
+INSERT INTO observation_set(osid, name, toi)
+ VALUES(1, 'test1', 999999);
 
 INSERT INTO observation(oid, full_path, time_from, time_to, val_n, observation_set, condition)
  VALUES(0, ARRAY['192.168.1.100','192.168.1.1','166.166.166.166']::VARCHAR[],
