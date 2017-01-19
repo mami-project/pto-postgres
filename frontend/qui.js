@@ -60,7 +60,10 @@ function runQuery() {
     {"path":["ecn","connectivity","offline"],"id":5},
     {"path":["ecn","connectivity","transient"],"id":4},
     {"path":["ecn","negotiation_attempt","succeeded"],"id":7},
-    {"path":["ecn","negotiation_attempt","failed"],"id":8}
+    {"path":["ecn","negotiation_attempt","failed"],"id":8},
+    {"path":["ecn","ect_one","seen"],"id":-1},
+    {"path":["ecn","ect_zero","seen"],"id":-1},
+    {"path":["ecn","ce","seen"],"id":-1}
   ];
 
   var condition_ = conditions.split(".");
