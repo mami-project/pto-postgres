@@ -83,8 +83,12 @@ def api_result():
     return json404({"error":"Not found!"})
 
   item = dr[0]
-  item['iql'] = json.loads(item['iql'])
-  item['result'] = json.loads(item['result'])
+  if type(item['iq']) == type(''):
+    item['iql'] = json.loads(item['iql'])
+
+  if type(item['result']) == type(''):
+    item['result'] = json.loads(item['result'])
+
 
   return json200(dr[0])
 
