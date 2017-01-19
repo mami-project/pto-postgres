@@ -45,6 +45,7 @@ class Context:
     self.ALL_SQL_ATTRS = config.ALL_SQL_ATTRS
 
 
+
 def convert_simple(exp, context):
   """
   Converts a simple query to SQL.
@@ -74,7 +75,7 @@ def convert_simple(exp, context):
 
 def convert_choice(operands, cur_table, context):
   """
-  Moo
+  An experimental undocumented operation. 
   """
 
   U.expect_array(operands, 0, "`choice'")
@@ -106,6 +107,11 @@ def convert_choice(operands, cur_table, context):
 
 
 def get_limit_clause(context):
+  """
+  Returns the LIMIT _ OFFSET _ clause for queries based on the information
+  provided in the context.
+  """
+
   if context.skip <= 0:
     return " LIMIT %d " % context.limit
   else:
@@ -116,8 +122,6 @@ def convert(query, config = Config()):
   """
   Converts a query to SQL.
   """
-
-  
 
   context = Context('', '')
 
@@ -381,7 +385,11 @@ def convert_query(query, context):
     raise ValueError("Need one of `sieve', `simple', `intersection', `union' or `subtraction': " + str(query))
 
 
+
 def convert_lookup(arguments, context):
+  """
+  Converts a lookup operation.
+  """
 
   U.expect_array(arguments, 0, "`lookup'")
 
@@ -464,9 +472,10 @@ def convert_set_op(queries, set_op, context):
   return sql
 
 
+
 def convert_sieve_ex(exps, context):
   """
-  Ex-Sieve
+  Converts an extended sieve operation.
   """
 
   U.expect_array(exps, 0, "`sieve-ex'")
@@ -552,6 +561,8 @@ def convert_sieve_ex(exps, context):
     sql = sql_
     
   return sql
+
+
 
 def convert_sieve(exps, context, attributes = None):
   """
@@ -763,6 +774,9 @@ def convert_array(operands, cur_table, context):
   Convert array.
   """
 
+  # Currently is tailored to support arrays of strings or numbers
+  # but not nested arrays.
+
   U.expect_array(operands, 0, "`array'")
 
   values = []
@@ -790,10 +804,13 @@ def convert_array(operands, cur_table, context):
     return ("(ARRAY[%s]::REAL[])" % (",".join(values)), "*N", "")
 
 
+
 def convert_n_op(operation, operands, cur_table, context):
   """
   Converts n-ary operations to SQL.
   """
+
+  # Currently is tailored to support or/and 
 
   exps = []
 
@@ -834,12 +851,14 @@ def to_sql_col_val(value, cur_table, data_type = ''):
   Converts value to SQL.
   """
 
+  # Map human-readable type representation to name part in SQL
   if data_type == '*S':
     data_type = 'A_S'
   elif data_type == '*N':
     data_type = 'A_N'
 
-  if value.startswith("@"): 
+  # Attribute reference
+  if value.startswith("@"):
 
     if not ":" in value[1:]: 
       return cur_table + "." + value[1:]
@@ -852,6 +871,7 @@ def to_sql_col_val(value, cur_table, data_type = ''):
 
     return "l" + str(parts[1]) + "." + parts[0]
 
+  # Value reference
   elif value.startswith("$"):
 
     if not ":" in value[1:]:
@@ -865,6 +885,8 @@ def to_sql_col_val(value, cur_table, data_type = ''):
 
     return "l" + str(parts[1]) + ".VAL_"
 
+
+  # Verbatim
   return value
 
 
