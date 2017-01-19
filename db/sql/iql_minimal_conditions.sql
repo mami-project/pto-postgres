@@ -66,17 +66,17 @@ INSERT INTO condition_tree(cid, name, parent, full_name)
 INSERT INTO condition_tree(cid, name, parent, full_name)
  VALUES(21, 'strict', 18, 'ecn.path_dependent.strict');
 
-INSERT INTO condition_tree(cid, name, paretn, full_name)
+INSERT INTO condition_tree(cid, name, parent, full_name)
  VALUES(22, 'site_dependent', 1, 'ecn.site_dependent');
 
 INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(23, 'weak', 22, 'ecn.path_dependent.weak');
+ VALUES(23, 'weak', 22, 'ecn.site_dependent.weak');
 
 INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(24, 'strong', 22, 'ecn.path_dependent.strong');
+ VALUES(24, 'strong', 22, 'ecn.site_dependent.strong');
 
 INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(25, 'strict', 22, 'ecn.path_dependent.strict');
+ VALUES(25, 'strict', 22, 'ecn.site_dependent.strict');
 
 INSERT INTO condition_tree(cid, name, parent, full_name)
  VALUES(26, 'seen', 10, 'ecn.ect_zero.seen');
