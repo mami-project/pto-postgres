@@ -197,6 +197,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
 
   var group_keys = Object.keys(groups);
   group_keys.sort()
+  console.log('group_keys', group_keys);
   var max_overall = 0;
   var cols = [];
 
@@ -215,7 +216,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
         counted_total[data[j][counted_attribute]] += data[j]['count'];
       }
       else {
-        counted_total[data[j][counted_attribute]] = 0;
+        counted_total[data[j][counted_attribute]] = data[j]['count'];
       }
     }
 
@@ -225,6 +226,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
   cols.sort();
   console.log('cols', cols);
   console.log('max_overall', max_overall);
+  console.log('counted_total', counted_total);
 
   var width = 720,
       barHeight = 30;
