@@ -28,8 +28,14 @@ CREATE TABLE observation (
   time_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   time_to TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   val_n REAL,
-  observation_set INT NOT NULL,
-  condition INT NOT NULL
+  observation_set BIGSERIOL NOT NULL,
+  condition INT NOT NULL,
+
+  FOREIGN KEY (observation_set)
+   REFERENCES observation_set (osid),
+
+  FOREIGN KEY (condition)
+   REFERENCES condition_tree (cid)
 );
 
 CREATE UNIQUE INDEX idx_observation_unique_oid ON observation (oid);
