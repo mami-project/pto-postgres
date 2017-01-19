@@ -30,7 +30,7 @@ CREATE TABLE observation (
   val_n REAL,
   observation_set BIGSERIAL NOT NULL,
   condition INT NOT NULL,
-  metadata JSONB,
+  metadata JSON,
 
   FOREIGN KEY (observation_set)
    REFERENCES observation_set (osid),
