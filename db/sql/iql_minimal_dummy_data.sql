@@ -1,30 +1,3 @@
-INSERT INTO condition_tree(cid, name, parent, full_name) 
- VALUES(0, 'ecn', NULL, 'ecn');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(1, 'connectivity', 0, 'ecn.connectivity');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(2, 'works', 1, 'ecn.connectivity.works');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(3, 'broken', 1, 'ecn.connectivity.broken');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(4, 'transient', 1, 'ecn.connectivity.transient');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(5, 'offline', 1, 'ecn.connectivity.offline');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(6, 'negotiation_attempt', 0, 'ecn.negotiation_attempt');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(7, 'succeeded', 6, 'ecn.negotiation_attempt.succeeded');
-
-INSERT INTO condition_tree(cid, name, parent, full_name)
- VALUES(8, 'failed', 6, 'ecn.negotiation_attempt.failed');
-
 INSERT INTO observation_set(osid, toc, toi)
  VALUES(0, 0, 999999);
 
