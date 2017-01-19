@@ -42,7 +42,7 @@ CREATE VIEW iql_minimal AS
         o.time_to AS time_to, 
         o.val_n AS val_n, 
         o.observation_set AS observation_set,
-        os.toc AS toc,
+        os.name AS os_name,
         os.toi AS toi,
         c.full_name as name
  FROM observation o
