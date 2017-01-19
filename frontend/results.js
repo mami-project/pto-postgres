@@ -89,6 +89,7 @@ function renderCounts(results, group_order, distinct) {
     }
 
     var group_keys = Object.keys(groups);
+    group_keys.sort();
 
     //for(var i = 0; i < group_keys.length; i++) {
     //  chart(groups[group_keys[i]], attr_name_to_display(group_by) + ": " + group_keys[i], counted_attribute);
@@ -185,6 +186,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
   document.getElementById('chart_section').style.display = 'block';
 
   var group_keys = Object.keys(groups);
+  group_keys.sort()
   var max_overall = 0;
   var cols = [];
 
@@ -208,7 +210,7 @@ function hbar_stacked(groups, title, counted_attribute, group_by) {
   var width = 720,
       barHeight = 30;
 
-  var colors = ['salmon','steelblue','peru','mediumorchid','red','darkgray','green','black','magenta','maroon','blue','darkgreen','burlywood','indigo'];
+  var colors = ['salmon','steelblue','peru','mediumorchid','red','darkgray','green','orangered','magenta','maroon','blue','darkgreen','burlywood','indigo'];
 
 
   var x = d3.scale.linear()
