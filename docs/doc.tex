@@ -72,6 +72,7 @@ interested in.
 {"settings": {
      "projection" : P,
      "attribute" : A,
+     "nub" : B,
      "order" : [A, S]}}
 \end{verbatim}
 
@@ -83,6 +84,11 @@ interested in.
 \begin{verbatim}
 {"settings" : {"attribute" : "@dip"}}
 \end{verbatim}
+
+\subsubsection{Nub}
+
+\verb|settings.nub| specifies whether operations shall return true sets or not. Please refer to the description of a specific
+operation to see what effect \verb|settings.nub| has on it. Default is true.
 
 \subsubsection{Order}
 
@@ -152,6 +158,37 @@ plus \verb|count|.
 
 \begin{verbatim}
 {"count": [[A,...], SET, S]} -> A_SET
+\end{verbatim}
+
+Same as \textit{group members} (see above) but overwrites \verb|settings.order|. Third argument is either \verb|'asc'| (ascending)
+or \verb|'desc'| (descending).
+
+\subsection{count-distinct}
+
+\subsubsection{all tuples}
+
+\begin{verbatim}
+{"count-distinct": [SET]} -> A_SET
+\end{verbatim}
+
+Returns the total count of all tuples in the input set. Result is a
+singleton \verb|(count)|. This behaves exactly the same as \verb|count|.
+
+\subsubsection{group members}
+
+\begin{verbatim}
+{"count-distinct": [[A,...], SET]} -> A_SET
+\end{verbatim}
+
+Groups observations based on the attributes specified in the first
+argument, then counts the distinct values of the last attribute in the specified attributes for each group.  Result is an
+$n$-tuple with all but the last attibutes as specified in the first argument
+plus \verb|count|.
+
+\subsubsection{group members, overwrite order}
+
+\begin{verbatim}
+{"count-distinct": [[A,...], SET, S]} -> A_SET
 \end{verbatim}
 
 Same as \textit{group members} (see above) but overwrites \verb|settings.order|. Third argument is either \verb|'asc'| (ascending)
@@ -327,7 +364,7 @@ Structure: \verb|(CITY,NAME,VALUE)|.
 
 The selectivity of the first argument has performance
 implications. Queries will be faster the fewer matches the first
-argument produces.
+argument produces. 
 
 \subsection{sieve-ex}
 
@@ -591,6 +628,10 @@ IQL is legal:
 {"union" : [{"simple": [{"eq" : ["$ecn.connectivity","broken"]}]},
             {"simple": [{"eq" : ["$ecn.negotiated", 1]}]}]}
 \end{verbatim}
+
+Because \verb|count| and \verb|count-distinct| add another attribute \verb|count| this attribute
+is a reserved name and underlying data should not have a \verb|count| attribute. Since \verb|count| isn't
+a real attribute it's not available in \verb|settings.order|.
 
 \section{Attribute selection}
 
