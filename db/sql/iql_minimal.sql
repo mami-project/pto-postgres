@@ -28,7 +28,7 @@ CREATE TABLE observation (
   time_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   time_to TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   val_n REAL,
-  observation_set BIGSERIOL NOT NULL,
+  observation_set BIGSERIAL NOT NULL,
   condition INT NOT NULL,
 
   FOREIGN KEY (observation_set)
