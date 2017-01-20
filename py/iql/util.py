@@ -228,7 +228,7 @@ def check_names_and_types(d, data, forbidden = []):
   expect_object(d, data)
 
   for key in d:
-    if re.match("[^a-zA-Z_]*", key) == None:
+    if re.match("[^a-zA-Z_]*", key) == None or key in forbidden:
       raise ValueError("Illegal name %s: %s" % (key, str(data)))
 
     value = d[key]
