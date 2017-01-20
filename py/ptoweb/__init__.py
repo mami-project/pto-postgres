@@ -19,7 +19,7 @@ def get_db():
   return g.psql_db
 
 def get_iql_config():
-  IQL_TABLE='iql_minimal'
+  IQL_TABLE='observation_fixed'
   
   IQL_ATTR_TYPES = {
     'time_to' : 'T',
