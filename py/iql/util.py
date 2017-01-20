@@ -160,6 +160,11 @@ def is_object(a):
 
 
 
+def is_bool(a):
+  return type(a) == type(True)
+
+
+
 def expect_object(a, data):
   if not is_object(a):
     raise ValueError("`" + str(a) + "' is not an object: " + str(data))

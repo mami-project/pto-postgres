@@ -718,7 +718,13 @@ def convert_exp(exp, cur_table, context):
   elif U.is_num(exp):
     return (str(exp), "N", "")
 
-  raise ValueError("BUG: %s" % str(exp))
+  elif U.is_bool(exp):
+    if exp: 
+      return ('(TRUE)',"B", "")
+    else:
+      return ('(FALSE)',"B","")
+
+  raise ValueError("ORLY? %s" % str(exp))
 
 
 
