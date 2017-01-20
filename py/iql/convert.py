@@ -145,7 +145,7 @@ def convert(query, config = Config()):
 
   # If there's an attribute or projection set we use them
 
-  view = None
+  view = ""
 
   if 'settings' in query:
     settings = query['settings']
