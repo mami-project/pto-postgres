@@ -1,4 +1,5 @@
 import iql.constants as C
+import re
 
 def is_uni_op(operation):
   """
@@ -220,6 +221,24 @@ def split_s_exp(a, data):
 
   key = a.keys()[0]
   return (key, a[key])
+
+
+
+def check_names_and_types(d, data, forbidden = []):
+  expect_object(d, data)
+
+  for key in d:
+    if re.match("[^a-zA-Z_]*", key) == None:
+      raise ValueError("Illegal name %s: %s" % (key, str(data)))
+
+    value = d[key]
+    expect_str(value, data)
+
+    if value.startswith("*") and len(value) == 2:
+      continue
+
+    if len(value) > 1:
+      raise ValueError("Illegal type %s for %s: %s" % (value, key, str(data)))
 
 
 

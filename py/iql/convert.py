@@ -4,14 +4,37 @@ from pg import escape_string
 
 class Config:
 
-  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, nub = True, max_limit = 128):
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, max_limit = 128):
+    """
+    Creates configuration containing necessary metadata for IQL to convert queries.
+
+    Parameters:
+      - msmnt_types : Dictionary with name of measurements as keys and the type of the measurement values as values.
+      - expected_types : Dictionary with name of attributes as keys and the type of the attributes as values.
+      - known_projections: Dictionary with name of projection functions as keys and the type of projections as values.
+      - tbl_name : Name of the SQL table (or view).
+      - all_sql_attrs : A list of string containing the names of all sql attributes. OPTIONAL. Defaults to None.
+                        Required if sieve (aggregation) is to be supported.
+      - max_limit : The upper limit of number of results to return. <=0 for no limit. Defaults to 128
+
+    Notes:
+      - Name of attributes, name of projection functions and tbl_name are restricted to
+        [a-z][A-Z]_
+      - An attribute, may not have any of the following names:
+         count, average, max, min
+    """
+
+    U.expect_int(max_limit, "Config: max_limit")
+    U.check_names_and_types(msmnt_types, "Config: msmnt_types")
+    U.check_names_and_types(expected_types, "Config: expected_types", ['count','average','max','min'])
+    U.check_names_and_types(known_projections, "Config: known_projections")
+
     self.DICT_MSMNT_TYPES = msmnt_types
     self.DICT_EXPECTED_TYPES_ATTR = expected_types
     self.DICT_KNOWN_PROJECTIONS = known_projections
     self.TBL_NAME = tbl_name
     self.ALL_SQL_ATTRS = all_sql_attrs
     self.MAX_LIMIT = max_limit
-
 
 class Context:
 
@@ -256,6 +279,9 @@ def convert_aggregation(query, context):
     query = query['sieve']
 
     U.expect_array(query, 0, "`sieve'")
+
+    if(context.ALL_SQL_ATTRS == None):
+      raise ValueError("`sieve` (aggregation) is not supported with this configuration!")
 
     sql_ = convert_sieve(query, context, attributes = context.ALL_SQL_ATTRS)
 
