@@ -37,7 +37,23 @@ class Context:
     self.order = None
     self.nub = True
 
+
+  def copy_from(self, other_context):
+    """
+    Read config and nub, inner_select from a different context.
+    This is merely a quirk to support `lookup`. Invokes `config_from`
+    """
+
+    self.config_from(other_context)
+    self.nub = other_context.nub
+
+
   def config_from(self, config):
+    """
+    Load config from either Configuration or another context. Is also invoked by
+    `copy_from`.
+    """
+
     self.DICT_MSMNT_TYPES = config.DICT_MSMNT_TYPES
     self.DICT_EXPECTED_TYPES_ATTR = config.DICT_EXPECTED_TYPES_ATTR
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
@@ -129,8 +145,24 @@ def convert(query, config = Config()):
 
   # If there's an attribute or projection set we use them
 
+  view = None
+
   if 'settings' in query:
     settings = query['settings']
+
+    if 'filter' in settings:
+      new_context = Context('', '')
+      new_context.copy_from(context)
+      (filter_sql, data_type, msmnt_type) = convert_exp(settings['filter'], context.TBL_NAME, new_context)
+
+      if data_type == '$':
+        raise ValueError("`settings.filter` can't reference measuremnt values!")
+
+      if new_context.msmnt_name != None:
+        raise ValueError("`settings.filter` can't reference measurement values!")
+
+      view = "WITH %s AS (SELECT * FROM %s WHERE %s)\n" % (context.TBL_NAME + "__iql__", context.TBL_NAME, filter_sql)
+      context.TBL_NAME += "__iql__"
   
     if 'nub' in settings:
       context.nub = not(not(settings['nub']))
@@ -185,6 +217,14 @@ def convert(query, config = Config()):
     raise ValueError("Missing `query': " + str(query))  
 
   query = query['query']
+
+  return view + convert_aggregation(query, context)
+
+
+def convert_aggregation(query, context):
+  """
+  Converts one of the top-level 'aggregations' all, count, sieve, count-distinct.
+  """
 
   if "all" in query:
     query = query['all']
@@ -321,7 +361,6 @@ def convert(query, config = Config()):
     raise ValueError("Expected `count' or `all': " + str(query))
 
 
-
 def convert_query(query, context):
   """
   Converts a query to SQL.
@@ -412,8 +451,7 @@ def convert_lookup(arguments, context):
   attribute = U.resolve_attribute(attribute, context, "`lookup'")
 
   new_context = Context(projection, attribute)
-  new_context.config_from(context)
-  new_context.nub = context.nub
+  new_context.copy_from(context)
   sql = convert_query(query, new_context)
 
   sql_filter = ""
@@ -422,7 +460,7 @@ def convert_lookup(arguments, context):
 
   if filter_ != None:
     new_context = Context('','')
-    new_context.config_from(context)
+    new_context.copy_from(context)
     sql_filter = convert_exp(filter_, "W", new_context)
     if sql_filter[1] != "B":
       raise ValueError("`lookup.3' expects `B': " + str(filter_))
@@ -637,7 +675,7 @@ def convert_sieve(exps, context, attributes = None):
 
 def convert_exp(exp, cur_table, context):
   """
-  Converts an expression to SQL.
+  Converts an expression to SQL. Return type is (exp AS sql, type, msmnt_type).
   """
 
   if type(exp) == type({}):
