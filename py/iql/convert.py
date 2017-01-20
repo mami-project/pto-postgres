@@ -22,6 +22,13 @@ class Config:
         [a-z][A-Z]_
       - An attribute, may not have any of the following names:
          count, average, max, min
+
+    Example usage:
+      import iql.convert as iqlc
+      cfg = iqlc.Config(msmnt_types = {}, expected_types = {"test":"N", "observation_set" : "N"}, tbl_name = "iql_data")
+      query = {"settings":{"filter":{"contains":[{"array":[1,2,3]},"@observation_set"]}},"query":{"all":[{"simple":[True]}]}}
+      print(query)
+      print(iqlc.convert(query, cfg))
     """
 
     U.expect_int(max_limit, "Config: max_limit")
