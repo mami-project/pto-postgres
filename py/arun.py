@@ -84,9 +84,42 @@ class ObservationSetWriter:
         pass
 
 class RawAnalyzer:
-    def run(self, context):
+    '''
+    A RawAnalyzer's run() method is invoked once for each 
+    raw input file the core decides the analyzer is interested.
+    raw_input_reader is a buffer-like object from which bytes
+    can be read. metadata_dict is a dictionary containing
+    metadata associated with the file on upload.
+    '''
+    def run(self, raw_input_reader, metadata_dict):
+        pass
+
+    '''
+    The core can ask a RawAnalyzer whether it cares about a (new)
+    input file by passing it a metadata dictionary 
+    (including campaign name and filetype in addition to metadata).
+    this function returns True if its run() method can do something
+    useful with the raw data, or False() otherwise.
+    '''
+    def interested(self, metadata_dict):
         pass
 
 class ObservationAnalyzer:
-    def run(self, context):
+    '''
+    An ObservationAnalyzer is invoked once for each query result
+    set the core decides the analyzer is interested in. Generally,
+    this will be an IQL query limited to the set of observation
+    sets the analyzer has not yet run over.
+    ''' 
+
+    def run(self, cursor_iterator):
+        pass
+
+    '''
+    The core can ask an ObservationAnalyzer for an IQL query that returns
+    rows its run() method can process. The core will periodically run this
+    query, limiting it to the observation sets not yet processed by the
+    analyzer.
+    '''
+    def iql_query(self):
         pass
