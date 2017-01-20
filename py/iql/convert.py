@@ -4,12 +4,13 @@ from pg import escape_string
 
 class Config:
 
-  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, nub = True):
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, nub = True, max_limit = 128):
     self.DICT_MSMNT_TYPES = msmnt_types
     self.DICT_EXPECTED_TYPES_ATTR = expected_types
     self.DICT_KNOWN_PROJECTIONS = known_projections
     self.TBL_NAME = tbl_name
     self.ALL_SQL_ATTRS = all_sql_attrs
+    self.MAX_LIMIT = max_limit
 
 
 class Context:
@@ -17,12 +18,6 @@ class Context:
   def __init__(self, projection, attribute):
     self.projection = projection
     self.attribute = attribute
-
-    self.DICT_MSMNT_TYPES = {}
-    self.DICT_EXPECTED_TYPES_ATTR = {}
-    self.DICT_KNOWN_PROJECTIONS = {}
-    self.TBL_NAME = "iql_data"
-
     
     if self.projection == None:
       self.projection = ''
@@ -59,6 +54,7 @@ class Context:
     self.DICT_KNOWN_PROJECTIONS = config.DICT_KNOWN_PROJECTIONS
     self.TBL_NAME = config.TBL_NAME
     self.ALL_SQL_ATTRS = config.ALL_SQL_ATTRS
+    self.MAX_LIMIT = config.MAX_LIMIT
 
 
 
@@ -127,6 +123,18 @@ def get_limit_clause(context):
   Returns the LIMIT _ OFFSET _ clause for queries based on the information
   provided in the context.
   """
+
+  if context.limit <= 0:
+    if context.MAX_LIMIT <= 0:
+      return " "
+    else:
+      context.limit = context.MAX_LIMIT
+
+  if context.limit > context.MAX_LIMIT:
+    context.limit = context.MAX_LIMIT
+
+  if context.skip >= context.limit:
+    context.skip = context.limit - 1
 
   if context.skip <= 0:
     return " LIMIT %d " % context.limit
