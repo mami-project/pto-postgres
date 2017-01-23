@@ -1,8 +1,11 @@
 from flask import Flask, g
 from pg import DB
+from pto_config import DefaultConfig
+
 import iql.convert as iqlc
 
 app = Flask(__name__)
+app.config.from_object(DefaultConfig)
 app.config.from_envvar('PTOWEB_SETTINGS', silent=False)
 
 from werkzeug.contrib.cache import FileSystemCache
@@ -19,22 +22,9 @@ def get_db():
   return g.psql_db
 
 def get_iql_config():
-  IQL_TABLE='iql_minimal'
-  
-  IQL_ATTR_TYPES = {
-    'time_to' : 'T',
-    'time_from' : 'T',
-    'full_path' : '*S',
-    'name' : 'S',
-    'observation_set' : 'N'
-  }
-
-  IQL_MSMNT_TYPES = {
-    'ecn.connectivity' : 'S',
-    'ecn.negotiated' : 'N',
-  }
-  
-  return iqlc.Config(msmnt_types = IQL_MSMNT_TYPES, expected_types = IQL_ATTR_TYPES, tbl_name = IQL_TABLE)
+  return iqlc.Config(msmnt_types = DefaultConfig.IQL_MSMNT_TYPES,
+    expected_types = DefaultConfig.IQL_ATTR_TYPES,
+    tbl_name = DefaultConfig.IQL_TABLE)
 
 
 @app.teardown_appcontext

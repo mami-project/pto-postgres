@@ -5,9 +5,32 @@ DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
 DROP TABLE IF EXISTS observation_set;
 
+DROP TYPE IF EXISTS os_state;
+
+-- States of an observation set:
+--   "in progress": an analyser is currently appending to this observation set
+--   "pending review": the analyzer is now done with this observation set,
+--     doesn't call observe() any more; set is waiting to be vetted
+--   "public": the observation set has been vetted and is now ready for
+--     public consumption; only now is this available to IQL
+--  "permanent" as a result of a query becoming permanent (can't delete, but
+--    can deprecate); can delete data as long as it's not permanent, after
+--    that, _cannot_ delete any more
+--  "deprecated": a formerly published observation set has been found to be
+--    wrong. Not avalilable for IQL
+CREATE TYPE os_state (
+  'in_progress',    -- analyser currently writing to this observation set
+  'pending_review', -- observation set waiting to be vetted, no more additions
+  'public'          -- successfully vetted, can now be used in IQL queries
+  'permanent'       -- observation set used in permanent IQL query, can't delete this
+  'deprecated'      -- defective observation set, only there to enable repeatability
+);
+
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL,
   name VARCHAR(255) NOT NULL,
+  ts TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
+  state os_state,
   toi INT
 );
 

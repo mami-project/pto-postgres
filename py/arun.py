@@ -2,6 +2,7 @@
 # Path Transparency Observatory
 # Analysis Runtime
 #
+from enum import Enum
 
 import iql.convert
 import pgdb
@@ -14,12 +15,14 @@ class BaseAnalysisContext:
     """
 
     def __init__(self, conn):
-        self._conn = conn
-        self._dbw = pg.DB(self._conn)
+      self._conn = conn
+      self._dbw = pg.DB(self._conn)
 
     def create_observation_set(self, name):
-        obset = self._dbw.insert("observation", name=name)
-        return ObservationSetWriter(self, obset.id)
+        with self._dbw as db:
+            observation_set = db.insert("observation_set", name=name, state='in_progress')
+
+        return ObservationSetWriter(self, observation_set.osid)
 
 class RawAnalysisContext(BaseAnalysisContext):
     """
@@ -68,20 +71,41 @@ class CursorIterator:
             return row
 
 
+class ObservationSetState(Enum):
+    """
+    State information for an observation set. Members must have the same
+    spelling (including capitalisation) as the SQL type os_state described
+    in iql_minimal.sql.
+    """
+    in_progress = 1
+    pending_review = 2
+    public = 3
+    permanent = 4
+    deprecated = 5
+   
+
+class ObservationSetStateError(Exception):
+    pass
+
 class ObservationSetWriter:
     
     def __init__(self, context, set_id):
         self._context = context
         self.osid = osid
+        self.state = ObservationSetState.in_progress
 
     def observe(self, start_time, end_time, path, condition, value=None):
-        self.context._dbw.insert('observation', full_path=path, time_from=start, time_to=end, condition=condition, val_n=value, observation_set=self.osid)
+        if self.state == ObservationSetState.in_progress:
+            self._context._dbw.insert('observation', full_path=path, time_from=start, time_to=end, condition=condition, val_n=value, observation_set=self.osid)
+        else:
+            raise ObservationSetStateException()
 
     def complete(self):
         """
         Finish writing observations to this observation set
         """
-        pass
+        self._context._dbw.update(osid=self.osid, state='pending_review')
+        self.state = ObservationSetState.pending_review
 
 class RawAnalyzer:
     '''
