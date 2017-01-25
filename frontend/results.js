@@ -11,7 +11,10 @@ var attr_display_names = {
   "observation_set" : "Observation set",
   "full_path" : "Path",
   "name" : "Condition",
-  "count" : "Count"
+  "count" : "Count",
+  "location" : "Location",
+  "week" : "Week",
+  "month" : "Month"
 };
 
 function attrNameToDisplay(name) {
@@ -91,16 +94,14 @@ function renderCounts(results, group_order, distinct) {
 
       console.log('part_groups', groups);
 
-      var group_keys = Object.keys(groups);
-      group_keys.sort();
-
+      var caption = attrNameToDisplay(top_group_by) + ' ' + top_group_keys[i];
       var title = "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
 
       if(distinct === true) {
         title = "Counts of distinct <i>" + attrNameToDisplay(distinct_attribute) + "s</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
       }
 
-      renderHBarStacked(groups, title, counted_attribute, bot_group_by);
+      renderHBarStacked(groups, title, counted_attribute, bot_group_by, caption);
     }
   }
 
@@ -252,7 +253,7 @@ function to_e(num) {
 }
 
 
-function renderHBarStacked(groups, title, counted_attribute, group_by) {
+function renderHBarStacked(groups, title, counted_attribute, group_by, caption) {
   console.log('renderHBarStacked', groups, title, counted_attribute);
 
   var group_keys = Object.keys(groups);
@@ -304,6 +305,10 @@ function renderHBarStacked(groups, title, counted_attribute, group_by) {
   var chart = figure.append("svg")
       .attr("width", width)
       .attr("height", (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2)));
+
+  if(caption !== undefined) {
+    figure.append("div").attr("class","caption").html(caption);
+  } else { console.log('no caption'); }
 
 
   for(var i = 0; i < group_keys.length; i++) {
