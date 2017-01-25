@@ -51,6 +51,59 @@ function renderCounts(results, group_order, distinct) {
   console.log('cols', cols);
   console.log('counted_attribute', counted_attribute);
 
+  if(group_order.length == 2) {
+    var top_group_by = group_order[0];
+    var bot_group_by = group_order[1];
+    console.log('top_group_by', top_group_by);
+    console.log('bot_group_by', bot_group_by);
+
+    var top_groups = {};
+
+    for(var i = 0; i < results.length; i++) {
+      var k = results[i][top_group_by];
+
+      if(k in top_groups) {
+        top_groups[k].push(results[i]);
+      }
+      else
+        top_groups[k] = [results[i]];
+    }
+
+    var top_group_keys = Object.keys(top_groups);
+    top_group_keys.sort()
+    console.log('top_group_keys', top_group_keys);
+
+    for(var i = 0; i < top_group_keys.length; i++) { 
+      var results = top_groups[top_group_keys[i]];
+      console.log('part_results', results);
+
+      var groups = {};
+
+      for(var j = 0; j < results.length; j++) {
+        var k = results[j][bot_group_by];
+
+        if(k in groups) {
+          groups[k].push(results[j]);
+        }
+        else
+          groups[k] = [results[j]];
+      }
+
+      console.log('part_groups', groups);
+
+      var group_keys = Object.keys(groups);
+      group_keys.sort();
+
+      var title = "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
+
+      if(distinct === true) {
+        title = "Counts of distinct <i>" + attrNameToDisplay(distinct_attribute) + "s</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
+      }
+
+      renderHBarStacked(groups, title, counted_attribute, bot_group_by);
+    }
+  }
+
   if(group_order.length == 1) {
 
     var group_by = group_order[0];
@@ -292,11 +345,13 @@ function renderHBarStacked(groups, title, counted_attribute, group_by) {
       offset_x += x(data[j].count);
     }
 
-    region.append("rect")
-      .attr("width", 2)
-      .attr("height", barHeight)
-      .attr("fill","black")
-      .attr("x", offset_x-2);
+    
+    if(offset_x > 200)
+      region.append("rect")
+        .attr("width", 2)
+        .attr("height", barHeight)
+        .attr("fill","black")
+        .attr("x", offset_x-2);
   }
 
   var lines = chart.append("g");
