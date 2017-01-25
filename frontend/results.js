@@ -1,25 +1,3 @@
-/*function getUploadStatistics() {
-      $.ajax({
-         'url': './api/uploadstats'})
-       .done(function(data) {
-         document.getElementById('uploads_total').innerHTML = data.total;
-
-         var rows = []
-
-         $.each(data.msmntCampaigns, function(key, item) {
-            rows.push('<tr><td>'+item._id+'</td><td>'+item.count+'</td></tr>')
-          });
-
-         document.getElementById('measurement_campaigns').innerHTML = rows.join("\n");
-        })
-       .fail(function() {
-         err = '<span class="error">(error: could not load data)</span>';
-         document.getElementById('uploads_total').innerHTML = err;
-         document.getElementById('measurement_campaigns').innerHTML = 
-            '<tr><td>' + err + '</td><td>' + err + '</td></tr>';
-        });
-     }*/
-
 var api_base = 'https://observatory.mami-project.eu/papi';
 
 $().ready(loadResults);
@@ -111,6 +89,16 @@ function renderCounts(results, group_order, distinct) {
 
 
 function renderResults(results) {
+
+  if(results['state'] == 'new') {
+    $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
+    return;
+  }
+
+  if(results['state'] == 'running') {
+    $('#results_msg').empty().append('<span class="txt-warn">Your query is currently being executed and the results are not available yet. Please try again in an hour.</span>');
+    return;
+  }
 
   $('#results_msg').empty().append('<span class="txt-info">Rendering results...</span>');
 

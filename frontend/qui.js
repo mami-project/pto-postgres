@@ -35,6 +35,17 @@ function process_successful_response(data) {
 
 }
 
+
+function toDate(date_s) {
+  var t_ms = Date.parse(date_s);
+  if(isNaN(t_ms)) {
+    return t_ms;
+  }
+
+  return Math.floor(t_ms / 1000);
+}
+
+
 function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
@@ -43,7 +54,7 @@ function runQuery() {
   var count = $("#i_count").val();
 
 
-  if((time_from != "" && isNaN(Date.parse(time_from))) || (time_to != "" && isNaN(Date.parse(time_to)))) {
+  if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
     $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
     return;
   }
@@ -95,10 +106,10 @@ function runQuery() {
   iql_time_parts = [];
 
   if(time_from != "")
-    iql_time_parts.push({"ge":[{"time":[Date.parse(time_from)]},"@time_from"]})
+    iql_time_parts.push({"ge":["@time_from",{"time":[toDate(time_from)]}]})
 
   if(time_to != "")
-    iql_time_parts.push({"le":[{"time":[Date.parse(time_to)]},"@time_to"]})
+    iql_time_parts.push({"le":["@time_to",{"time":[toDate(time_to)]}]})
 
   var exp_ = {"or":iql_condition_parts};
 
@@ -113,10 +124,10 @@ function runQuery() {
   }
 
   
-  var query = {"query":{"count":[['@' + group_by, '@'+count], {"simple":[exp_]}]}};
+  var query = {"settings":{"order":['@'+count,'asc']},"query":{"count":[['@' + group_by, '@'+count], {"simple":[exp_]}]}};
 
   if(group_by == 'no') 
-    query = {"query":{"count":[['@'+count], {"simple":[exp_]}]}};
+    query = {"settings":{"order":['@'+count,'asc']},"query":{"count":[['@'+count], {"simple":[exp_]}]}};
   
   var str_query = JSON.stringify(query);
 
