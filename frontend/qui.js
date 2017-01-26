@@ -22,12 +22,14 @@ function process_successful_response(data) {
   console.log(JSON.stringify(data));
   if("already" in data) {
     $("#query_msg").empty()
+    .append(new Date().toString() + '<br>')
     .append('The results for your query are already present. ')
     .append('Please click on the link below to retrieve your results: <br>')
     .append('<a href="results.html?' + encodeURIComponent(data['query_id']) + '">Retrieve results</a>');
   }
   else {
     $("#query_msg").empty()
+    .append(new Date().toString() + '<br>')
     .append('Your query has been submitted and has been put into a queue. You can retrieve your results ')
     .append('through the link below: <br>')
     .append('<a href="results.html?' + encodeURIComponent(data['query_id']) + '">Retrieve results</a>');
@@ -37,6 +39,10 @@ function process_successful_response(data) {
 
 
 function toDate(date_s) {
+
+  date_s = date_s.replace("start","00:00:00 GMT+0000");
+  date_s = date_s.replace("end","23:59:59 GMT+0000");
+
   var t_ms = Date.parse(date_s);
   if(isNaN(t_ms)) {
     return t_ms;
@@ -49,13 +55,20 @@ function toDate(date_s) {
 function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
+  var then_by = $("#i_then_by").val();
   var time_from = $("#i_time_from").val();
   var time_to = $("#i_time_to").val();
   var count = $("#i_count").val();
+  var per = $('#i_per').val();
 
 
   if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
     $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
+    return;
+  }
+
+  if(group_by == "no" && then_by != "no") {
+    $("#query_msg").empty().append("Can't not group and then group. Please correct grouping!");
     return;
   }
 
@@ -70,11 +83,22 @@ function runQuery() {
     {"path":["ecn","connectivity","broken"],"id":3},
     {"path":["ecn","connectivity","offline"],"id":5},
     {"path":["ecn","connectivity","transient"],"id":4},
+    {"path":["ecn","connectivity","super","works"],"id":-1},
+    {"path":["ecn","connectivity","super","broken"],"id":-1},
+    {"path":["ecn","connectivity","super","offline"],"id":-1},
+    {"path":["ecn","connectivity","super","transient"],"id":-1},
+    {"path":["ecn","connectivity","super","weird"],"id":-1},
     {"path":["ecn","negotiation_attempt","succeeded"],"id":7},
     {"path":["ecn","negotiation_attempt","failed"],"id":8},
     {"path":["ecn","ect_one","seen"],"id":-1},
     {"path":["ecn","ect_zero","seen"],"id":-1},
-    {"path":["ecn","ce","seen"],"id":-1}
+    {"path":["ecn","ce","seen"],"id":-1},
+    {"path":["ecn","site_dependent","strict"],"id":-1},
+    {"path":["ecn","site_dependent","strong"],"id":-1},
+    {"path":["ecn","site_dependent","weak"],"id":-1},
+    {"path":["ecn","path_dependent","strict"],"id":-1},
+    {"path":["ecn","path_dependent","strong"],"id":-1},
+    {"path":["ecn","path_dependent","weak"],"id":-1},
   ];
 
   var condition_ = conditions.split(".");
@@ -123,17 +147,42 @@ function runQuery() {
     exp_ = {"and":[exp_,iql_time_parts[0],iql_time_parts[1]]};
   }
 
-  
-  var query = {"settings":{"order":['@'+count,'asc']},"query":{"count":[['@' + group_by, '@'+count], {"simple":[exp_]}]}};
+  var iql_count_parts = [];
+  var query = {};
 
-  if(group_by == 'no') 
-    query = {"settings":{"order":['@'+count,'asc']},"query":{"count":[['@'+count], {"simple":[exp_]}]}};
+  if(group_by != 'no') {
+    iql_count_parts.push('@'+group_by);
+  }
+  if(then_by != 'no') {
+    iql_count_parts.push('@'+then_by);
+  }
+  if(per != 'no') {
+    iql_count_parts.push('@'+per);
+  }
+
+
+  if(count == 'no') { // no distinct counting
+    if(group_by == 'no' && then_by == 'no') { //absolutely no grouping
+      query = {"query":{"count":[{"simple":[exp_]}]}};
+    }
+    else {
+      query = {"query":{"count":[iql_count_parts,{"simple":[exp_]},"asc"]}};
+    }
+  }
+  else {
+    iql_count_parts.push('@'+count);
+    query = {"query":{"count-distinct":[iql_count_parts,{"simple":[exp_]},"asc"]}};
+  }
   
   var str_query = JSON.stringify(query);
 
   var url = api_base + '/query?q=' + encodeURIComponent(str_query);
 
+  console.log('str_query',str_query);
+
+  
+
   var request = $.ajax({'url': url});
   request.done(process_successful_response);
-  request.fail(process_failed_response);
+  request.fail(process_failed_response); 
 }

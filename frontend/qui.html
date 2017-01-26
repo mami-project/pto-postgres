@@ -29,22 +29,12 @@
                 <select id="i_conditions">
                   <option value="ecn.ce">ecn.ce.*</option>
                   <option value="ecn.connectivity">ecn.connectivity.*</option>
+                  <option value="ecn.connectivity.super">ecn.connectivity.super.*</option>
                   <option value="ecn.ect_one">ect.ect_one.*</option>
                   <option value="ecn.ect_zero">ect.ect_zero.*</option>
                   <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.*</option>
-                </select>
-              </div>
-            </div>
-            <div class="row-2">
-              <div class="cell">
-                <label>Group by</label>
-              </div>
-              <div class="cell">
-                <select id="i_group_by">
-                  <option value="observation_set">Observation set</option>
-                  <option value="full_path">Path</option>
-                  <option value="name">Condition</option>
-                  <option value="no">Don't group</option>
+                  <option value="ecn.site_dependent">ecn.site_dependent.*</option>
+                  <option value="ecn.path_dependent">ecn.path_dependent.*</option>
                 </select>
               </div>
             </div>
@@ -54,12 +44,61 @@
               </div>
               <div class="cell">
                 <select id="i_count">
-                  <option value="name">Conditions</option>
+                  <option value="no" selected>Observations (default)</option>
                   <option value="full_path">Paths</option>
                   <option value="observation_set">Observation sets</option>
+                  <option value="name">Conditions</option>
+                </select><br>
+                <span class="input_info">If in doubt use Observations.</span>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="cell">
+                <label>per</label>
+              </div>
+              <div class="cell">
+                <select id="i_per">
+                  <option value="name" selected>Condition (default)</option>
+                  <option value="observation_set">Observation set</option>
+                  <option value="full_path">Path</option>
+                </select><br>
+                <span class="input_info">If in doubt use Condition.</span>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="cell">
+                <label>grouped by</label>
+              </div>
+              <div class="cell">
+                <select id="i_group_by">
+                  <option value="observation_set">Observation set</option>
+                  <option value="full_path">Path</option>
+                  <option value="name">Condition</option>
+                  <option value="week">Week</option>
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                  <option value="location">Location</option>
+                  <option value="no" selected>Don't group (default)</option>
                 </select>
               </div>
             </div>
+            <div class="row-2">
+              <div class="cell">
+                <label>... then by</label>
+              </div>
+              <div class="cell">
+                <select id="i_then_by">
+                  <option value="observation_set">Observation set</option>
+                  <option value="full_path">Path</option>
+                  <option value="name">Condition</option>
+                  <option value="week">Week</option>
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                  <option value="location">Location</option>
+                  <option value="no" selected>Don't group (default)</option>
+                </select>
+              </div>
+            </div>   
           </fieldset>
           <fieldset>
             <legend>Time window</legend>
@@ -70,7 +109,7 @@
               </div>
               <div class="cell">
                 <input id="i_time_from" type="text"/><br>
-                <span class="input_info">Leave blank for no restriction</span>
+                <span class="input_info">Leave blank for no restriction.</span>
               </div>
             </div>
             <div class="row-2">
