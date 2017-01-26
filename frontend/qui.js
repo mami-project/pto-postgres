@@ -52,6 +52,47 @@ function toDate(date_s) {
 }
 
 
+function submitQuery(query) {
+  var str_query = JSON.stringify(query);
+
+  var url = api_base + '/query?q=' + encodeURIComponent(str_query);
+
+  console.log('str_query',str_query);
+
+  var request = $.ajax({'url': url});
+  request.done(process_successful_response);
+  request.fail(process_failed_response); 
+}
+
+
+function ecnSupportQuery() {
+  var selected_window = $('#i_ecn_support_time_window').val();
+
+  var windows = {
+    "Nov 2016" : [toDate("01 Nov 2016 start"), toDate("30 Nov 2016 end")],
+    "Dec 2016" : [toDate("01 Dec 2016 start"), toDate("31 Dec 2016 end")],
+    "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2016 end")]
+  };
+
+  var exp_conditions = {"or":[
+        {"eq":["@name","ecn.connectivity.works"]},
+        {"eq":["@name","ecn.connectivity.broken"]},
+        {"eq":["@name","ecn.connectivity.transient"]},
+        {"eq":["@name","ecn.connectivity.offline"]}
+   ]};
+
+  var exp_ = {"and":[
+     exp_conditions,
+     {"ge":["@time_from",{"time":[windows[selected_window][0]]}]},
+     {"le":["@time_to",{"time":[windows[selected_window][1]]}]}
+   ]};
+
+  query = {"query":{"count":[["@name"],{"simple":[exp_]},"asc"]}};
+
+  submitQuery(query);
+}
+
+
 function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
