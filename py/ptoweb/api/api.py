@@ -166,7 +166,7 @@ def api_sql():
 def api_qq_running():
   query = """
     SELECT start_time, id, state, (CASE WHEN (stop_time IS NOT NULL) THEN stop_time - start_time ELSE (NOW()::TIMESTAMP WITHOUT TIME ZONE) - start_time  END) as duration 
-    FROM query_queue ORDER by start_time WHERE state = 'running';
+    FROM query_queue WHERE state = 'running' ORDER BY start_time ;
   """
 
   try:
