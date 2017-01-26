@@ -183,6 +183,29 @@ def api_qq_running():
     print(error)
     return json500({"error":"Internal Server Error"})
 
+
+@app.route('/qq/new')
+def api_qq_running():
+  query = """
+    SELECT start_time, id, iql,
+    (CASE WHEN (stop_time IS NOT NULL) THEN 
+         EXTRACT( EPOCH FROM (stop_time - start_time) )
+     ELSE 
+       EXTRACT(
+           EPOCH FROM ( (NOW()::TIMESTAMP WITHOUT TIME ZONE) - start_time )
+       )
+     END) as duration 
+      FROM query_queue WHERE state = 'new' ORDER BY start_time ;
+  """
+
+  try:
+    dr = get_db().query(query).dictresult()
+    return json200(dr)
+  except Exception as error:
+    print(error)
+    return json500({"error":"Internal Server Error"})
+
+
 @app.route('/qq/get')
 def api_qq_get():
   query = """
