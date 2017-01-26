@@ -161,3 +161,18 @@ def api_sql():
 
   return text200(sql)
 
+
+@app.route('/qq/running')
+def api_qq_running():
+  query = """
+    SELECT start_time, id, state, (CASE WHEN (stop_time IS NOT NULL) THEN stop_time - start_time ELSE (NOW()::TIMESTAMP WITHOUT TIME ZONE) - start_time  END) as duration 
+    FROM query_queue ORDER by start_time WHERE state = 'running';
+  """
+
+  try:
+    dr = get_db().query(sql).dictresult()
+    return json200(dr)
+  except Exception as error:
+    print(error)
+    return json500({"error":"Internal Server Error"})
+
