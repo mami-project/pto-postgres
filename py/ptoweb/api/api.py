@@ -185,7 +185,7 @@ def api_qq_running():
 
 
 @app.route('/qq/new')
-def api_qq_running():
+def api_qq_new():
   query = """
     SELECT start_time, id, iql,
     (CASE WHEN (stop_time IS NOT NULL) THEN 
