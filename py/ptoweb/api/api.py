@@ -170,7 +170,7 @@ def api_qq_running():
   """
 
   try:
-    dr = get_db().query(sql).dictresult()
+    dr = get_db().query(query).dictresult()
     return json200(dr)
   except Exception as error:
     print(error)
@@ -183,7 +183,7 @@ def api_qq_get():
   """ % (escape_string(request.args.get('id')))
 
   try:
-    dr = get_db().query(sql).dictresult()
+    dr = get_db().query(query).dictresult()
     return json200(dr)
   except Exception as error:
     print(error)
