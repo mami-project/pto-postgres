@@ -176,3 +176,15 @@ def api_qq_running():
     print(error)
     return json500({"error":"Internal Server Error"})
 
+@app.route('/qq/get')
+def api_qq_get():
+  query = """
+    SELECT * FROM query_queue WHERE id = '%s';
+  """ % (escape_string(request.args.get('id')))
+
+  try:
+    dr = get_db().query(sql).dictresult()
+    return json200(dr)
+  except Exception as error:
+    print(error)
+    return json500({"error":"Internal Server Error"})
