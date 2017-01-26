@@ -137,7 +137,12 @@ function renderCounts(results, group_order, distinct) {
 
   }
   else if(group_order.length == 0) {
-    renderHBar(results, "Counts", counted_attribute);
+    if(distinct === true) {
+      renderHBar(results, "Counts of <i>" + attrNameToDisplay(distinct_attribute) + "</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
+    }
+    else {
+      renderHBar(results, "Counts of observations per <i>" + counted_attribute + "</i>");
+    }
   }
 }
 
@@ -413,7 +418,7 @@ function renderHBar(data, title, counted_attribute) {
        .range([0, width]);
 
   var figure = d3.select("#figures").append("div").attr("class","figure");
-      figure.append("div").attr("class","title").text(title);
+      figure.append("div").attr("class","title").html(title);
 
   var chart = figure.append("svg")
        .attr("width", width)
