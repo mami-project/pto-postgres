@@ -14,8 +14,30 @@ html {
   max-width: 65rem;
 }
 
+ul {
+  margin-left: 1rem;
+  list-style-type: square;
+}
+
+li {
+  padding: 0.5rem;
+}
+
 #nav ul {
   list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#nav ul li {
+  margin: 0;
+  padding: 0;
+}
+
+.clear-float::after {
+  clear: both;
+  display: table;
+  content: '';
 }
 
 #nav ul::after {
@@ -42,7 +64,7 @@ html {
 #nav ul li a:active,
 #nav ul li a:focus {
   text-decoration: none;
-  color: red;
+  color: firebrick;
 }
 
 #nav ul li a:hover, 
@@ -236,6 +258,57 @@ input:hover, select:hover, textarea:hover, button:hover {
 
 .auto-overflow {
   overflow: auto;
+}
+
+.auto-margin-85 {
+  width: 85%;
+  margin: auto;
+}
+
+.jumbo {
+  width: 85%;
+  margin: auto;
+  margin-top: 2rem;
+}
+
+.txt-center {
+  text-align: center;
+}
+
+.txt-huge {
+  font-size: 2rem;
+}
+
+.txt-gray {
+  color: darkgray;
+}
+
+.bold-emph {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.row-margin + .row-margin {
+  margin-top: 1.5rem;
+}
+
+.txt-abbr {
+  font-size: 1.1em;
+}
+
+.inline {
+  display: inline;
+  width: auto;
+  padding: 0.1rem;
+}
+
+.linky, linky:visited {
+  color: firebrick;
+  text-decoration: none;
+}
+
+.linky:hover::after {
+  content: ' \2192';
 }
 
 #chart_section, #table_section, #raw_query_section, #raw_results_section { display: none; }
