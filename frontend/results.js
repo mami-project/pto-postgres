@@ -163,7 +163,7 @@ function renderResults(results) {
 
   var rawResultsDiv = document.getElementById('raw_results');
   var result = results['result'];
-  $('#raw_results').append(JSON.stringify(result));
+  $('#raw_results').append('<pre>'+JSON.stringify(result, null, ' ')+'</pre>');
   var iql = results['iql'];
   $('#raw_query').append(JSON.stringify(iql));
 
