@@ -141,7 +141,7 @@ function renderCounts(results, group_order, distinct) {
       renderHBar(results, "Counts of <i>" + attrNameToDisplay(distinct_attribute) + "</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
     }
     else {
-      renderHBar(results, "Counts of observations per <i>" + counted_attribute + "</i>", counted_attribute);
+      renderHBar(results, "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
     }
   }
 }
