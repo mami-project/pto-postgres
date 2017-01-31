@@ -39,7 +39,7 @@ class Worker(th.Thread):
 
   def find_and_process_new(self, f):
 
-    time_now = int(datetime.now().timestamp())
+    time_now = int(datetime.utcnow().timestamp())
 
     dr = self.db.query("""
          UPDATE %s SET state = 'running',
