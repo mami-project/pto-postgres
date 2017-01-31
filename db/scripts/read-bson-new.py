@@ -6,9 +6,9 @@ import json
 
 path = sys.argv[1]
 
-dbname = sys.argv[2]
-user = sys.argv[3]
-pwd = sys.argv[4]
+dbname = input('DB? ')
+user = input('User? ')
+pwd = input('PWD? ')
 
 db = DB(dbname = dbname, user = user, passwd = pwd)
 
