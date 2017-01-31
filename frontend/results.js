@@ -23,6 +23,33 @@ function attrNameToDisplay(name) {
   return name;
 }
 
+function findInJSON(query, what, arr) {
+  if(typeof(query) != 'object') return;
+  var keys = Object.keys(query);
+  for(var i = 0; i < keys.length; i++) {
+    if(what == keys[i]) {
+      arr.push(query[what]);
+    }
+    findInJSON(query[keys[i]], what, arr);
+  }
+}
+
+function extractTimestamps(query) {
+  var timestamps = [];
+  findInJSON(query, 'time', timestamps);
+  for(var i = 0; i < timestamps.length; i++) {
+    if(Array.isArray(timestamps[i])) {
+      timestamps[i] = timestamps[i][0];
+      if(timestamps[i] != undefined)
+        if(typeof(timestamps[i]) == 'number') {
+          timestamps[i] = timestamps[i] + " : " + new Date(timestamps[i]*1000).toUTCString();
+        }
+    }
+  }
+  console.log('timestamps', timestamps);
+  return timestamps;
+}
+
 function renderCounts(results, group_order, distinct) {
   if(!Array.isArray(group_order)) {
     console.log("group_order not an array");
@@ -141,7 +168,7 @@ function renderCounts(results, group_order, distinct) {
       renderHBar(results, "Counts of <i>" + attrNameToDisplay(distinct_attribute) + "</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
     }
     else {
-      renderHBar(results, "Counts of observations per <i>" + counted_attribute + "</i>");
+      renderHBar(results, "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
     }
   }
 }
@@ -163,7 +190,7 @@ function renderResults(results) {
 
   var rawResultsDiv = document.getElementById('raw_results');
   var result = results['result'];
-  $('#raw_results').append(JSON.stringify(result));
+  $('#raw_results').append('<pre>'+JSON.stringify(result, null, ' ')+'</pre>');
   var iql = results['iql'];
   $('#raw_query').append(JSON.stringify(iql));
 
@@ -180,6 +207,16 @@ function renderResults(results) {
 
   if(!('query' in iql)) {
     return; //abort. something's more than fishy
+  }
+
+  var timestamps = extractTimestamps(iql);
+
+  for(var i = 0; i < timestamps.length; i++) {
+    if(i == 0)
+     $('#raw_query').append('<br><br>----<br>Timestamps in this query:<br>');
+    else
+     $('#raw_query').append('<br>');
+    $('#raw_query').append(timestamps[i]);
   }
 
 

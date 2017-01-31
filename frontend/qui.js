@@ -64,14 +64,13 @@ function submitQuery(query) {
   request.fail(process_failed_response); 
 }
 
-
 function ecnSupportQuery() {
   var selected_window = $('#i_ecn_support_time_window').val();
 
   var windows = {
     "Nov 2016" : [toDate("01 Nov 2016 start"), toDate("30 Nov 2016 end")],
     "Dec 2016" : [toDate("01 Dec 2016 start"), toDate("31 Dec 2016 end")],
-    "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2016 end")]
+    "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2017 end")]
   };
 
   var exp_conditions = {"or":[
