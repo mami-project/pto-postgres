@@ -4,7 +4,7 @@ from pg import escape_string
 
 class Config:
 
-  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, max_limit = 128):
+  def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, max_limit = 4096):
     """
     Creates configuration containing necessary metadata for IQL to convert queries.
 
@@ -57,7 +57,7 @@ class Context:
 
     self.msmnt_name = None
 
-    self.limit = 128
+    self.limit = 0
     self.skip = 0
     self.order = None
     self.nub = True
