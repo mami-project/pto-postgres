@@ -20,6 +20,9 @@ class ProgrammingError(Error):
 class NotSupportedError(Error):
   pass
 
+class OperationalError(Error):
+  pass
+
 class Connection:
 
   def __init__(self, db_con, config):
@@ -34,22 +37,27 @@ class Connection:
     self.config = config
 
   def commit(self):
-    """
-    Not supported.
-    """
-
-    raise NotSupportedError('Commit not supported')
+    # Redirect to underlying connection
+    
+    try:
+      return self.db_con.commit()
+    except error:
+      raise OperationalError(error)
 
   def rollback(self):
-    """
-    Not supported.
-    """
-
-    raise NotSupportedError('Rollback not supported')
-
-  def cursor():
     # Redirect to underlying connection
-    return Cursor(db_con.cursor(), db_con)
+
+    try:
+      return self.db_con.rollback()
+    except error:
+      raise OperationalError(error)
+
+  def cursor(self):
+    # Redirect to underlying connection
+    try:
+      return Cursor(self.db_con.cursor(), self.db_con)
+    except error:
+      raise DatabaseError(error)
 
 class Cursor:
   
