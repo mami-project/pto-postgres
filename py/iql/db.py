@@ -1,9 +1,15 @@
 import iql.convert as iqlc
 import json
+import pgdb
 
 apilevel = '2.0'
 threadsafety = 1
 paramstyle = None #Is this even compliant? :(
+
+def pg_connect(database = 'pto', user = 'user', password = 'password', config = iqlc.Config()):
+  pg_con = pgdb.connect(database = database, user = user, password = password)
+  con = Connection(pg_con, config)
+  return con
 
 class Error(BaseException):
   pass
