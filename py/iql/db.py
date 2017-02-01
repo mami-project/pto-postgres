@@ -67,7 +67,13 @@ class Cursor:
   
   def __getattr__(self, attr):
     # Redirect to underlying cursor
+
     return self.db_cursor.__getattribute__(attr)
+
+  def __setattr__(self, prop, val):
+    # Redirect to underlying cursor
+
+    return self.db_cursor.__setattr__(prop, val)
 
   def callproc(self, procname, *parameters):
     """
