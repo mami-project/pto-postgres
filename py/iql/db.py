@@ -33,7 +33,7 @@ class Connection:
     - config: iql.convert.Config
     """
 
-    self.db_con = db_con()
+    self.db_con = db_con
     self.config = config
 
   def commit(self):
@@ -41,7 +41,7 @@ class Connection:
     
     try:
       return self.db_con.commit()
-    except error:
+    except Exception as error:
       raise OperationalError(error)
 
   def rollback(self):
@@ -49,31 +49,35 @@ class Connection:
 
     try:
       return self.db_con.rollback()
-    except error:
+    except Exception as error:
       raise OperationalError(error)
 
   def cursor(self):
     # Redirect to underlying connection
     try:
-      return Cursor(self.db_con.cursor(), self.db_con)
-    except error:
+      return Cursor(self.db_con.cursor(), self.db_con, self.config)
+    except Exception as error:
       raise DatabaseError(error)
 
 class Cursor:
   
-  def __init__(self, db_cursor, db_con):
+  def __init__(self, db_cursor, db_con, config):
     self.db_cursor = db_cursor
     self.db_con = db_con
+    self.config = config
   
   def __getattr__(self, attr):
     # Redirect to underlying cursor
 
-    return self.db_cursor.__getattribute__(attr)
+    return getattr(self.db_cursor, attr)
 
   def __setattr__(self, prop, val):
     # Redirect to underlying cursor
+    if not prop in ['db_cursor','db_con']:
+      return setattr(self.db_cursor, prop, val)
 
-    return self.db_cursor.__setattr__(prop, val)
+    else:
+      super().__setattr__(prop, val)
 
   def callproc(self, procname, *parameters):
     """
@@ -94,7 +98,7 @@ class Cursor:
     if(type(operation) == type('')):
       try:
         operation = json.loads(operation)
-      except error:
+      except Exception as error:
         raise ProgrammingError(error)
 
     sql = None
@@ -102,16 +106,16 @@ class Cursor:
   
     # Convert IQL
     try:
-      sql = iqlc.convert(operation, db_con.config)
+      sql = iqlc.convert(operation, self.config)
     except iqlc.IQLTranslationError as error:
       raise ProgrammingError(error)
-    except error:
+    except Exception as error:
       raise ProgrammingError(error)
 
     # Pass SQL to underlying cursor
     try:
       self.db_cursor.execute(sql)
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
 
   def executemany(self, operation, seq_of_parameters):
@@ -125,21 +129,21 @@ class Cursor:
     # Redirect to underlying cursor
     try:
       return self.db_cursor.fetchone()
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
 
   def fetchmany(self, size = 4096):
     # Redirect to underlying cursor
     try:
       return self.db_cursor.fetchmany(size = size)
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
 
   def fetchall(self):
     # Redirect to underlying cursor
     try:
       return self.db_cursor.fetchall()
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
 
   def nextset(self):
@@ -153,12 +157,12 @@ class Cursor:
     # Redirect to underlying cursor
     try:
       return self.db_cursor.setinputsizes(sizes)
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
 
   def setoutputsize(self, size, *columns):
     # Redirect to underlying cursor
     try:
       return self.db_cursor.setoutputsize(size, *columns)
-    except error:
+    except Exception as error:
       raise DatabaseError(error)
