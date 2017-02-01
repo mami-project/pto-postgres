@@ -76,7 +76,7 @@ class Worker(th.Thread):
     time_now = int(datetime.now().timestamp())
 
     self.db.query("""
-    UPDATE %s SET state = 'done', result = '%s',
+    UPDATE %s SET state = 'done', result = '%s'::JSONB,
                   stop_time = to_timestamp('%d')::TIMESTAMP WITHOUT TIME ZONE
     WHERE id = '%s';""" % (self.TBL_NAME, escape_string(json.dumps(result, sort_keys = True, cls = CustomEncoder)), time_now, escape_string(item['id'])))
 

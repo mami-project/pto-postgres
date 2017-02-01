@@ -130,7 +130,7 @@ def api_aquery():
     first = dr[0]
     return json200({"query_id": first["id"], "already" : first})
 
-  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state) VALUES('%s', '%s', '%s', NULL, 'new');" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql))
+  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new');" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql))
 
   try:
     get_db().query(sql)
