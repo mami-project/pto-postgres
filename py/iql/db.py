@@ -59,6 +59,14 @@ class Connection:
     except Exception as error:
       raise DatabaseError(error)
 
+  def close(self):
+    # Redirect to underlying connection
+    
+    try:
+      return self.db_con.close()
+    except Exception as error:
+      raise DatabaseError(error)
+
 class Cursor:
   
   def __init__(self, db_cursor, db_con, config):
