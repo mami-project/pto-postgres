@@ -74,6 +74,24 @@ class Connection:
       raise DatabaseError(error)
 
 class Cursor:
+
+  def _rewrite_values(self, row):
+    if row == None: return row
+
+    row = row._asdict()
+    keys = list(row.keys())
+
+    for key in keys:
+      if type(row[key]) == type(1):
+        row[key] = float(row[key])
+
+      if key.startswith('val_'):
+        if row[key] == None:
+          del row[key]
+        else:
+          row['value'] = row[key]
+          del row[key]
+    return row
   
   def __init__(self, db_cursor, db_con, config):
     self.db_cursor = db_cursor
@@ -142,21 +160,21 @@ class Cursor:
   def fetchone(self):
     # Redirect to underlying cursor
     try:
-      return self.db_cursor.fetchone()
+      return self._rewrite_values(self.db_cursor.fetchone())
     except Exception as error:
       raise DatabaseError(error)
 
   def fetchmany(self, size = 4096):
     # Redirect to underlying cursor
     try:
-      return self.db_cursor.fetchmany(size = size)
+      return list(map(self._rewrite_values, self.db_cursor.fetchmany(size = size)))
     except Exception as error:
       raise DatabaseError(error)
 
   def fetchall(self):
     # Redirect to underlying cursor
     try:
-      return self.db_cursor.fetchall()
+      return list(map(self._rewrite_values, self.db_cursor.fetchall()))
     except Exception as error:
       raise DatabaseError(error)
 
