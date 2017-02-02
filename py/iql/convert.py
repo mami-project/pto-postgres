@@ -426,9 +426,6 @@ def convert_query(query, context):
     exps = query["sieve"]
     return convert_sieve(exps, context)
 
-  elif "nsieve" in query:
-    exps = query["nsieve"]
-    return convert_nsieve(exps, context)
 
   elif "sieve-ex" in query:
 
@@ -656,77 +653,6 @@ def convert_sieve_ex(exps, context):
     sql = sql_
     
   return sql
-
-
-def convert_nsieve(exps, context, attributes = None):
-  """
-  Converts a nsieve operation query to SQL.
-  """
-
-  if context.attribute == '' or context.attribute == None:
-    raise IQLTranslationError("`nsieve' requires `settings.attribute': " + str(exps))
-
-
-  if type(exps) != type([]):
-      raise IQLTranslationError("Error: Expected Array but not found: " + str(exps))
-
-  i = 0
-
-  wheres = []
-
-  for exp in exps:
-
-    context.msmnt_name = None
-    (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
-
-    if return_type != "B":
-      raise IQLTranslationError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
-
-    if context.msmnt_name != None:
-      wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
-
-    wheres.append(sql)
-
-    i += 1
-
-  distinct = 'DISTINCT' if context.nub else ''
-
-  if attributes == None:
-    sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
-  else:
-    q = 0
-    sql_attrs_selects = []
-    while q < i:
-      sql_attrs = ",".join(list(map(lambda a: "%s(l%d.%s) as \"%s:%d\"" % (context.projection if a == context.attribute else '',q,a,a,q), attributes)))
-      sql_attrs_selects.append(sql_attrs)
-      q += 1
-
-    sql_attrs_select_line = ",".join(sql_attrs_selects)
-
-    sql = "(SELECT %s FROM\n" % sql_attrs_select_line
-
-  sql += "%s l0 " % (context.TBL_NAME)
-  j = 1
-
-  while j < i:
-    sql += "LEFT JOIN %s l%d " % (context.TBL_NAME, j)
-    sql += "ON %s(l%d.%s) = %s(l%d.%s) AND (%s) AND (%s)\n" % (context.projection, j-1, context.attribute, context.projection, j, context.attribute, wheres[j-1], wheres[j])
-    j += 1
-
-  sql += "WHERE\n"
-  
-  tbls = j
-  j = 1
-
-  i = tbls
-
-  while j < i:
-    sql += "(l%d.%s IS NULL) " % (j, context.attribute)
-    if(j != i - 1):
-      sql += "AND\n"
-    j += 1
-
-  return sql + ")"
 
 
 
