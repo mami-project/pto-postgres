@@ -822,18 +822,18 @@ def convert_exp(exp, cur_table, context):
     elif exp.startswith("$"):
 
       if context.msmnt_name == None:
-        context.msmnt_name = exp[1:]
+        context.msmnt_name = U.get_msmnt_name(exp)[1:]
       else:
-        if context.msmnt_name != exp[1:]:
+        if context.msmnt_name != U.get_msmnt_name(exp)[1:]:
           raise IQLTranslationError("Found `" + str(exp) + "' but expected `$" + context.msmnt_name + "'")
 
         
-      exp = exp[1:]
+      msmnt_name = U.get_msmnt_name(exp)[1:]
 
-      if not U.is_known_msmnt(exp, context):
-        raise IQLTranslationError("Unknown measurement name `" + exp + "': " + str(exp))
+      if not U.is_known_msmnt(msmnt_name, context):
+        raise IQLTranslationError("Unknown measurement name or value `" + exp + "': " + str(exp))
 
-      return ("$" + exp, "$", U.get_msmnt_type(exp, context))
+      return (exp, "$", U.get_msmnt_type(msmnt_name, context))
 
     elif exp.startswith('@'):
       attr_name = U.get_attribute_name(exp)[1:]
@@ -1093,7 +1093,7 @@ def to_sql_col_val(value, cur_table, data_type = ''):
     if len(parts) != 2:
       raise IQLTranslationError("Illegal reference `" + value + "'.")
 
-    return "l" + str(parts[1]) + ".VAL_"
+    return "l" + str(parts[1]) + ".VAL_" + data_type
 
 
   # Verbatim

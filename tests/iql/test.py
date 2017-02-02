@@ -106,6 +106,22 @@ class Tests():
     Tests.check_dict_compare(expected, rows[0])
 
 
+  @staticmethod
+  def test_sieve(cursor):
+    iql = {"query" : {"all" : [{"sieve" : [
+            {"eq":["@name","msmnt5"]},
+            {"eq":["$msmnt5:1",{"mul":[2,"$msmnt5:0"]}]}
+          ]}]}, "settings":{"attribute":"@attr_b"}}
+
+    expected = {"attr_b" : ["u","m","g"]}
+
+    cursor.execute(iql)
+    rows = cursor.fetchall()
+    
+    Tests.check_len(rows, 1)
+    Tests.check_dict_compare(expected, rows[0])
+
+
 if len(sys.argv) != 2:
   print('Need path!')
   exit()
@@ -127,7 +143,7 @@ def main():
 
   config = Config(tbl_name = 'iql_test', 
                   expected_types = {"name" : "S", "attr_a" : "N", "attr_b" : "*S"}, 
-                  msmnt_types = {'msmnt1' : 'N', 'msmnt2' : 'N', 'msmnt3' : 'N', 'msmnt4' : 'N'})
+                  msmnt_types = {'msmnt1' : 'N', 'msmnt2' : 'N', 'msmnt3' : 'N', 'msmnt4' : 'N', 'msmnt5' : 'N'})
 
 
   con = iqld.pg_connect(database = dbname, user = user, password = password, config = config)
