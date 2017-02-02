@@ -67,8 +67,38 @@ class Tests():
 
 
   @staticmethod
-  def test_find_msmnt(cursor):
+  def test_find_msmnt_1(cursor):
     iql = {"query" : {"all" : [{"simple" : [{"eq":["@name","msmnt3"]}]}]}}
+    expected = {"oid":5.0, "name" : "msmnt3", "value" : 1.0, "attr_a" : 3.5}
+
+    Tests.check_one(cursor, iql, expected)
+
+
+  @staticmethod
+  def test_find_msmnt_2(cursor):
+    iql = {"query" : {"all" : [{"simple" : [{"and":[{"eq":["@name","msmnt3"]}]}]}]}}
+    expected = {"oid":5.0, "name" : "msmnt3", "value" : 1.0, "attr_a" : 3.5}
+
+    Tests.check_one(cursor, iql, expected)
+
+  @staticmethod
+  def test_find_msmnt_3(cursor):
+    iql = {"query" : {"all" : [{"simple" : [{"or":[{"eq":["@name","msmnt3"]}]}]}]}}
+    expected = {"oid":5.0, "name" : "msmnt3", "value" : 1.0, "attr_a" : 3.5}
+
+    Tests.check_one(cursor, iql, expected)
+
+  @staticmethod
+  def test_find_msmnt_4(cursor):
+    iql = {"query" : {"all" : [{"simple" : [{"and":[{"le":["$msmnt5",9]},{"gt":["$msmnt5",6]}]}]}]}}
+    expected = {"oid":11.0, "name" : "msmnt5", "value" : 8.8}
+
+    Tests.check_one(cursor, iql, expected)
+
+
+  @staticmethod
+  def test_find_msmnt_5(cursor):
+    iql = {"query" : {"all" : [{"simple" : [{"or":[{"eq":[2,3]},{"eq":["@name","msmnt3"]}]}]}]}}
     expected = {"oid":5.0, "name" : "msmnt3", "value" : 1.0, "attr_a" : 3.5}
 
     Tests.check_one(cursor, iql, expected)
@@ -120,6 +150,7 @@ class Tests():
     
     Tests.check_len(rows, 1)
     Tests.check_dict_compare(expected, rows[0])
+
 
   @staticmethod
   def test_subtraction_sieve(cursor):
