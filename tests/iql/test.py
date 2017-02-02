@@ -121,6 +121,21 @@ class Tests():
     Tests.check_len(rows, 1)
     Tests.check_dict_compare(expected, rows[0])
 
+  @staticmethod
+  def test_subtraction_sieve(cursor):
+    iql = {"query" : {"all" : [{"subtraction" : [
+            {"simple":[{"eq":["@name","msmnt5"]}]},
+            {"sieve":[{"eq":["@name", "msmnt5"]},{"eq":[{"mul":[2.0, "$msmnt5:0"]}, "$msmnt5:1"]}]}
+          ]}]}, "settings":{"attribute":"@attr_b"}}
+
+    expected = {"attr_b" : ["s","t","u"]}
+
+    cursor.execute(iql)
+    rows = cursor.fetchall()
+    
+    Tests.check_len(rows, 1)
+    Tests.check_dict_compare(expected, rows[0])
+
 
 if len(sys.argv) != 2:
   print('Need path!')
