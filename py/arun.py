@@ -187,7 +187,7 @@ class ObservationSetAnalyzer:
         '''
         raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
 
-    def interested(self, conditions):
+    def interested(self, conditions, metadata):
         '''
         An ObservationSetAnalyzer's interested() method is invoked 
         with a set of conditions (as strings) available in a given
@@ -195,6 +195,9 @@ class ObservationSetAnalyzer:
         represent an observation set the analyzer can analyze.
 
         :param set conditions: conditions present in the observation set
+
+        :param dict metadata: observation set metadata
+
 
         :rtype: bool
         '''
