@@ -116,43 +116,103 @@ class ObservationSetWriter:
 ######## | ### | ###########
 ######## | ### V ###########
 
+#
+# Analysis Runtime MPI definition
+#
+
+Observation = collections.namedtuple("Observation", ("start_time", "end_time", "path", "condition", "value"))
+
 class RawAnalyzer:
     '''
-    A RawAnalyzer's run() method is invoked once for each 
-    raw input file the core decides the analyzer is interested.
-    raw_input_reader is a buffer-like object from which bytes
-    can be read. metadata_dict is a dictionary containing
-    metadata associated with the file on upload.
-    '''
-    def run(self, raw_input_reader, metadata_dict):
-        pass
+    Interface definition for RawAnalyzer. A RawAnalyzer analyzes
+    raw measurement data and creates observations.
 
+    Any object that implements appropriate run() and interested() 
+    methods may be used as a RawAnalyzer.
     '''
-    The core can ask a RawAnalyzer whether it cares about a (new)
-    input file by passing it a metadata dictionary 
-    (including campaign name and filetype in addition to metadata).
-    this function returns True if its run() method can do something
-    useful with the raw data, or False() otherwise.
-    '''
-    def interested(self, metadata_dict):
-        pass
 
-class ObservationAnalyzer:
+    def run(self, reader, writer, metadata):
+        '''
+        A RawAnalyzer's run() method is invoked once for each 
+        raw input file the analyzer is interested in.
+        The run() method should analyze the input file completely,
+        writing observations to the supplied writer.
+
+        reader is a binary or text file object open for reading,
+        depending on the filetype of the underlying file.
+
+        writer is an ObservationSetWriter to write observations to.
+
+        metadata is a dict, containing metadata associated 
+        with the file on upload. FIXME: which keys are guaranteed?
+        '''
+        raise NotImplementedError("cannot instantiate abstract RawAnalyzer")
+
+    def interested(self, metadata):
+        '''
+        A RawAnalyzer's interested() method is invoked with the metadata
+        for a newly uploaded file. It should return True if the metadata
+        represents a file the analyzer can analyze.
+        '''
+        raise NotImplementedError("cannot instantiate abstract RawAnalyzer")
+
+class ObservationSetAnalyzer:
     '''
-    An ObservationAnalyzer is invoked once for each query result
-    set the core decides the analyzer is interested in. Generally,
-    this will be an IQL query limited to the set of observation
-    sets the analyzer has not yet run over.
+    Interface definition for ObservationSetAnalyzer. 
+    An ObservationSetAnalyzer analyzes observations on a 
+    per-observation set basis, and derives observations from them.
+
+    Any object that implements appropriate run() and interested() 
+    methods may be used as an ObservationSetAnalyzer.
+
     ''' 
 
-    def run(self, cursor_iterator):
-        pass
+    def run(self, observations, writer):
+        '''
+        An ObservationSetAnalyzer's run() method is invoked once for each 
+        observation set the analyzer is interested in.
 
+        The run() method should analyze the observation set
+        completely, writing derived observations to the supplied writer.
+
+        observations is an iterator of Observations, such that every 
+        observation belongs to the same observation set.
+
+        writer is an ObservationSetWriter to write observations to.
+        '''
+        raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
+
+    def interested(self, conditions):
+        '''
+        An ObservationSetAnalyzer's interested() method is invoked 
+        with a set of conditions (as strings) available in a given
+        observation set. It should return True if the conditions
+        represent an observation set the analyzer can analyze.
+        '''
+        raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
+
+class QueryAnalyzer:
     '''
-    The core can ask an ObservationAnalyzer for an IQL query that returns
-    rows its run() method can process. The core will periodically run this
-    query, limiting it to the observation sets not yet processed by the
-    analyzer.
+    Interface definition for QueryAnalyzer. A QueryAnalyzer
+    runs one or more arbitrary IQL queries when invoked, and
+    derives observations from them.
+
+    Any object that implements an appropriate run() method
+    may be used as a QueryAnalyzer.
     '''
-    def iql_query(self):
-        pass
+
+    def run(self, query_context, writer, **kwargs):
+        '''
+        A QueryAnalyzer's run() method is invoked externally; it takes
+        additional keyword arguments specified by its invocation
+        environment. The run() method should use the query_context to
+        run an arbitrary IQL query against the database, writing
+        derived observations to a supplied writer.
+
+        query_context wraps a database connection; it provides a single 
+        iql_query method to run queries against the database.
+
+        writer is a ObservationSetWriter to write observations to.
+        '''
+        raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
+
