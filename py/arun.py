@@ -107,6 +107,15 @@ class ObservationSetWriter:
         self._context._dbw.update(osid=self.osid, state='pending_review')
         self.state = ObservationSetState.pending_review
 
+
+######## ^ ### | ###########
+######## | ### | ###########
+######## | ### | ###########
+### sten |     | britram ### 
+######## | ### | ###########
+######## | ### | ###########
+######## | ### V ###########
+
 class RawAnalyzer:
     '''
     A RawAnalyzer's run() method is invoked once for each 
