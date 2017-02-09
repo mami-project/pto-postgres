@@ -332,6 +332,12 @@ def api_raw_upload():
   except:
     return json400({"error":"Not valid JSON!"})
 
+  if (not ('format' in metadata)):
+    return json400({"error" : "Format is missing!"})
+
+  if not isinstance(metadata['format'], str):
+    return json400({"error" : "Wrong type!"})
+
   if (not ('filename' in metadata)) or (not ('campaign' in metadata)):
     return json400({"error" : "Missing filename and/or campaign!"})
 
@@ -355,7 +361,7 @@ def api_raw_upload():
   secure_filename_ = secure_filename(metadata['filename'])
   path = os.path.join(secure_campaign_, secure_filename_)
 
-  path_prefix = '/tmp'
+  path_prefix = app.config['RAW_UPLOAD_FOLDER']
   
   if not os.path.isdir(os.path.join(path_prefix, secure_campaign_)):
     os.mkdir(os.path.join(path_prefix, secure_campaign_))
