@@ -18,18 +18,18 @@ DROP TYPE IF EXISTS os_state;
 --    that, _cannot_ delete any more
 --  "deprecated": a formerly published observation set has been found to be
 --    wrong. Not avalilable for IQL
-CREATE TYPE os_state (
+CREATE TYPE os_state AS ENUM (
   'in_progress',    -- analyser currently writing to this observation set
   'pending_review', -- observation set waiting to be vetted, no more additions
-  'public'          -- successfully vetted, can now be used in IQL queries
-  'permanent'       -- observation set used in permanent IQL query, can't delete this
+  'public',         -- successfully vetted, can now be used in IQL queries
+  'permanent',      -- observation set used in permanent IQL query, can't delete this
   'deprecated'      -- defective observation set, only there to enable repeatability
 );
 
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL,
   name VARCHAR(255) NOT NULL,
-  ts TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
+  toc TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
   state os_state,
   toi INT
 );

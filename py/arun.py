@@ -14,9 +14,8 @@ class BaseAnalysisContext:
     Implements observation set creation.
     """
 
-    def __init__(self, conn):
-      self._conn = conn
-      self._dbw = pg.DB(self._conn)
+    def __init__(self, dbw):
+      self._dbw = dbw
 
     def create_observation_set(self, name):
         with self._dbw as db:
@@ -30,17 +29,13 @@ class RawAnalysisContext(BaseAnalysisContext):
     Implements access to raw data in HDFS via Spark.
     """
 
-    def __init__(self, conn, some_handle_to_spark):
-        super().__init__(conn)
-        self._spark = some_handle_to_spark
+    def __init__(self, dbw):
+        super().__init__(dbw)
 
 class ObservationAnalysisContext(BaseAnalysisContext):
 
-    def __init__(self, conn):
-        super().__init__(conn)
-
-        # store connection to the database
-        self._conn = conn
+    def __init__(self, dbw):
+        super().__init__(dbw)
         
     def iql_query(self, iql_ast):
         """
@@ -85,27 +80,32 @@ class ObservationSetState(Enum):
    
 
 class ObservationSetStateError(Exception):
-    pass
+    def __init__(self, observed_state, expected_state):
+        self.observed_state = observed_state
+        self.expected_state = expected_state
+
 
 class ObservationSetWriter:
-    
     def __init__(self, context, set_id):
         self._context = context
-        self.osid = osid
-        self.state = ObservationSetState.in_progress
+        self._set_id = set_id
+        self._state = ObservationSetState.in_progress
 
-    def observe(self, start_time, end_time, path, condition, value=None):
-        if self.state == ObservationSetState.in_progress:
-            self._context._dbw.insert('observation', full_path=path, time_from=start, time_to=end, condition=condition, val_n=value, observation_set=self.osid)
+    def observe(self, time_from, time_to, path, condition, value=None):
+        if self._state == ObservationSetState.in_progress:
+            self._context._dbw.insert('observation', full_path=path, time_from=time_from, time_to=time_to, condition=condition, val_n=value, observation_set=self._state_id)
         else:
-            raise ObservationSetStateException()
+            raise ObservationSetStateException(self._state, ObservationSetState.in_progress)
 
     def complete(self):
         """
         Finish writing observations to this observation set
         """
-        self._context._dbw.update(osid=self.osid, state='pending_review')
-        self.state = ObservationSetState.pending_review
+        if self._state == ObservationSetState.in_progress:
+            self._context._dbw.update(osid=self._set_id, state='pending_review')
+            self._state = ObservationSetState.pending_review
+        else:
+            raise ObservationSetStateException(self.state, ObservationSetState.in_progress)
 
 
 ######## ^ ### | ###########
