@@ -120,7 +120,7 @@ class ObservationSetWriter:
 # Analysis Runtime MPI definition
 #
 
-Observation = collections.namedtuple("Observation", ("start_time", "end_time", "path", "condition", "value"))
+Observation = collections.namedtuple("Observation", ("start_time", "end_time", "path", "condition", "value", "observation_set"))
 
 class RawAnalyzer:
     '''
@@ -138,12 +138,12 @@ class RawAnalyzer:
         The run() method should analyze the input file completely,
         writing observations to the supplied writer.
 
-        reader is a binary or text file object open for reading,
+        :param reader: is a binary or text file object open for reading,
         depending on the filetype of the underlying file.
 
-        writer is an ObservationSetWriter to write observations to.
+        :param writer: is an ObservationSetWriter to write observations to.
 
-        metadata is a dict, containing metadata associated 
+        :param dict metadata: metadata associated 
         with the file on upload. FIXME: which keys are guaranteed?
         '''
         raise NotImplementedError("cannot instantiate abstract RawAnalyzer")
@@ -153,6 +153,11 @@ class RawAnalyzer:
         A RawAnalyzer's interested() method is invoked with the metadata
         for a newly uploaded file. It should return True if the metadata
         represents a file the analyzer can analyze.
+
+        :param dict metadata: metadata associated 
+        with the file on upload. FIXME: which keys are guaranteed?
+
+        :rtype bool:
         '''
         raise NotImplementedError("cannot instantiate abstract RawAnalyzer")
 
@@ -175,10 +180,10 @@ class ObservationSetAnalyzer:
         The run() method should analyze the observation set
         completely, writing derived observations to the supplied writer.
 
-        observations is an iterator of Observations, such that every 
-        observation belongs to the same observation set.
+        :param observations: is an iterator over all the Observations in
+        the (one or more) ObservationSets included in this run.
 
-        writer is an ObservationSetWriter to write observations to.
+        :param writer: is an ObservationSetWriter to write observations to.
         '''
         raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
 
@@ -188,6 +193,10 @@ class ObservationSetAnalyzer:
         with a set of conditions (as strings) available in a given
         observation set. It should return True if the conditions
         represent an observation set the analyzer can analyze.
+
+        :param set conditions: conditions present in the observation set
+
+        :rtype: bool
         '''
         raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
 
@@ -209,10 +218,10 @@ class QueryAnalyzer:
         run an arbitrary IQL query against the database, writing
         derived observations to a supplied writer.
 
-        query_context wraps a database connection; it provides a single 
+        :param query_context: wraps a database connection; it provides a single 
         iql_query method to run queries against the database.
 
-        writer is a ObservationSetWriter to write observations to.
+        :param writer: is a ObservationSetWriter to write observations to.
         '''
-        raise NotImplementedError("cannot instantiate abstract ObservationSetAnalyzer")
+        raise NotImplementedError("cannot instantiate abstract QueryAnalyzer")
 
