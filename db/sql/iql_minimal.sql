@@ -4,10 +4,14 @@ DROP VIEW IF EXISTS iql_minimal;
 DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
 DROP TABLE IF EXISTS observation_set;
+DROP TABLE IF EXISTS observation_set_metadata;
 
 DROP TYPE IF EXISTS os_state;
 
 -- States of an observation set:
+--   "unknown": an ObservationSetWriter is instantiated and may want to
+--     resume writing but it's not clear that the observation ID it refers
+--     to exists
 --   "in progress": an analyser is currently appending to this observation set
 --   "pending review": the analyzer is now done with this observation set,
 --     doesn't call observe() any more; set is waiting to be vetted
@@ -19,6 +23,7 @@ DROP TYPE IF EXISTS os_state;
 --  "deprecated": a formerly published observation set has been found to be
 --    wrong. Not avalilable for IQL
 CREATE TYPE os_state AS ENUM (
+  'unknown',        -- after initialisation, before checking
   'in_progress',    -- analyser currently writing to this observation set
   'pending_review', -- observation set waiting to be vetted, no more additions
   'public',         -- successfully vetted, can now be used in IQL queries
@@ -27,11 +32,20 @@ CREATE TYPE os_state AS ENUM (
 );
 
 CREATE TABLE observation_set (
-  osid BIGSERIAL NOT NULL,
+  osid BIGSERIAL NOT NULL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   toc TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
   state os_state,
   toi INT
+);
+
+CREATE TABLE observation_set_metadata (
+  osid BIGSERIAL NOT NULL,
+  key VARCHAR(255),
+  value VARCHAR(255),
+
+  FOREIGN KEY(osid)
+    REFERENCES observation_set (osid)
 );
 
 CREATE UNIQUE INDEX idx_observation_set_unique_osid ON observation_set (osid);

@@ -5,7 +5,6 @@
 from enum import Enum
 
 import iql.convert
-import pgdb
 import pg
 
 class BaseAnalysisContext:
@@ -14,14 +13,14 @@ class BaseAnalysisContext:
     Implements observation set creation.
     """
 
-    def __init__(self, dbw):
-      self._dbw = dbw
+    def __init__(self, db):
+      self._db = db
 
     def create_observation_set(self, name):
-        with self._dbw as db:
+        with self._db as db:
             observation_set = db.insert("observation_set", name=name, state='in_progress')
-
-        return ObservationSetWriter(self, observation_set.osid)
+        print(observation_set)
+        return ObservationSetWriter(self, observation_set['osid'])
 
 class RawAnalysisContext(BaseAnalysisContext):
     """
@@ -29,13 +28,13 @@ class RawAnalysisContext(BaseAnalysisContext):
     Implements access to raw data in HDFS via Spark.
     """
 
-    def __init__(self, dbw):
-        super().__init__(dbw)
+    def __init__(self, db):
+        super().__init__(db)
 
 class ObservationAnalysisContext(BaseAnalysisContext):
 
-    def __init__(self, dbw):
-        super().__init__(dbw)
+    def __init__(self, db):
+        super().__init__(db)
         
     def iql_query(self, iql_ast):
         """
@@ -72,11 +71,12 @@ class ObservationSetState(Enum):
     spelling (including capitalisation) as the SQL type os_state described
     in iql_minimal.sql.
     """
-    in_progress = 1
-    pending_review = 2
-    public = 3
-    permanent = 4
-    deprecated = 5
+    unknown = 1
+    in_progress = 2
+    pending_review = 3
+    public = 4
+    permanent = 5
+    deprecated = 6
    
 
 class ObservationSetStateError(Exception):
@@ -84,16 +84,127 @@ class ObservationSetStateError(Exception):
         self.observed_state = observed_state
         self.expected_state = expected_state
 
+class ObservationSetNotFoundError(Exception):
+    def __init__(self, param):
+        self.param = param
+
+class ObservationSet:
+    # TODO Make this subscriptable
+    def __init__(self, db):
+        self._db = db
+        self._state = ObservationSetState.unknown
+
+    def __str__(self):
+        if self._state == ObservationSetState.unknown:
+            return 'OSID unknown'
+        else:
+            if self._toi is None:
+                toi = 'never'
+            else:
+                toi = self._toi.__str__()
+
+            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s}, invalidated {4:s}'\
+                .format(self._name, self._state, self._osid, self._toc.__str__(), toi)
+
+    @property
+    def state(self):
+        '''The state of this observation set'''
+        return self._state
+
+    @state.setter
+    def state(self, state):
+        self._state = state
+        print(self._state)
+        with self._db as db:
+            db.update('observation_set', osid=self._osid, state=self._state.name)
+
+    @state.deleter
+    def state(self):
+        pass
+
+    @staticmethod
+    def find_sets_by_name(db, name):
+        '''
+        Retrieves all observation sets for a given name. Not the most
+        efficient implementation, but should work
+        '''
+        ret = list()
+        with db as d:
+            observation_sets = d.query('SELECT * FROM observation_set WHERE name = $1', name)
+        if observation_sets is not None:
+            for observation_set in observation_sets.dictresult():
+                o = ObservationSet(db)
+                o.resume(observation_set['osid'])
+                ret.append(o)
+            return ret
+        else:
+            raise ObservationSetNotFoundError(name)
+
+    def create(self, name, metadata=None):
+        '''
+        Creates a new observation set with a new, unised observation set ID
+        '''
+        with self._db as db:
+            print(ObservationSetState.in_progress)
+            observation_set = db.insert('observation_set', name=name,
+                state=ObservationSetState.in_progress.name)
+            self._state = observation_set['state']
+            self._osid = observation_set['osid']
+            self._toc = observation_set['toc']
+            self._name = observation_set['name']
+            self._toi = observation_set['toi']
+            self._metadata = metadata
+        if metadata is not None:
+            with self._db as db:
+                for key in metadata:
+                    db.insert('observation_set_metadata', osid=self._osid,
+                        key=key, value=metadata[key])
+
+    def resume(self, osid):
+        '''
+        Loads an existing observation set, given its observation set ID.
+        Raises an ObservationSetNotFoundError if the observation set ID does
+        not exist
+        '''
+        with self._db as db:
+            observation_set = db.get('observation_set', osid, 'osid')
+        if observation_set is not None:
+            self._state = observation_set['state']
+            self._osid = observation_set['osid']
+            self._toc = observation_set['toc']
+            self._name = observation_set['name']
+            self._toi = observation_set['toi']
+            self._metadata = dict()
+            with self._db as db:
+                metadata = db.query('SELECT * from observation_set_metadata WHERE osid = $1', self._osid).getresult()
+            for m in metadata:
+                self._metadata[m[0]] = m[1]
+        else:
+            raise ObservationSetNotFoundError(osid)
 
 class ObservationSetWriter:
-    def __init__(self, context, set_id):
-        self._context = context
-        self._set_id = set_id
-        self._state = ObservationSetState.in_progress
+    def __init__(self, db, name, set_id=None):
+        self._db = db
+        self._name = name
+        if set_id is not None:
+            self._set_id = set_id
+            self.resume(set_id)
+        else:
+            pass
+
+    def resume(self, set_id):
+        pass
+
+
+    def begin(self, name=None):
+        pass
+
+    def commit(self):
+        self.complete()
 
     def observe(self, time_from, time_to, path, condition, value=None):
         if self._state == ObservationSetState.in_progress:
-            self._context._dbw.insert('observation', full_path=path, time_from=time_from, time_to=time_to, condition=condition, val_n=value, observation_set=self._state_id)
+            self._context._dbw.insert('observation', full_path=path, time_from=time_from, time_to=time_to, condition=condition, val_n=value, observation_set=self._set_id)
         else:
             raise ObservationSetStateException(self._state, ObservationSetState.in_progress)
 
@@ -120,7 +231,7 @@ class ObservationSetWriter:
 # Analysis Runtime MPI definition
 #
 
-Observation = collections.namedtuple("Observation", ("start_time", "end_time", "path", "condition", "value"))
+#Observation = collections.namedtuple("Observation", ("start_time", "end_time", "path", "condition", "value"))
 
 class RawAnalyzer:
     '''
