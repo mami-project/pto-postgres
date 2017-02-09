@@ -91,6 +91,19 @@ def get_attribute_name(attribute):
   else: return attribute.lower()
 
 
+def get_msmnt_name(msmnt):
+  """
+  Returns the name of a measurement.
+  """
+
+  if ":" in msmnt:
+
+    parts = msmnt.split(":")
+    return parts[0].lower()
+
+  else: return msmnt.lower()
+
+
 
 def is_known_attribute(attribute, context):
   """

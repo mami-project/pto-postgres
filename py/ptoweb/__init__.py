@@ -3,7 +3,8 @@ from pg import DB
 import iql.convert as iqlc
 
 app = Flask(__name__)
-app.config.from_envvar('PTOWEB_SETTINGS', silent=False)
+app.config.from_envvar('PTO_PAPI_SETTINGS', silent=False)
+app.config.from_envvar('PTO_PAPI_IQL_SETTINGS', silent = False)
 
 from werkzeug.contrib.cache import FileSystemCache
 cache = FileSystemCache('/tmp/ptoweb')
@@ -19,20 +20,11 @@ def get_db():
   return g.psql_db
 
 def get_iql_config():
-  IQL_TABLE='iql_minimal'
+  IQL_TABLE = app.config['IQL_TABLE'];
   
-  IQL_ATTR_TYPES = {
-    'time_to' : 'T',
-    'time_from' : 'T',
-    'full_path' : '*S',
-    'name' : 'S',
-    'observation_set' : 'N'
-  }
+  IQL_ATTR_TYPES = app.config['IQL_ATTR_TYPES'];
 
-  IQL_MSMNT_TYPES = {
-    'ecn.connectivity' : 'S',
-    'ecn.negotiated' : 'N',
-  }
+  IQL_MSMNT_TYPES = app.config['IQL_MSMNT_TYPES'];
   
   return iqlc.Config(msmnt_types = IQL_MSMNT_TYPES, expected_types = IQL_ATTR_TYPES, tbl_name = IQL_TABLE)
 

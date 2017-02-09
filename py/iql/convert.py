@@ -2,6 +2,9 @@ import iql.constants as C
 import iql.util as U
 from pg import escape_string
 
+class IQLTranslationError(Exception):
+  pass
+
 class Config:
 
   def __init__(self, msmnt_types = {}, expected_types = {}, known_projections = {}, tbl_name = "iql_data", all_sql_attrs = None, max_limit = 4096):
@@ -29,6 +32,9 @@ class Config:
       query = {"settings":{"filter":{"contains":[{"array":[1,2,3]},"@observation_set"]}},"query":{"all":[{"simple":[True]}]}}
       print(query)
       print(iqlc.convert(query, cfg))
+
+    Raises:
+      IQLTranslationError - if the IQL query is invalid.
     """
 
     U.expect_int(max_limit, "Config: max_limit")
@@ -96,10 +102,10 @@ def convert_simple(exp, context):
   (sql, return_type, a) = convert_exp(exp, 'l0', context)
 
   if return_type == '$':
-    raise ValueError("Not a boolean expression: " + str(exp))
+    raise IQLTranslationError("Not a boolean expression: " + str(exp))
 
   if return_type != "B":
-    raise ValueError("Expected type `B' but found `" + return_type + "': " + str(exp))
+    raise IQLTranslationError("Expected type `B' but found `" + return_type + "': " + str(exp))
 
   if context.msmnt_name != None:
     sql_ = "l0.name = '" + context.msmnt_name + "' AND "
@@ -123,10 +129,10 @@ def convert_choice(operands, cur_table, context):
   U.expect_array(operands, 0, "`choice'")
 
   if len(operands) < 2:
-    raise ValueError("`choice' expects array of size 2: " + str(operands))
+    raise IQLTranslationError("`choice' expects array of size 2: " + str(operands))
 
   if context.msmnt_name != None:
-    raise ValueError("Can't use `choice' because expression is already bound to `" + context.msmnt_name + "': " + str(operands))
+    raise IQLTranslationError("Can't use `choice' because expression is already bound to `" + context.msmnt_name + "': " + str(operands))
 
   choices = []
 
@@ -134,7 +140,7 @@ def convert_choice(operands, cur_table, context):
     (sql, return_type, a) = convert_exp(operand, cur_table, context)
 
     if return_type != "B":
-      raise ValueError("Expected type `B' but found `" + return_type + "': " + str(operand))
+      raise IQLTranslationError("Expected type `B' but found `" + return_type + "': " + str(operand))
 
     if context.msmnt_name != None:
       sql = "%s.name = '%s' AND (%s)" % (cur_table, context.msmnt_name, sql)
@@ -177,86 +183,92 @@ def convert(query, config = Config()):
   Converts a query to SQL.
   """
 
-  context = Context('', '')
+  try:
+    context = Context('', '')
 
-  context.config_from(config)
+    context.config_from(config)
 
-  # If there's an attribute or projection set we use them
+    # If there's an attribute or projection set we use them
 
-  view = ""
+    view = ""
 
-  if 'settings' in query:
-    settings = query['settings']
+    if 'settings' in query:
+      settings = query['settings']
 
-    if 'filter' in settings:
-      new_context = Context('', '')
-      new_context.copy_from(context)
-      (filter_sql, data_type, msmnt_type) = convert_exp(settings['filter'], context.TBL_NAME, new_context)
+      if 'filter' in settings:
+        new_context = Context('', '')
+        new_context.copy_from(context)
+        (filter_sql, data_type, msmnt_type) = convert_exp(settings['filter'], context.TBL_NAME, new_context)
 
-      if data_type == '$':
-        raise ValueError("`settings.filter` can't reference measuremnt values!")
+        if data_type == '$':
+          raise IQLTranslationError("`settings.filter` can't reference measuremnt values!")
 
-      if new_context.msmnt_name != None:
-        raise ValueError("`settings.filter` can't reference measurement values!")
+        if new_context.msmnt_name != None:
+          raise IQLTranslationError("`settings.filter` can't reference measurement values!")
 
-      view = "WITH %s AS (SELECT * FROM %s WHERE %s)\n" % (context.TBL_NAME + "__iql__", context.TBL_NAME, filter_sql)
-      context.TBL_NAME += "__iql__"
-  
-    if 'nub' in settings:
-      context.nub = not(not(settings['nub']))
-    else: context.nub = True
+        view = "WITH %s AS (SELECT * FROM %s WHERE %s)\n" % (context.TBL_NAME + "__iql__", context.TBL_NAME, filter_sql)
+        context.TBL_NAME += "__iql__"
+    
+      if 'nub' in settings:
+        context.nub = not(not(settings['nub']))
+      else: context.nub = True
 
-    if 'limit' in settings:
-      U.expect_int(settings['limit'], "`settings.limit'")
-      context.limit = settings['limit']
+      if 'limit' in settings:
+        U.expect_int(settings['limit'], "`settings.limit'")
+        context.limit = settings['limit']
 
-      if context.limit >= 500 or context.limit <= 0:
-        context.limit = 500
+        if context.limit >= 500 or context.limit <= 0:
+          context.limit = 500
 
-      if 'skip' in settings:
-        U.expect_int(settings['skip'], "`settings.skip'")
-        context.skip = settings['skip']
+        if 'skip' in settings:
+          U.expect_int(settings['skip'], "`settings.skip'")
+          context.skip = settings['skip']
 
-    if 'projection' in settings:
-      projection = settings['projection']
+      if 'projection' in settings:
+        projection = settings['projection']
 
-      if type(projection) == type(''):
-        context.projection = projection
-      else:
-        raise ValueError("Invalid value for `settings.projection'. Need string: " + str(query))
+        if type(projection) == type(''):
+          context.projection = projection
+        else:
+          raise IQLTranslationError("Invalid value for `settings.projection'. Need string: " + str(query))
 
-      if not U.is_known_projection(context.projection, context):
-        raise ValueError("Unknown projection `" + str(self.projection) + "': " + str(query))
+        if not U.is_known_projection(context.projection, context):
+          raise IQLTranslationError("Unknown projection `" + str(self.projection) + "': " + str(query))
 
-    if 'attribute' in settings:
-      context.attribute = U.resolve_attribute(settings['attribute'], context, "`attribute.settings'")
+      if 'attribute' in settings:
+        context.attribute = U.resolve_attribute(settings['attribute'], context, "`attribute.settings'")
 
-    if 'order' in settings:
-      order = settings['order']
+      if 'order' in settings:
+        order = settings['order']
 
-      U.expect_array(order, 2, "`settings.order'")
+        U.expect_array(order, 2, "`settings.order'")
 
-      attribute = order[0]
-      asc_desc = order[1]
+        attribute = order[0]
+        asc_desc = order[1]
 
-      attribute = U.resolve_attribute(attribute, context, "`settings.order'")
+        attribute = U.resolve_attribute(attribute, context, "`settings.order'")
 
-      if context.attribute != None and context.attribute != '':
-        if context.attribute != attribute:
-          raise ValueError("Can't order by `" + attribute + "': " + str(query))
+        if context.attribute != None and context.attribute != '':
+          if context.attribute != attribute:
+            raise IQLTranslationError("Can't order by `" + attribute + "': " + str(query))
 
-      U.expect_one_of(asc_desc, ['asc','desc'], "`settings.order'")
-      asc_desc = asc_desc.upper()
+        U.expect_one_of(asc_desc, ['asc','desc'], "`settings.order'")
+        asc_desc = asc_desc.upper()
 
-      context.order = (attribute, asc_desc)
+        context.order = (attribute, asc_desc)
 
 
-  if not 'query' in query:
-    raise ValueError("Missing `query': " + str(query))  
+    if not 'query' in query:
+      raise IQLTranslationError("Missing `query': " + str(query))  
 
-  query = query['query']
+    query = query['query']
 
-  return view + convert_aggregation(query, context)
+    return view + convert_aggregation(query, context)
+
+  except ValueError as error:
+    raise IQLTranslationError(error)
+  except Exception as error:
+    raise error
 
 
 def convert_aggregation(query, context):
@@ -288,7 +300,7 @@ def convert_aggregation(query, context):
     U.expect_array(query, 0, "`sieve'")
 
     if(context.ALL_SQL_ATTRS == None):
-      raise ValueError("`sieve` (aggregation) is not supported with this configuration!")
+      raise IQLTranslationError("`sieve` (aggregation) is not supported with this configuration!")
 
     sql_ = convert_sieve(query, context, attributes = context.ALL_SQL_ATTRS)
 
@@ -337,7 +349,7 @@ def convert_aggregation(query, context):
           attribute = attributes[-1]
           raw_attribute = attributes[-1]
         else:
-          raise ValueError("`count.0' if array specified the array must not be empty:" + str(query))
+          raise IQLTranslationError("`count.0' if array specified the array must not be empty:" + str(query))
 
       attributes = list(map(lambda a: "z.%s" % U.resolve_attribute(a, context, "`count.0.x'"), attributes))
      
@@ -345,7 +357,7 @@ def convert_aggregation(query, context):
         order = query[2]
         overwrite_order = True
         if not order in ['asc','desc']:
-          raise ValueError("`count.3' must be either `asc' or `desc'!")
+          raise IQLTranslationError("`count.3' must be either `asc' or `desc'!")
 
       query = query[1]
 
@@ -353,11 +365,11 @@ def convert_aggregation(query, context):
 
       if context.attribute != None:
         if context.attribute != attribute:
-          raise ValueError("Can't count `" + attribute + "': " + str(query))
+          raise IQLTranslationError("Can't count `" + attribute + "': " + str(query))
 
       if context.order != None:
         if not ("z."+context.order[0]) in attributes:
-          raise ValueError("Can't order by `" + context.order[0] + "' due to `count': " + str(query))
+          raise IQLTranslationError("Can't order by `" + context.order[0] + "' due to `count': " + str(query))
 
 
       sql_ = convert_query(query, context)
@@ -396,10 +408,10 @@ def convert_aggregation(query, context):
       return sql; 
 
     else:
-      raise ValueError("`count' expects array of size 1, 2 or 3: " + str(query))
+      raise IQLTranslationError("`count' expects array of size 1, 2 or 3: " + str(query))
 
   else:
-    raise ValueError("Expected `count' or `all': " + str(query))
+    raise IQLTranslationError("Expected `count' or `all': " + str(query))
 
 
 def convert_query(query, context):
@@ -414,9 +426,6 @@ def convert_query(query, context):
     exps = query["sieve"]
     return convert_sieve(exps, context)
 
-  elif "nsieve" in query:
-    exps = query["nsieve"]
-    return convert_nsieve(exps, context)
 
   elif "sieve-ex" in query:
 
@@ -439,7 +448,7 @@ def convert_query(query, context):
     if type(query) == type([]):
 
       if len(query) != 1:
-        raise ValueError("Error: `simple' expects Array of size 1: " + str(query))
+        raise IQLTranslationError("Error: `simple' expects Array of size 1: " + str(query))
 
       query = query[0]
 
@@ -466,7 +475,7 @@ def convert_query(query, context):
     return convert_set_op(subqueries, 'EXCEPT', context)
 
   else:
-    raise ValueError("Need one of `sieve', `simple', `intersection', `union' or `subtraction': " + str(query))
+    raise IQLTranslationError("Need one of `sieve', `simple', `intersection', `union' or `subtraction': " + str(query))
 
 
 
@@ -478,7 +487,7 @@ def convert_lookup(arguments, context):
   U.expect_array(arguments, 0, "`lookup'")
 
   if len(arguments) < 3 or len(arguments) > 4:
-    raise ValueError("`lookup' requires array of size 3 or 4: " + str(arguments))
+    raise IQLTranslationError("`lookup' requires array of size 3 or 4: " + str(arguments))
 
   projection = arguments[0]
   attribute = arguments[1]
@@ -508,7 +517,7 @@ def convert_lookup(arguments, context):
     new_context.copy_from(context)
     sql_filter = convert_exp(filter_, "W", new_context)
     if sql_filter[1] != "B":
-      raise ValueError("`lookup.3' expects `B': " + str(filter_))
+      raise IQLTranslationError("`lookup.3' expects `B': " + str(filter_))
 
     sql_filter = " WHERE " + sql_filter[0] + " "
 
@@ -527,13 +536,13 @@ def convert_set_op(queries, set_op, context):
   """  
 
   if context.attribute == '' or context.attribute == None:
-    if not set_op.startswith("UNION "): raise ValueError("Set operations require `attribute': " + str(queries))
+    if not set_op.startswith("UNION "): raise IQLTranslationError("Set operations require `attribute': " + str(queries))
 
   if type(queries) != type([]):
-      raise ValueError("Error: Expected Array but not found: " + str(exps))
+      raise IQLTranslationError("Error: Expected Array but not found: " + str(exps))
 
   if len(queries) < 1:
-    raise ValueError("Set operations require at least one argument!")
+    raise IQLTranslationError("Set operations require at least one argument!")
 
   subqueries = []
 
@@ -564,7 +573,7 @@ def convert_sieve_ex(exps, context):
   U.expect_array(exps, 0, "`sieve-ex'")
 
   if len(exps) < 3:
-    raise ValueError("`sieve-ex' requires array of at least size 3: "  + str(exps))
+    raise IQLTranslationError("`sieve-ex' requires array of at least size 3: "  + str(exps))
 
   projection_function = exps[0]
   attribute = exps[1]
@@ -573,7 +582,7 @@ def convert_sieve_ex(exps, context):
   U.expect_str(projection_function, "`sieve-ex.1'")
 
   if not U.is_known_projection(projection_function, context):
-    raise ValueError("Unknown projection function `%s': %s" % (projection, str(exps)))
+    raise IQLTranslationError("Unknown projection function `%s': %s" % (projection, str(exps)))
 
   attribute = U.resolve_attribute(attribute, context, "`sieve-ex.1'")
 
@@ -589,7 +598,7 @@ def convert_sieve_ex(exps, context):
     (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
 
     if return_type != "B":
-      raise ValueError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
+      raise IQLTranslationError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
 
     if context.msmnt_name != None:
       wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
@@ -646,77 +655,6 @@ def convert_sieve_ex(exps, context):
   return sql
 
 
-def convert_nsieve(exps, context, attributes = None):
-  """
-  Converts a nsieve operation query to SQL.
-  """
-
-  if context.attribute == '' or context.attribute == None:
-    raise ValueError("`nsieve' requires `settings.attribute': " + str(exps))
-
-
-  if type(exps) != type([]):
-      raise ValueError("Error: Expected Array but not found: " + str(exps))
-
-  i = 0
-
-  wheres = []
-
-  for exp in exps:
-
-    context.msmnt_name = None
-    (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
-
-    if return_type != "B":
-      raise ValueError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
-
-    if context.msmnt_name != None:
-      wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
-
-    wheres.append(sql)
-
-    i += 1
-
-  distinct = 'DISTINCT' if context.nub else ''
-
-  if attributes == None:
-    sql = "(SELECT %s %s(l0.%s) AS %s FROM\n" % (distinct, context.projection, context.attribute, context.attribute)
-  else:
-    q = 0
-    sql_attrs_selects = []
-    while q < i:
-      sql_attrs = ",".join(list(map(lambda a: "%s(l%d.%s) as \"%s:%d\"" % (context.projection if a == context.attribute else '',q,a,a,q), attributes)))
-      sql_attrs_selects.append(sql_attrs)
-      q += 1
-
-    sql_attrs_select_line = ",".join(sql_attrs_selects)
-
-    sql = "(SELECT %s FROM\n" % sql_attrs_select_line
-
-  sql += "%s l0 " % (context.TBL_NAME)
-  j = 1
-
-  while j < i:
-    sql += "LEFT JOIN %s l%d " % (context.TBL_NAME, j)
-    sql += "ON %s(l%d.%s) = %s(l%d.%s) AND (%s) AND (%s)\n" % (context.projection, j-1, context.attribute, context.projection, j, context.attribute, wheres[j-1], wheres[j])
-    j += 1
-
-  sql += "WHERE\n"
-  
-  tbls = j
-  j = 1
-
-  i = tbls
-
-  while j < i:
-    sql += "(l%d.%s IS NULL) " % (j, context.attribute)
-    if(j != i - 1):
-      sql += "AND\n"
-    j += 1
-
-  return sql + ")"
-
-
 
 def convert_sieve(exps, context, attributes = None):
   """
@@ -724,11 +662,11 @@ def convert_sieve(exps, context, attributes = None):
   """
 
   if context.attribute == '' or context.attribute == None:
-    raise ValueError("`sieve' requires `settings.attribute': " + str(exps))
+    raise IQLTranslationError("`sieve' requires `settings.attribute': " + str(exps))
 
 
   if type(exps) != type([]):
-      raise ValueError("Error: Expected Array but not found: " + str(exps))
+      raise IQLTranslationError("Error: Expected Array but not found: " + str(exps))
 
   i = 0
 
@@ -740,7 +678,7 @@ def convert_sieve(exps, context, attributes = None):
     (sql, return_type, a) = convert_exp(exp, "l" + str(i), context)
 
     if return_type != "B":
-      raise ValueError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
+      raise IQLTranslationError("Expected type `B' or boolean expression but found `" + return_type + "': " + str(exp))
 
     if context.msmnt_name != None:
       wheres.append("l" + str(i) + ".name = '" + context.msmnt_name + "'")
@@ -797,7 +735,7 @@ def convert_exp(exp, cur_table, context):
   if type(exp) == type({}):
 
     if len(exp) != 1:
-      raise ValueError("Expected dictionary of size one: " + str(exp))
+      raise IQLTranslationError("Expected dictionary of size one: " + str(exp))
 
     operation = list(exp.keys())[0]
 
@@ -810,24 +748,24 @@ def convert_exp(exp, cur_table, context):
     elif exp.startswith("$"):
 
       if context.msmnt_name == None:
-        context.msmnt_name = exp[1:]
+        context.msmnt_name = U.get_msmnt_name(exp)[1:]
       else:
-        if context.msmnt_name != exp[1:]:
-          raise ValueError("Found `" + str(exp) + "' but expected `$" + context.msmnt_name + "'")
+        if context.msmnt_name != U.get_msmnt_name(exp)[1:]:
+          raise IQLTranslationError("Found `" + str(exp) + "' but expected `$" + context.msmnt_name + "'")
 
         
-      exp = exp[1:]
+      msmnt_name = U.get_msmnt_name(exp)[1:]
 
-      if not U.is_known_msmnt(exp, context):
-        raise ValueError("Unknown measurement name `" + exp + "': " + str(exp))
+      if not U.is_known_msmnt(msmnt_name, context):
+        raise IQLTranslationError("Unknown measurement name or value `" + exp + "': " + str(exp))
 
-      return ("$" + exp, "$", U.get_msmnt_type(exp, context))
+      return (exp, "$", U.get_msmnt_type(msmnt_name, context))
 
     elif exp.startswith('@'):
       attr_name = U.get_attribute_name(exp)[1:]
 
       if not U.is_known_attribute(U.get_attribute_name(attr_name), context):
-        raise ValueError("`" + exp + "' is unknown: " + str(exp))
+        raise IQLTranslationError("`" + exp + "' is unknown: " + str(exp))
 
       return (exp, U.get_data_type_for_attribute(attr_name, context), "")
 
@@ -840,7 +778,7 @@ def convert_exp(exp, cur_table, context):
     else:
       return ('(FALSE)',"B","")
 
-  raise ValueError("ORLY? %s" % str(exp))
+  raise IQLTranslationError("ORLY? %s" % str(exp))
 
 
 
@@ -871,10 +809,10 @@ def convert_operation(operation, operands, cur_table, context):
     return convert_uni_op(operation, operands, cur_table, context)
 
   elif U.is_query_op(operation):
-    raise ValueError("`" + operation + "' is not allowed in expressions: " + str(operands))
+    raise IQLTranslationError("`" + operation + "' is not allowed in expressions: " + str(operands))
 
   else:
-    raise ValueError("Unknown operation `" + operation + "': " + str(operands))
+    raise IQLTranslationError("Unknown operation `" + operation + "': " + str(operands))
 
 
 def convert_in(operands, cur_table, context):
@@ -886,7 +824,7 @@ def convert_in(operands, cur_table, context):
   U.expect_array(operands[1], 0, "`in.1'")
 
   if(len(operands[1]) == 0):
-    raise ValueError("`in.1': Array is empty!")
+    raise IQLTranslationError("`in.1': Array is empty!")
 
   (needle_sql, needle_data_type, needle_cond_type) = convert_exp(operands[0], cur_table, context)
   if needle_data_type == '$':
@@ -900,7 +838,7 @@ def convert_in(operands, cur_table, context):
     (operand_in_sql, operand_in_data_type, operand_in_cond_type) = convert_exp(operand_in, cur_table, context)
     if operand_in_data_type == '$': operand_in_data_type = operand_in_cond_type
     if expected_type != operand_in_data_type:
-      raise ValueError("Expected `%s' in `in' but found `%s': %s" % (expected_type, operand_in_data_type, str(operands)))
+      raise IQLTranslationError("Expected `%s' in `in' but found `%s': %s" % (expected_type, operand_in_data_type, str(operands)))
 
     operands_in.append(operand_in_sql)
 
@@ -918,7 +856,7 @@ def convert_uni_op(operation, operands, cur_table, context):
   """
 
   if len(operands) != 1:
-    raise ValueError("Operation `" + operation + "' expects exactly one argument: " + str(operands))
+    raise IQLTranslationError("Operation `" + operation + "' expects exactly one argument: " + str(operands))
 
   if operation == 'time':
 
@@ -929,14 +867,14 @@ def convert_uni_op(operation, operands, cur_table, context):
     elif(U.is_num(operands[0])):
       return ("(to_timestamp(%d)::TIMESTAMP WITHOUT TIME ZONE)" % operands[0], "T", "")
     else:
-      raise ValueError("`time' expects literal of type `N' or `S': " + str(operands))
+      raise IQLTranslationError("`time' expects literal of type `N' or `S': " + str(operands))
 
   elif operation == 'exists':
 
     U.expect_str(operands[0])
 
     if not U.is_known_msmnt(operands[0], context):
-      raise ValueError("Unknown measurement name: " + str(operands[0]))
+      raise IQLTranslationError("Unknown measurement name: " + str(operands[0]))
 
     context.msmnt_name = operands[0]
 
@@ -961,7 +899,7 @@ def convert_date_part(operation, operands, cur_table, context):
   if data_type == "$": data_type = cond_type
 
   if data_type != "T":
-    raise ValueError("Expected `T' but found `%s' in `%s': %s" % (data_type, operation, str(operands)))
+    raise IQLTranslationError("Expected `T' but found `%s' in `%s': %s" % (data_type, operation, str(operands)))
 
   return ("(date_part('%s',%s)::REAL)" % (operation, to_sql_col_val(sql, cur_table, data_type)),"N","")
 
@@ -987,14 +925,14 @@ def convert_array(operands, cur_table, context):
 
     if expected_type != None:
       if data_type != expected_type:
-        raise ValueError("Expected type `%s' but found `%s': %s" % (expected_type, data_type, str(operand)))
+        raise IQLTranslationError("Expected type `%s' but found `%s': %s" % (expected_type, data_type, str(operand)))
     else:
       expected_type = data_type
 
     values.append(sql)
 
   if expected_type not in ['S','N']:
-    raise ValueError("Currently only `*S' and `*N' are supported: %s" % str(operands))
+    raise IQLTranslationError("Currently only `*S' and `*N' are supported: %s" % str(operands))
 
   if expected_type == 'S':
     return ("(ARRAY[%s]::VARCHAR[])" % (",".join(values)), "*S", "")
@@ -1015,7 +953,7 @@ def convert_n_op(operation, operands, cur_table, context):
   expected_type = U.get_expected_types(operation)
 
   if len(operands) < 1:
-    raise ValueError("`%s' needs at least one argument!" % operation)
+    raise IQLTranslationError("`%s' needs at least one argument!" % operation)
   
   for operand in operands:
     operand_ = convert_exp(operand, cur_table, context)
@@ -1023,7 +961,7 @@ def convert_n_op(operation, operands, cur_table, context):
 
 
     if data_type != "B":
-      raise ValueError("Expected `B' but found `" + data_type + "': " + str(operands))
+      raise IQLTranslationError("Expected `B' but found `" + data_type + "': " + str(operands))
 
     exps.append(operand_)
 
@@ -1065,7 +1003,7 @@ def to_sql_col_val(value, cur_table, data_type = ''):
     parts = value.split(":")
 
     if len(parts) != 2:
-      raise ValueError("Illegal reference `" + value + "'.")
+      raise IQLTranslationError("Illegal reference `" + value + "'.")
 
     return "l" + str(parts[1]) + "." + parts[0]
 
@@ -1079,9 +1017,9 @@ def to_sql_col_val(value, cur_table, data_type = ''):
     parts = value.split(":")
     
     if len(parts) != 2:
-      raise ValueError("Illegal reference `" + value + "'.")
+      raise IQLTranslationError("Illegal reference `" + value + "'.")
 
-    return "l" + str(parts[1]) + ".VAL_"
+    return "l" + str(parts[1]) + ".VAL_" + data_type
 
 
   # Verbatim
@@ -1103,17 +1041,17 @@ def convert_contains(operands, cur_table, context):
   if data_type_1 == "$": data_type_1 = cond_type_1
 
   if not data_type_0.startswith("*"):
-    raise ValueError("`contains.0' must be of type *a: " + str(operands))
+    raise IQLTranslationError("`contains.0' must be of type *a: " + str(operands))
 
   if not data_type_1 == data_type_0[1:]:
-    raise ValueError("`%s' is incompatible with `%s' for `contains': %s" % (data_type_1, data_type_0, str(operands)))
+    raise IQLTranslationError("`%s' is incompatible with `%s' for `contains': %s" % (data_type_1, data_type_0, str(operands)))
 
   if data_type_0 == '*S':
     return ("(%s @> ARRAY[%s]::VARCHAR[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
   elif data_type_0 == '*N':
     return ("(%s @> ARRAY[%s]::REAL[])" % (to_sql_col_val(sql_0, cur_table, data_type_0), to_sql_col_val(sql_1, cur_table, data_type_1)), "B", "")
   else:
-    raise ValueError("Unsupported type `%s': %s" % (data_type_0, str(operands)))
+    raise IQLTranslationError("Unsupported type `%s': %s" % (data_type_0, str(operands)))
 
 
 
@@ -1123,7 +1061,7 @@ def convert_bin_op(operation, operands, cur_table, context):
   """
 
   if len(operands) != 2:
-    raise ValueError("Operation `" + operation + "' expects exactly two arguments: " + str(operands))
+    raise IQLTranslationError("Operation `" + operation + "' expects exactly two arguments: " + str(operands))
 
   exps = []
 
@@ -1149,11 +1087,11 @@ def convert_bin_op(operation, operands, cur_table, context):
       expected_type = data_type
     else:
       if U.is_array(expected_type) and (data_type not in expected_type):
-        raise ValueError("Unexpected type `%s' for `%s': %s" % (data_type, operation, str(operand)))
+        raise IQLTranslationError("Unexpected type `%s' for `%s': %s" % (data_type, operation, str(operand)))
       elif U.is_array(expected_type) and (data_type in expected_type):
         expected_type = data_type
       elif expected_type != data_type:
-         raise ValueError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
+         raise IQLTranslationError("Expected type `" + expected_type + "' but found `" + data_type + "': " + str(operand))
 
     exps.append(operand_)
 
