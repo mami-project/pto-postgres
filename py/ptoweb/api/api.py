@@ -9,6 +9,9 @@ import iql.convert as iqlc
 import pprint
 import hashlib
 from pg import escape_string
+import os
+import os.path
+from werkzeug.utils import secure_filename
 
 def sha1_hash(s):
   return hashlib.sha1(s.encode("utf-8")).hexdigest()
@@ -218,3 +221,45 @@ def api_qq_get():
   except Exception as error:
     print(error)
     return json500({"error":"Internal Server Error"})
+
+
+@app.route('/raw/upload', methods=['POST'])
+def api_raw_upload():
+  if 'data' not in request.files:
+    return json400({"error":"File is missing"})
+
+  metadata = request.args.get('metadata')
+  print(metadata)
+
+  if metadata == None:
+    return json400({"error" : "Metadata missing!"})
+
+  try:
+    metadata = json.loads(metadata)
+  except:
+    return json400({"error":"Not valid JSON!"})
+
+  if (not ('filename' in metadata)) or (not ('campaign' in metadata)):
+    return json400({"error" : "Missing filename and/or campaign!"})
+
+  if not isinstance(metadata['filename'], str) or not isinstance(metadata['campaign'], str):
+    return json400({"error" : "Wrong type for filename and/or campaign"})
+
+  data = request.files['data']
+  secure_campaign_ = secure_filename(metadata['campaign'])
+  secure_filename_ = secure_filename(metadata['filename'])
+  path = os.path.join(secure_campaign_, secure_filename_)
+
+  path_prefix = '/tmp'
+  
+  if not os.path.isdir(os.path.join(path_prefix, secure_campaign_)):
+    os.mkdir(os.path.join(path_prefix, secure_campaign_))
+  
+  save_path = os.path.join(path_prefix, path)
+
+  if os.path.exists(save_path):
+    return json400({"error" : "File already exists!"})
+
+  data.save(os.path.join(path_prefix, path))
+
+  return json200({"msg":"OK"})
