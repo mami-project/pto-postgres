@@ -1,5 +1,5 @@
 from ptoweb import cache, app, get_db, get_iql_config
-from flask import Response, g, request
+from flask import Response, g, request, send_file
 from bson import json_util
 import json
 from ptoweb.api.auth import require_auth
@@ -389,6 +389,39 @@ def api_qq_get():
   except Exception as error:
     print(error)
     return json500({"error":"Internal Server Error"})
+
+
+@app.route('/raw/download')
+def api_raw_download():
+  """
+  Download file
+  """
+
+  doer = check_permissions_request(request, 'r')
+  if not doer:
+    return json400({"error" : "Insufficietn permissions or invalid API key!"})
+
+  filesystem_path = request.args.get('filesystem_path')
+
+  if (filesystem_path == None or filesystem_path == ''):
+    return json400({"error" : "Missing filesystem_path"})
+
+  download_path = None
+
+  try:
+    uploads = find_uploads_by_filesystem_path(filesystem_path)
+
+    if len(uploads) == 0:
+      return json404({"error": "Not found!"})
+
+    download_path = uploads[0]['filesystem_path']
+
+  except Exception as error:
+    return json500({"error" : "Internal error"})
+
+  download_path = os.path.join(app.config['RAW_UPLOAD_FOLDER'], download_path)
+
+  return send_file(download_path, mimetype = "application/octet-stream")
 
 
 @app.route('/raw/upload-entry')
