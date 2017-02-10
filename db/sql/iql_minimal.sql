@@ -31,11 +31,20 @@ CREATE TYPE os_state AS ENUM (
   'deprecated'      -- defective observation set, only there to enable repeatability
 );
 
+-- In order for an observation set to be eligible for a query at time t, the
+-- following conditions must hold:
+--
+--   the tov field must be non-null and must be no later than t; and
+--   the toi field is either null or is later than t.
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  -- Time of creation
   toc TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
   state os_state,
+  -- Time of visibility
+  tov TIMESTAMP WITHOUT TIME ZONE,
+  -- Time of invalidation
   toi TIMESTAMP WITHOUT TIME ZONE 
 );
 

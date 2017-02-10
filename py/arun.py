@@ -91,6 +91,12 @@ class ObservationSetNotFoundError(Exception):
     def __init__(self, param):
         self.param = param
 
+def timestamp_str(ts):
+    if ts is None:
+        return 'never'
+    else:
+        return ts.__str__()
+
 class ObservationSet:
     # TODO Make this subscriptable
     def __init__(self, db):
@@ -101,13 +107,11 @@ class ObservationSet:
         if self._state == ObservationSetState.unknown:
             return 'OSID unknown'
         else:
-            if self._toi is None:
-                toi = 'never'
-            else:
-                toi = self._toi.__str__()
+            toi = timestamp_str(self._toi)
+            tov = timestamp_str(self._tov)
 
-            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s} (UTC), invalidated {4:s} (UTC)' \
-                .format(self._name, self._state, self._osid, self._toc.__str__(), toi)
+            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s} (UTC), visible {4:s} (UTC), invalidated {5:s} (UTC)' \
+                .format(self._name, self._state, self._osid, self._toc.__str__(), tov, toi)
 
     @property
     def state(self):
@@ -117,7 +121,13 @@ class ObservationSet:
     @state.setter
     def state(self, state):
         self._state = state
-        if self._state == ObservationSetState.deprecated:
+        if self._state == ObservationSetState.public:
+            now = datetime.utcnow()
+            self._tov = pgdb.Timestamp(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
+            with self._db as db:
+                db.update('observation_set', osid=self._osid, state=self._state.name,
+                    tov=self._tov)
+        elif self._state == ObservationSetState.deprecated:
             now = datetime.utcnow()
             self._toi = pgdb.Timestamp(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
             with self._db as db:
