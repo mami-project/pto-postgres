@@ -405,10 +405,10 @@ def api_raw_upload():
   except:
     return json400({"error":"Not valid JSON!"})
 
-  if (not ('format' in metadata)):
-    return json400({"error" : "Format is missing!"})
+  if (not ('filetype' in metadata)):
+    return json400({"error" : "Filetype is missing!"})
 
-  if not isinstance(metadata['format'], str):
+  if not isinstance(metadata['filetype'], str):
     return json400({"error" : "Wrong type!"})
 
   if (not ('filename' in metadata)) or (not ('campaign' in metadata)):
