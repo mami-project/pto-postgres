@@ -34,7 +34,7 @@ class PathspiderECNRawAnalyzer:
 
 
     def interested(self, metadata):
-        return metadata['type'] == 'ps-ecn-ndjson' || metadata['type'] == 'ps-ecn-ndjson-bz2'
+        return metadata['format'] == 'ps-ecn-ndjson' || metadata['format'] == 'ps-ecn-ndjson-bz2'
 
 def observations_to_dataframe(observations, conditions):
     # create a dataframe from an observation iterator, 
