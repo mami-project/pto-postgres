@@ -106,7 +106,7 @@ class ObservationSet:
             else:
                 toi = self._toi.__str__()
 
-            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s}, invalidated {4:s}' \
+            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s} (UTC), invalidated {4:s} (UTC)' \
                 .format(self._name, self._state, self._osid, self._toc.__str__(), toi)
 
     @property
