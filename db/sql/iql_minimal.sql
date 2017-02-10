@@ -3,8 +3,8 @@
 DROP VIEW IF EXISTS iql_minimal;
 DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
-DROP TABLE IF EXISTS observation_set;
 DROP TABLE IF EXISTS observation_set_metadata;
+DROP TABLE IF EXISTS observation_set;
 
 DROP TYPE IF EXISTS os_state;
 
@@ -36,7 +36,7 @@ CREATE TABLE observation_set (
   name VARCHAR(255) NOT NULL,
   toc TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
   state os_state,
-  toi INT
+  toi TIMESTAMP WITHOUT TIME ZONE 
 );
 
 CREATE TABLE observation_set_metadata (

@@ -7,9 +7,15 @@ db = DB(dbname='pto', host='localhost', port=5432,
 
 os = ObservationSet(db)
 
+# Create a new observation set with the given name
 os.create('O RLY')
 
+# This will persist the observation set
 os.state = ObservationSetState.permanent
+
+# Test deprecation
+os.create('O RLY')
+os.state = ObservationSetState.deprecated
 
 sets = ObservationSet.find_sets_by_name(db, 'O RLY')
 for set in sets:

@@ -4,8 +4,11 @@
 #
 from enum import Enum
 
+import collections
+from datetime import datetime
 import iql.convert
 import pg
+import pgdb
 
 class BaseAnalysisContext:
     """
@@ -103,7 +106,7 @@ class ObservationSet:
             else:
                 toi = self._toi.__str__()
 
-            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s}, invalidated {4:s}'\
+            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s}, invalidated {4:s}' \
                 .format(self._name, self._state, self._osid, self._toc.__str__(), toi)
 
     @property
@@ -114,12 +117,19 @@ class ObservationSet:
     @state.setter
     def state(self, state):
         self._state = state
-        print(self._state)
-        with self._db as db:
-            db.update('observation_set', osid=self._osid, state=self._state.name)
+        if self._state == ObservationSetState.deprecated:
+            now = datetime.utcnow()
+            self._toi = pgdb.Timestamp(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
+            with self._db as db:
+                db.update('observation_set', osid=self._osid, state=self._state.name,
+                    toi=self._toi)
+        else:
+            with self._db as db:
+                db.update('observation_set', osid=self._osid, state=self._state.name)
 
     @state.deleter
     def state(self):
+        # Can't delete this attribute
         pass
 
     @staticmethod
