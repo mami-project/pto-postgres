@@ -420,7 +420,7 @@ def api_raw_download():
     return json500({"error" : "Internal error"})
 
   download_path = os.path.join(app.config['RAW_UPLOAD_FOLDER'], download_path)
-
+  print(download_path)
   return send_file(download_path, mimetype = "application/octet-stream")
 
 
@@ -498,6 +498,7 @@ def api_raw_upload():
   data = request.files['data']
 
   file_hash = sha1_file_hash(data.stream)
+  data.stream.seek(0) #jump back to beginning
   start_time = metadata['start_time']
   stop_time = metadata['stop_time']
   campaign = metadata['campaign']
