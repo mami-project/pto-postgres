@@ -76,6 +76,34 @@ def to_int(value):
     return 0
 
 
+def find_uploads_by_filesystem_path(filesystem_path):
+  """
+  Find uploads with a given path.
+  """
+
+  filesystem_path = escape_string(filesystem_path)
+
+  sql = """
+  SELECT * FROM uploads WHERE filesystem_path = '%s';
+  """ % (filesystem_path)
+
+  return get_db().query(sql).dictresult()
+
+
+def find_uploads_by_file_hash(file_hash):
+  """
+  Find uploads with a given file_hash
+  """
+
+  file_hash = escape_string(file_hash)
+
+  sql = """
+  SELECT * FROM uploads WHERE file_hash = '%s';
+  """ % (file_hash)
+
+  return get_db().query(sql).dictresult()
+
+
 def insert_upload(filesystem_path, campaign, file_hash, start_time, stop_time, uploader, metadata):
   """
   Insert an upload
@@ -113,6 +141,21 @@ def insert_upload(filesystem_path, campaign, file_hash, start_time, stop_time, u
 
   return True
 
+def check_permissions_request(req, required_permissions):
+  key = req.headers.get("X-API-KEY")
+  return check_permissions(key, required_permissions)
+
+
+def expand_permissions(permissions):
+
+  # u includes r
+  if 'u' in permissions:
+    if not 'r' in permissions:
+      permissions += 'r'
+
+  return permissions
+
+
 def check_permissions(key, required_permissions):
   """
   Check permissions based on api key
@@ -126,7 +169,7 @@ def check_permissions(key, required_permissions):
       if not 'permissions' in e:
         return False
 
-      permissions = e['permissions']
+      permissions = expand_permissions(e['permissions'])
 
       if not isinstance(permissions, str):
         return False
@@ -309,17 +352,47 @@ def api_qq_get():
     return json500({"error":"Internal Server Error"})
 
 
+@app.route('/raw/upload-entry')
+def api_raw_upload_entry():
+  """
+  Get a raw upload entry
+  """
+
+  doer = check_permissions_request(request, 'u')
+  if not doer:
+    return json400({"error" : "Insufficient permissions or invalid API key!"})
+
+  filesystem_path = request.args.get('filesystem_path')
+  file_hash = request.args.get('file_hash')
+
+  if (filesystem_path == None or filesystem_path == '') and (file_hash == None or file_hash == ''):
+    return json400({"error" : "Missing filesystem_path or file_hash!"})
+
+  try:
+    if filesystem_path != None and filesystem_path != '':
+      return json200(find_uploads_by_filesystem_path(filesystem_path))
+    else:
+      return json200(find_uploads_by_file_hash(file_hash))
+  except Exception as error:
+    print(error)
+    return json500({"error" : "Internal error!"})
+
+
 @app.route('/raw/upload', methods=['POST'])
 def api_raw_upload():
+  """
+  Upload a raw file to the observatory.
+  """
+
   key = request.headers.get('X-API-KEY')
 
   uploader = check_permissions(key, 'u')
 
   if not uploader:
-    return json400({"error": "Insufficient permissions or invalid API key"}) 
+    return json400({"error": "Insufficient permissions or invalid API key!"})
 
   if 'data' not in request.files:
-    return json400({"error":"File is missing"})
+    return json400({"error":"File is missing!"})
 
   metadata = request.args.get('metadata')
   print(metadata)
@@ -374,7 +447,7 @@ def api_raw_upload():
   data.save(os.path.join(path_prefix, path))
 
   try:
-    insert_upload(save_path, campaign, file_hash, start_time, stop_time, uploader, metadata)
+    insert_upload(path, campaign, file_hash, start_time, stop_time, uploader, metadata)
   except Exception as error:
     print(error)
     return json500({"error" : "Internal error!"})
