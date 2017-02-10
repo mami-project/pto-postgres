@@ -76,6 +76,23 @@ def to_int(value):
     return 0
 
 
+def revoke_api_key(api_key):
+  """
+  Drop all permissions.
+  """
+
+  api_key = escape_string(api_key)
+
+  sql = """
+  UPDATE api_keys SET permissions = ''
+  WHERE key = '%s';
+  """ % (api_key)
+
+  get_db().query(sql)
+
+  return True  
+
+
 def find_uploads_by_filesystem_path(filesystem_path):
   """
   Find uploads with a given path.
@@ -195,9 +212,31 @@ def api_index():
     print(e)
 
   return json200({'status':'running'})
+
   
+@app.route("/revoke-key")
+def api_revoke_key():
+  """
+  Revoke API key. Call this when you suspect your API key is not
+  secret anymore.
+  """
+
+  if not check_permissions_request(request, ''):
+    return json400({"error" : "Insufficient permissions or invalid API key!"})
+
+  api_key = request.headers.get('X-API_KEY')
+  
+  if api_key != None:
+    try:
+      revoke_api_key(api_key)
+
+    except Exception as error:
+      print(error)
+      return json500({"error" : "Internal error"})
+
+  return json200({"msg":"ok"}) 
  
- 
+
 @app.route("/result")
 def api_result():
   query_id = request.args.get('id')
