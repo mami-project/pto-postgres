@@ -525,4 +525,4 @@ def api_raw_upload():
     print(error)
     return json500({"error" : "Internal error!"})
 
-  return json200({"file_hash":file_hash})
+  return json200({"file_hash":file_hash,"filesystem_path":path})
