@@ -320,8 +320,7 @@ class Condition:
             raise DuplicateConditionError(self.full_name)
         elif len(conditions) == 1:
             self.cid = conditions[0][0]
-            if self.ctype is not None and conditions[0][2] != self.ctype \
-                    or self.ctype is None and conditions[0][2] is not None:
+            if conditions[0][2] != self.ctype:
                 raise ConditionTypeError(self.ctype, conditions[0][2])
         else:
             assert len(conditions) == 0

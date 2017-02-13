@@ -1,4 +1,4 @@
-from arun import ObservationSetWriter, Condition, ObservationSetState, ObservationSetStateError, RawAnalysisContext, ObservationSet
+from arun import ObservationSetWriter, Condition, ConditionTypeError, ObservationSetState, ObservationSetStateError, RawAnalysisContext, ObservationSet
 from pg import DB
 import pgdb
 
@@ -55,6 +55,11 @@ print(c)
 
 c = Condition(db, 'some.new.connectivity.super.duper.works', 'N')
 print(c)
+
+try:
+	c = Condition(db, 'some.new.connectivity.super.duper.works', 'B')
+except ConditionTypeError as e:
+	print('expected type {0:s}, found {1:s}'.format(e.specified, e.found))
 
 #ctx = RawAnalysisContext(db)
 #obset = ctx.create_observation_set("huba-huba")
