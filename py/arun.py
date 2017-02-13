@@ -313,7 +313,7 @@ class Condition:
         if len(conditions) > 1:
             raise DuplicateConditionError(self._full_name)
         elif len(conditions) == 1:
-            self._cid = conditions[0][0]
+            self.cid = conditions[0][0]
         else:
             assert len(conditions) == 0
             full_name = None
@@ -335,9 +335,8 @@ class Condition:
                     parent = conditions[0][0]
                 else:
                     raise DuplicateConditionError(self._full_name)
-            self._cid = parent
-            assert self._cid is not None
-
+            self.cid = parent
+            assert self.cid is not None
 
 class ObservationSetWriter:
     def __init__(self, db, name, set_id=None):
