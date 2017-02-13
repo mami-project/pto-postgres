@@ -76,6 +76,23 @@ def to_int(value):
     return 0
 
 
+def count_queued_queries():
+  """
+  Return number of queries WAITING in the queue
+  """
+
+  sql = """
+  SELECT COUNT(*) AS count_ FROM query_queue WHERE state = 'new';
+  """
+
+  dr = get_db().query(sql).dictresult()
+
+  if len(dr) != 1:
+    raise Exception("Couldn't count queued queries")
+
+  return dr[0]['count_']
+
+
 def revoke_api_key(api_key):
   """
   Drop all permissions.
@@ -246,7 +263,7 @@ def api_revoke_key():
 
     except Exception as error:
       print(error)
-      return json500({"error" : "Internal error"})
+      return json500({"error" : "Internal Server Error"})
 
   return json200({"msg":"ok"}) 
  
@@ -314,6 +331,15 @@ def api_aquery():
   if len(dr) > 0:
     first = dr[0]
     return json200({"query_id": first["id"], "already" : first})
+
+  try:
+    queued_queries_count = count_queued_queries()
+  except Exception as error:
+    print(error)
+    return json500({"error" : "Internal Server Error"})
+
+  if(queued_queries_count >= 10):
+    return json400({"error" : "Currently we are experiencing high load. Please try again another day!"})
 
   sql = "INSERT INTO query_queue(id, iql, sql_query, result, state) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new');" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql))
 
@@ -431,7 +457,7 @@ def api_raw_download():
     download_path = uploads[0]['filesystem_path']
 
   except Exception as error:
-    return json500({"error" : "Internal error"})
+    return json500({"error" : "Internal Server Error"})
 
   download_path = os.path.join(app.config['RAW_UPLOAD_FOLDER'], download_path)
   print(download_path)
@@ -485,7 +511,7 @@ def api_raw_upload_entry():
       return json200(find_uploads_by_file_hash(file_hash))
   except Exception as error:
     print(error)
-    return json500({"error" : "Internal error!"})
+    return json500({"error" : "Internal Server Error!"})
 
 
 @app.route('/raw/upload', methods=['POST'])
@@ -561,6 +587,6 @@ def api_raw_upload():
     insert_upload(path, campaign, file_hash, start_time, stop_time, uploader, metadata)
   except Exception as error:
     print(error)
-    return json500({"error" : "Internal error!"})
+    return json500({"error" : "Internal Server Error!"})
 
   return json200({"file_hash":file_hash,"filesystem_path":path})
