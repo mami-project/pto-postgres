@@ -174,16 +174,16 @@ class ObservationSet:
             observation_set = db.insert('observation_set', name=name,
                 state=ObservationSetState.in_progress.name,
                 roc=revid['revision'])
-        self._osid = observation_set['osid']
-        self._name = observation_set['name']
-        self._state = ObservationSetState(observation_set['state'])
-        self._roc = observation_set['roc']
-        self._rov = observation_set['rov'] # None
-        self._rod = observation_set['rod'] # None
 
-        self._metadata = metadata
-        if metadata is not None:
-            with self._db as db:
+            self._osid = observation_set['osid']
+            self._name = observation_set['name']
+            self._state = ObservationSetState(observation_set['state'])
+            self._roc = observation_set['roc']
+            self._rov = observation_set['rov'] # None
+            self._rod = observation_set['rod'] # None
+
+            self._metadata = metadata
+            if metadata is not None:
                 for key in metadata:
                     db.insert('observation_set_metadata', osid=self._osid,
                         key=key, value=metadata[key])
