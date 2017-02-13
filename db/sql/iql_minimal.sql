@@ -5,7 +5,8 @@ DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
 DROP TABLE IF EXISTS observation_set_metadata;
 DROP TABLE IF EXISTS observation_set;
-
+DROP TABLE IF EXITS observation_set_dependencies;
+DROP TABLE IF EXISTS observation_set_revision;
 DROP TYPE IF EXISTS os_state;
 
 -- States of an observation set:
@@ -31,21 +32,45 @@ CREATE TYPE os_state AS ENUM (
   'deprecated'      -- defective observation set, only there to enable repeatability
 );
 
--- In order for an observation set to be eligible for a query at time t, the
--- following conditions must hold:
---
---   the tov field must be non-null and must be no later than t; and
---   the toi field is either null or is later than t.
+-- Observation table revisions. We use revisions instead of timestamps
+-- because timestamps are unreliable for determining what the state
+-- of an observation set was at a given time. (Time stamps are only
+-- reliable when nothing ever goes wrong.)
+CREATE TABLE observation_set_revision (
+  revision BIGSERIAL NOT NULL PRIMARY KEY,
+  -- This timestamp is purely for informational purposes
+  created_on TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
+  -- For informational purposes only. Might be used to answer the question,
+  -- "who created revision 123?"
+  creator VARCHAR(255)
+);
+
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  -- Time of creation
-  toc TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
   state os_state,
-  -- Time of visibility
-  tov TIMESTAMP WITHOUT TIME ZONE,
-  -- Time of invalidation
-  toi TIMESTAMP WITHOUT TIME ZONE 
+  -- Revision ID when this observation set was created
+  roc BIGINT NOT NULL,
+  -- Revision ID when this observation set first became visible (state public)
+  rov BIGINT,
+  -- Revision ID when this observation set became deprecated
+  rod BIGINT,
+
+  FOREIGN KEY(roc)
+    REFERENCES observation_set_revision(revision),
+  FOREIGN KEY(rov)
+    REFERENCES observation_set_revision(revision),
+  FOREIGN KEY(rod)
+    REFERENCES observation_set_revision(revision)
+);
+
+CREATE TABLE observation_set_dependencies (
+  osid BIGINT NOT NULL,
+  depends_on BIGINT NOT NULL,
+
+  PRIMARY KEY(osid, depends_on),
+  FOREIGN KEY(osid) REFERENCES observation_set(osid),
+  FOREIGN KEY(depends_on) REFERENCES observation_set(osid)
 );
 
 CREATE TABLE observation_set_metadata (
@@ -74,7 +99,7 @@ CREATE TABLE observation (
   time_from TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   time_to TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   val_n REAL,
-  observation_set BIGSERIAL NOT NULL,
+  observation_set BIGINT NOT NULL,
   condition INT NOT NULL,
 
   FOREIGN KEY (observation_set)
@@ -94,8 +119,9 @@ CREATE VIEW iql_minimal AS
         o.time_to AS time_to, 
         o.val_n AS val_n, 
         o.observation_set AS observation_set,
-        os.toc AS toc,
-        os.toi AS toi,
+        os.roc AS roc,
+        os.rov AS rov,
+        os.rod AS rod,
         c.full_name as name
  FROM observation o
  JOIN observation_set os

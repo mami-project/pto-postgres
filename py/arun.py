@@ -74,12 +74,12 @@ class ObservationSetState(Enum):
     spelling (including capitalisation) as the SQL type os_state described
     in iql_minimal.sql.
     """
-    unknown = 1
-    in_progress = 2
-    pending_review = 3
-    public = 4
-    permanent = 5
-    deprecated = 6
+    unknown = 'unknown'
+    in_progress = 'in_progress'
+    pending_review = 'pending_review'
+    public = 'public'
+    permanent = 'permanent'
+    deprecated = 'deprecated'
    
 
 class ObservationSetStateError(Exception):
@@ -87,9 +87,16 @@ class ObservationSetStateError(Exception):
         self.observed_state = observed_state
         self.expected_state = expected_state
 
+    def __str__(self):
+        return 'Observed state {0:s}, expected {1:s}'.format(self.observed_state, self.expected_state)
+
 class ObservationSetNotFoundError(Exception):
     def __init__(self, param):
         self.param = param
+
+class DuplicateConditionError(Exception):
+    def __init__(self, full_name):
+        self.full_name = full_name
 
 def timestamp_str(ts):
     if ts is None:
@@ -97,50 +104,42 @@ def timestamp_str(ts):
     else:
         return ts.__str__()
 
+def revision_id_string(revid):
+    if revid is None:
+        return 'never'
+    else:
+        return str(revid)
+
+def metadata_to_string(md):
+    if md is None:
+        return ''
+    else:
+        return md.__str__()
+
 class ObservationSet:
-    # TODO Make this subscriptable
     def __init__(self, db):
         self._db = db
         self._state = ObservationSetState.unknown
+
+    def load(self, osid):
+        self._load(osid)
+
+    def create(self, name, metadata):
+        self._create(name, metadata)
+
+    def osid(self):
+        return self._osid
 
     def __str__(self):
         if self._state == ObservationSetState.unknown:
             return 'OSID unknown'
         else:
-            toi = timestamp_str(self._toi)
-            tov = timestamp_str(self._tov)
-
-            return 'OSID {2:d} \'{0:s}\', {1:s}, created {3:s} (UTC), visible {4:s} (UTC), invalidated {5:s} (UTC)' \
-                .format(self._name, self._state, self._osid, self._toc.__str__(), tov, toi)
-
-    @property
-    def state(self):
-        '''The state of this observation set'''
-        return self._state
-
-    @state.setter
-    def state(self, state):
-        self._state = state
-        if self._state == ObservationSetState.public:
-            now = datetime.utcnow()
-            self._tov = pgdb.Timestamp(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
-            with self._db as db:
-                db.update('observation_set', osid=self._osid, state=self._state.name,
-                    tov=self._tov)
-        elif self._state == ObservationSetState.deprecated:
-            now = datetime.utcnow()
-            self._toi = pgdb.Timestamp(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
-            with self._db as db:
-                db.update('observation_set', osid=self._osid, state=self._state.name,
-                    toi=self._toi)
-        else:
-            with self._db as db:
-                db.update('observation_set', osid=self._osid, state=self._state.name)
-
-    @state.deleter
-    def state(self):
-        # Can't delete this attribute
-        pass
+            roc = revision_id_string(self._roc)
+            rov = revision_id_string(self._rov)
+            rod = revision_id_string(self._rod)
+            md = metadata_to_string(self._metadata)
+            return 'OSID {2:d} \'{0:s}\', {1:s}, roc {3:s}, rov {4:s}, rod {5:s} {6:s}' \
+                .format(self._name, self._state.name, self._osid, roc, rov, rod, md)
 
     @staticmethod
     def find_sets_by_name(db, name):
@@ -153,78 +152,214 @@ class ObservationSet:
             observation_sets = d.query('SELECT * FROM observation_set WHERE name = $1', name)
         if observation_sets is not None:
             for observation_set in observation_sets.dictresult():
-                o = ObservationSet(db)
-                o.resume(observation_set['osid'])
-                ret.append(o)
+                new_o = ObservationSet(db)
+                new_o.load(observation_set['osid'])
+                ret.append(new_o)
             return ret
         else:
             raise ObservationSetNotFoundError(name)
 
-    def create(self, name, metadata=None):
+    def _create_revid(self, db, name):
+        '''
+        Creates a new revision ID.
+        '''
+        return db.insert('observation_set_revision', creator=name)
+
+    def _create(self, name, metadata=None):
         '''
         Creates a new observation set with a new, unised observation set ID
         '''
         with self._db as db:
-            print(ObservationSetState.in_progress)
+            revid = self._create_revid(db, name)
             observation_set = db.insert('observation_set', name=name,
-                state=ObservationSetState.in_progress.name)
-            self._state = observation_set['state']
-            self._osid = observation_set['osid']
-            self._toc = observation_set['toc']
-            self._name = observation_set['name']
-            self._toi = observation_set['toi']
-            self._metadata = metadata
+                state=ObservationSetState.in_progress.name,
+                roc=revid['revision'])
+        self._osid = observation_set['osid']
+        self._name = observation_set['name']
+        self._state = ObservationSetState(observation_set['state'])
+        self._roc = observation_set['roc']
+        self._rov = observation_set['rov'] # None
+        self._rod = observation_set['rod'] # None
+
+        self._metadata = metadata
         if metadata is not None:
             with self._db as db:
                 for key in metadata:
                     db.insert('observation_set_metadata', osid=self._osid,
                         key=key, value=metadata[key])
 
-    def resume(self, osid):
-        '''
-        Loads an existing observation set, given its observation set ID.
-        Raises an ObservationSetNotFoundError if the observation set ID does
-        not exist
-        '''
+    def _load(self, osid):
         with self._db as db:
             observation_set = db.get('observation_set', osid, 'osid')
         if observation_set is not None:
-            self._state = observation_set['state']
             self._osid = observation_set['osid']
-            self._toc = observation_set['toc']
             self._name = observation_set['name']
-            self._toi = observation_set['toi']
+            self._state = ObservationSetState(observation_set['state'])
+            self._roc = observation_set['roc']
+            self._rov = observation_set['rov']
+            self._rod = observation_set['rod']
+
             self._metadata = dict()
             with self._db as db:
                 metadata = db.query('SELECT * from observation_set_metadata WHERE osid = $1', self._osid).getresult()
             for m in metadata:
-                self._metadata[m[0]] = m[1]
+                self._metadata[m[1]] = m[2]
         else:
             raise ObservationSetNotFoundError(osid)
+
+    def resume(self, osid):
+        '''
+        Loads an existing observation set, given its observation set ID.
+        Raises an ObservationSetNotFoundError if the observation set ID does
+        not exist, raises an ObservationSetStateError if the observation
+        set is not in state in_progress.
+        '''
+        self._load(osid)
+        if self._state != ObservationSetState.in_progress:
+            raise ObservationSetStateError(self._state, ObservationSetState.in_progress)
+
+    def commit(self):
+        '''
+        Makes this observation set available to review. Raises an
+        ObservationSetStateError of the state is not in_progress.
+        '''
+        if self._state != ObservationSetState.in_progress:
+            raise ObservationSetStateError(self._state, ObservationSetState.in_progress)
+
+        with self._db as db:
+            self._state = ObservationSetState.pending_review            
+            db.update('observation_set', osid=self._osid, state=self._state.name)
+
+    def publish(self):
+        '''
+        Makes this observation set available for analysers.  Raises an
+        ObservationSetStateError if the state is not pending_review.
+
+        TODO: Do we need another revision ID for this state transition?
+        '''
+        if self._state != ObservationSetState.pending_review:
+            raise ObservationSetStateError(self._state, ObservationSetState.pending_review)
+
+        with self._db as db:
+            revid = self._create_revid(db, self._name)
+            self._state = ObservationSetState.public
+            self._rov = revid['revision']
+            db.update('observation_set', osid=self._osid, state=self._state.name, rov=self._rov)
+
+    def make_permanent(self):
+        '''
+        Makes this observation set permanent.  Raises an
+        ObservationSetStateError if the state is not public.
+
+        TODO: Do we need another revision ID for this state transition?
+        '''
+        if self._state != ObservationSetState.public:
+            raise ObservationSetStateError(self._state, ObservationSetState.public)
+
+        with self._db as db:
+            self._state = ObservationSetState.permanent
+            db.update('observation_set', osid=self._osid, state=self._state.name)
+
+    def deprecate(self):
+        '''
+        Makes this observation set deprecated.  Raises an
+        ObservationSetStateError if the state is not permanent.
+        '''
+        if self._state != ObservationSetState.permanent:
+            raise ObservationSetStateError(self._state, ObservationSetState.permanent)
+
+        with self._db as db:
+            revid = self._create_revid(db, self._name)
+            self._state = ObservationSetState.deprecated
+            self._rod = revid['revision']
+            db.update('observation_set', osid=self._osid, state=self._state.name, rod=self._rod)
+
+    def is_being_worked_on(self):
+        return self._state == ObservationSetState.in_progress
+
+    def is_review_pending(self):
+        return self._state == ObservationSetState.pending_review
+
+    def is_published(self):
+        return self._state == ObservationSetState.public
+
+    def is_permanent(self):
+        return self._state == ObservationSetState.permanent
+
+    def is_deprecated(self):
+        return self._state == ObservationSetState.deprecated
+
+    def can_delete(self):
+        return self._state == ObservationSetState.in_progress \
+            or self._state == ObservationSetState.pending_review \
+            or self._state == ObservationSetState.public
+
+
+def get_condition_by_full_name(db, full_name):
+    with db as db:
+        return db.query('SELECT * FROM condition_tree WHERE full_name = $1', full_name).getresult()
+
+class Condition:
+    def __init__(self, db, full_name):
+        self._db = db
+        self._full_name = full_name
+        self._load_or_create()
+
+    def __str__(self):
+        return 'Condition {0:d} full name {1:s}'.format(self._cid, self._full_name)
+
+    def _load_or_create(self):
+        conditions = get_condition_by_full_name(self._db, self._full_name)
+        if len(conditions) > 1:
+            raise DuplicateConditionError(self._full_name)
+        elif len(conditions) == 1:
+            self._cid = conditions[0][0]
+        else:
+            assert len(conditions) == 0
+            full_name = None
+            parent = None
+            for name in self._full_name.split('.'):
+                if full_name is None:
+                    full_name = name
+                else:
+                    full_name = full_name + '.' + name
+                conditions = get_condition_by_full_name(self._db, full_name)
+                if len(conditions) == 0:
+                    with self._db as db:
+                        if parent is None:
+                            new_condition = db.insert('condition_tree', name=name, full_name=full_name)
+                        else:
+                            new_condition = db.insert('condition_tree', name=name, full_name=full_name, parent=parent)
+                    parent = new_condition['cid']
+                elif len(conditions) == 1:
+                    parent = conditions[0][0]
+                else:
+                    raise DuplicateConditionError(self._full_name)
+            self._cid = parent
+            assert self._cid is not None
+
 
 class ObservationSetWriter:
     def __init__(self, db, name, set_id=None):
         self._db = db
         self._name = name
-        if set_id is not None:
-            self._set_id = set_id
-            self.resume(set_id)
+        self._observation_set = ObservationSet(db)
+        if set_id is None:
+            self._observation_set.create(self._name, None)
         else:
-            pass
-
-    def resume(self, set_id):
-        pass
-
+            self._observation_set.load(set_id)
+            self.resume(set_id)
+        self._set_id = self._observation_set.osid()
 
     def begin(self, name=None):
         pass
 
     def commit(self):
-        self.complete()
+        self.commit()
 
     def observe(self, time_from, time_to, path, condition, value=None):
-        if self._state == ObservationSetState.in_progress:
-            self._context._dbw.insert('observation', full_path=path, time_from=time_from, time_to=time_to, condition=condition, val_n=value, observation_set=self._set_id)
+        if self._observation_set.is_being_worked_on():
+            self._db.insert('observation', full_path=path, time_from=time_from, time_to=time_to, condition=condition, val_n=value, observation_set=self._set_id)
         else:
             raise ObservationSetStateException(self._state, ObservationSetState.in_progress)
 
