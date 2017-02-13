@@ -306,7 +306,7 @@ class Condition:
         self._load_or_create()
 
     def __str__(self):
-        return 'Condition {0:d} full name {1:s}'.format(self._cid, self._full_name)
+        return 'Condition {0:d} full name {1:s}'.format(self.cid, self._full_name)
 
     def _load_or_create(self):
         conditions = get_condition_by_full_name(self._db, self._full_name)
