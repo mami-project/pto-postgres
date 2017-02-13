@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PTO - PAPI</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="qui.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="nav" class="clear-float">
+        <ul style="float: left;">
+          <li><a href="index.html">PTO</a></li>
+          <li><a href="observatory.html">Observatory</a></li>
+          <li><a href="uploadstats.html">Upload statistics</a></li>
+        </ul>
+        <img style="height: 2rem; float: right;" src="logo.png" alt="Logo of the MAMI project"/>
+      </div>
+      <div id="main">
+        <div class="jumbo">
+          <p class="txt-center txt-huge txt-gray">PTO - PAPI</p>
+          <div class="txt-center auto-margin-85">
+            <a href="https://mami-project.eu"><img style="width: 10%" src="logo2.png" alt="Logo spelling MAMI"/></a>
+          </div>
+          <div class="row-1 row-margin">
+            <p>
+              PAPI is the API of the observatory. The API allows you to submit queries and retrieve results. The observatory
+              has its own custom query language called Interesting Query Language or abbr. IQL. 
+            </p>
+          </div>
+          <div class="row-2 row-margin">
+            <div class="cell">
+              <span class="bold-emph"><a href="https://github.com/mami-project/pto-postgres/wiki/IQL" class="linky">IQL</a></span><br><br>
+              Queries to our observatory have to be in IQL. If you want to write custom queries on your own you'll have to get acquanted with it. Otherwise
+              please use the <a class="linky2" href="qui.html">Query UI</a>.
+            </div>
+            <div class="cell">
+              <span class="bold-emph"><a href="https://github.com/mami-project/pto-postgres/wiki/PAPI" class="linky">The full API</a></span><br><br>
+              The API offers additional functionality mainly of interest to researchers. Please read the API documentation. Some API methods
+              are not public and require an API key. To receive an API key please <a class="linky2" href="https://mami-project.eu/">contact us</a>.
+            </div>
+          </div>
+          <div class="row2 row-margin">
+            <div class="cell">
+              <span class="bold-emph">Get help with IQL</span><br><br>
+              If you need help with writing IQL queries let us know. 
+<div class="auto-overflow">
+<code>
+<pre>
+{"query":
+ {"count":[["@month","@week","@name"],
+  {"simple":[{"and":[
+     {"or":[
+            {"eq":["@name","ecn.connectivity.works"]},
+            {"eq":["@name","ecn.connectivity.broken"]},
+            {"eq":["@name","ecn.connectivity.offline"]},
+            {"eq":["@name","ecn.connectivity.transient"]}]},
+     {"ge":["@time_from",{"time":[1477958400]}]},
+     {"le":["@time_to",{"time":[1485907199]}]}]}]},"asc"]}}
+</pre>
+</code>
+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

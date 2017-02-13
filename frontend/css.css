@@ -302,7 +302,7 @@ input:hover, select:hover, textarea:hover, button:hover {
   padding: 0.1rem;
 }
 
-.linky, linky:visited {
+.linky, .linky:visited {
   color: firebrick;
   text-decoration: none;
 }
@@ -312,3 +312,14 @@ input:hover, select:hover, textarea:hover, button:hover {
 }
 
 #chart_section, #table_section, #raw_query_section, #raw_results_section { display: none; }
+
+.cell + .cell { margin-left: 0.5rem; }
+
+.linky2, .linky2:visited {
+  color: firebrick;
+  text-decoration: none;
+}
+
+.linky2:hover {
+  color: salmon;
+}
