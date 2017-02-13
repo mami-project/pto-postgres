@@ -107,6 +107,20 @@ def find_uploads_by_filesystem_path(filesystem_path):
   return get_db().query(sql).dictresult()
 
 
+def find_uploads_by_campaign(campaign):
+  """
+  Find uploads with a given campaign
+  """
+
+  campaign = escape_string(campaign)
+
+  sql = """
+  SELECT * FROM uploads WHERE campaign = '%s';
+  """ % (campaign)
+
+  return get_db().query(sql).dictresult()
+
+
 def find_uploads_by_file_hash(file_hash):
   """
   Find uploads with a given file_hash
@@ -422,6 +436,30 @@ def api_raw_download():
   download_path = os.path.join(app.config['RAW_UPLOAD_FOLDER'], download_path)
   print(download_path)
   return send_file(download_path, mimetype = "application/octet-stream")
+
+
+@app.route('/raw/upload-entries')
+def api_raw_upload_entries():
+  """
+  Get all upload entries for a campaign.
+  """
+
+  doer = check_permissions_request(request, 'r')
+  if not doer:
+    return json400({"error": "Insufficiont permissions or invalid API key!"})
+
+  campaign = request.args.get('campaign')
+  if campaign == None or campaign == '':
+    return json400({"error": "Missing campaign!"})
+
+  try:
+    upload_entries = find_uploads_by_campaign(campaign)
+    return json200(upload_entries)
+  except Exception as error:
+    print(error)
+    return json400({"error" : "Internal error!"})
+
+
 
 
 @app.route('/raw/upload-entry')
