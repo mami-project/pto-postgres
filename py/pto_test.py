@@ -53,6 +53,9 @@ print(c)
 c = Condition(db, 'some.new.connectivity.super.works')
 print(c)
 
+c = Condition(db, 'some.new.connectivity.super.duper.works', 'N')
+print(c)
+
 #ctx = RawAnalysisContext(db)
 #obset = ctx.create_observation_set("huba-huba")
 

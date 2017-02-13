@@ -98,6 +98,11 @@ class DuplicateConditionError(Exception):
     def __init__(self, full_name):
         self.full_name = full_name
 
+class ConditionTypeError(Exception):
+    def __init__(self, specified, found):
+        self.specified = specified
+        self.found = found
+
 def timestamp_str(ts):
     if ts is None:
         return 'never'
@@ -300,25 +305,29 @@ def get_condition_by_full_name(db, full_name):
         return db.query('SELECT * FROM condition_tree WHERE full_name = $1', full_name).getresult()
 
 class Condition:
-    def __init__(self, db, full_name):
+    def __init__(self, db, full_name, ctype='N'):
         self._db = db
-        self._full_name = full_name
+        self.full_name = full_name
+        self.ctype = ctype
         self._load_or_create()
 
     def __str__(self):
-        return 'Condition {0:d} full name {1:s}'.format(self.cid, self._full_name)
+        return 'Condition {0:d} full name {1:s}'.format(self.cid, self.full_name)
 
     def _load_or_create(self):
-        conditions = get_condition_by_full_name(self._db, self._full_name)
+        conditions = get_condition_by_full_name(self._db, self.full_name)
         if len(conditions) > 1:
-            raise DuplicateConditionError(self._full_name)
+            raise DuplicateConditionError(self.full_name)
         elif len(conditions) == 1:
             self.cid = conditions[0][0]
+            if self.ctype is not None and conditions[0][2] != self.ctype \
+                    or self.ctype is None and conditions[0][2] is not None:
+                raise ConditionTypeError(self.ctype, conditions[0][2])
         else:
             assert len(conditions) == 0
             full_name = None
             parent = None
-            for name in self._full_name.split('.'):
+            for name in self.full_name.split('.'):
                 if full_name is None:
                     full_name = name
                 else:
@@ -330,11 +339,13 @@ class Condition:
                             new_condition = db.insert('condition_tree', name=name, full_name=full_name)
                         else:
                             new_condition = db.insert('condition_tree', name=name, full_name=full_name, parent=parent)
+                        if self.full_name == full_name:
+                            db.update('condition_tree', full_name=full_name, type=self.ctype)
                     parent = new_condition['cid']
                 elif len(conditions) == 1:
                     parent = conditions[0][0]
                 else:
-                    raise DuplicateConditionError(self._full_name)
+                    raise DuplicateConditionError(self.full_name)
             self.cid = parent
             assert self.cid is not None
 

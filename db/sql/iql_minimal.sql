@@ -4,8 +4,8 @@ DROP VIEW IF EXISTS iql_minimal;
 DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
 DROP TABLE IF EXISTS observation_set_metadata;
+DROP TABLE IF EXISTS observation_set_dependencies;
 DROP TABLE IF EXISTS observation_set;
-DROP TABLE IF EXITS observation_set_dependencies;
 DROP TABLE IF EXISTS observation_set_revision;
 DROP TYPE IF EXISTS os_state;
 
@@ -87,8 +87,9 @@ CREATE UNIQUE INDEX idx_observation_set_unique_osid ON observation_set (osid);
 CREATE TABLE condition_tree (
   cid SERIAL NOT NULL,
   name VARCHAR(255),
+  type VARCHAR(63),
   parent INT,
-  full_name VARCHAR(1024) NOT NULL
+  full_name VARCHAR(1024) PRIMARY KEY
 );
 
 CREATE UNIQUE INDEX idx_condition_tree_unique_cid ON condition_tree (cid);
