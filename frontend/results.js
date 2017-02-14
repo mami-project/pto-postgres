@@ -280,7 +280,7 @@ function table(data) {
 
 function trimLongStr(str) {
   str = str.toString();
-  var max_len = 33;
+  var max_len = 31;
   if(str.length > max_len)
     return str.substring(0,max_len-2) + "...";
   return str;
