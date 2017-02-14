@@ -3,6 +3,7 @@ from flask import Response, g, request, send_file
 from bson import json_util
 import json
 from ptoweb.api.auth import require_auth
+from ptoweb.api.util import put_to_cache, get_from_cache
 import re
 from datetime import datetime
 import iql.convert as iqlc
@@ -56,6 +57,9 @@ def json200(obj):
 
 def json400(obj):
   return cors(Response(json.dumps(obj, cls=CustomEncoder), status=400, mimetype='application/json'))
+
+def json429(obj):
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=429, mimetype='application/json'))
 
 def json404(obj):
   return cors(Response(json.dumps(obj, cls=CustomEncoder), status=404, mimetype='application/json'))
@@ -295,6 +299,33 @@ def api_result():
   return json200(dr[0])
 
 
+def check_rate_limit(req, max_reqs = 4):
+  if req.remote_addr == None or req.remote_addr == '':
+    return False
+
+  counter = get_from_cache('rate-limit/' + req.remote_addr)
+
+  if counter == None:
+    counter = 1
+  else:
+    counter += 1
+
+  put_to_cache('rate-limit/' + req.remote_addr, counter, timeout = 24*60*60)
+
+  if counter > max_reqs:
+    return False
+
+  return True
+
+
+@app.route('/rate-limit')
+def api_rate_limit():
+
+  if not check_rate_limit(request):
+    return json429({"error" : "Too many requests!"})
+
+  return json200({"msg":"ok"})
+
 
 @app.route('/query')
 def api_aquery():
@@ -331,6 +362,9 @@ def api_aquery():
   if len(dr) > 0:
     first = dr[0]
     return json200({"query_id": first["id"], "already" : first})
+
+  if not check_rate_limit(request):
+    return json429({"error" : "Too many requests!"})
 
   try:
     queued_queries_count = count_queued_queries()
