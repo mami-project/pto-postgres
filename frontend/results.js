@@ -372,7 +372,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
 
     region.append("text")
       .attr("y", barHeight /2).attr("dy", ".35em").text(trimLongStr(group_keys[i]))
-      .attr("style","font-family: monospace; font-size: 13px; text-anchor: start");
+      .attr("style","font-family: monospace; font-size: 12px; text-anchor: start");
 
     for(var j = 0; j < data.length; j++) {
       region.append("rect")
