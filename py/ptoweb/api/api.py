@@ -156,6 +156,19 @@ def find_uploads_by_file_hash(file_hash):
   return get_db().query(sql).dictresult()
 
 
+def get_recent_queries():
+  """
+  Return 12 most recent queries.
+  """
+
+  sql = """
+  SELECT id, iql FROM query_queue WHERE state = 'done'
+  ORDER BY start_time DESC LIMIT 12;
+  """
+
+  return get_db().query(sql).dictresult()
+
+
 def insert_upload(filesystem_path, campaign, file_hash, start_time, stop_time, uploader, metadata):
   """
   Insert an upload
@@ -405,6 +418,16 @@ def api_sql():
   #  return json400({"error" : str(error)})
 
   return text200(sql)
+
+
+@app.route('/qq/recent')
+def api_qq_recent():
+  try:
+    return json200(get_recent_queries())
+
+  except Exception as error:
+    print(error)
+    return json500({"error": "Internal Server Error"})
 
 
 @app.route('/qq/running')
