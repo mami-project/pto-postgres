@@ -17,18 +17,14 @@ class BaseAnalysisContext:
     """
 
     def __init__(self, db):
-      self._db = db
+        self._db = db
 
     def create_observation_set(self, name):
-        with self._db as db:
-            observation_set = db.insert("observation_set", name=name, state='in_progress')
-        print(observation_set)
-        return ObservationSetWriter(self, observation_set['osid'])
+        return ObservationSetWriter(self._db, name)
 
 class RawAnalysisContext(BaseAnalysisContext):
     """
-    Analysis context for RawAnalyzers. 
-    Implements access to raw data in HDFS via Spark.
+    Analysis context for RawAnalyzers.
     """
 
     def __init__(self, db):
@@ -83,6 +79,12 @@ class ObservationSetState(Enum):
    
 
 class ObservationSetStateError(Exception):
+    '''
+    This error gets raised whenever a state transition is triggered for an
+    observation set, but where that observation set is found to be in the
+    wrong state. For example, you cannot resume() an observation set that
+    is deprecated.
+    '''
     def __init__(self, observed_state, expected_state):
         self.observed_state = observed_state
         self.expected_state = expected_state
@@ -91,23 +93,21 @@ class ObservationSetStateError(Exception):
         return 'Observed state {0:s}, expected {1:s}'.format(self.observed_state, self.expected_state)
 
 class ObservationSetNotFoundError(Exception):
+    '''
+    This error gets raised whenever an observation set is requested by
+    observation set ID, but that observation set ID does not exist.
+    '''
     def __init__(self, param):
         self.param = param
 
-class DuplicateConditionError(Exception):
-    def __init__(self, full_name):
-        self.full_name = full_name
-
 class ConditionTypeError(Exception):
+    '''
+    This error gets raised whenever a condition is looked up with a given
+    type, and that condition exists in the database, but with a different type.
+    '''
     def __init__(self, specified, found):
         self.specified = specified
         self.found = found
-
-def timestamp_str(ts):
-    if ts is None:
-        return 'never'
-    else:
-        return ts.__str__()
 
 def revision_id_string(revid):
     if revid is None:
@@ -332,9 +332,8 @@ class Condition:
 
     def _load_or_create(self):
         conditions = get_condition_by_full_name(self._db, self.full_name)
-        if len(conditions) > 1:
-            raise DuplicateConditionError(self.full_name)
-        elif len(conditions) == 1:
+        assert 0 <= len(conditions) and len(conditions) <= 1
+        if len(conditions) == 1:
             self.cid = conditions[0][0]
             if conditions[0][2] != self.ctype:
                 raise ConditionTypeError(self.ctype, conditions[0][2])
@@ -348,6 +347,7 @@ class Condition:
                 else:
                     full_name = full_name + '.' + name
                 conditions = get_condition_by_full_name(self._db, full_name)
+                assert 0 <= len(conditions) and len(conditions) <= 1
                 if len(conditions) == 0:
                     with self._db as db:
                         if parent is None:
@@ -357,10 +357,9 @@ class Condition:
                         if self.full_name == full_name:
                             db.update('condition_tree', full_name=full_name, type=self.ctype)
                     parent = new_condition['cid']
-                elif len(conditions) == 1:
-                    parent = conditions[0][0]
                 else:
-                    raise DuplicateConditionError(self.full_name)
+                    assert len(conditions) == 1
+                    parent = conditions[0][0]
             self.cid = parent
             assert self.cid is not None
 
