@@ -278,9 +278,11 @@ function table(data) {
   $('#table_section').css('display','block');
 }
 
-function trimLongStr(str) {
+function trimLongStr(str, max_len_) {
+  if(max_len_ == undefined)
+    max_len_ = 30;
   str = str.toString();
-  var max_len = 30;
+  var max_len = max_len_;
   if(str.length > max_len)
     return str.substring(0,max_len-2) + "...";
   return str;
@@ -371,7 +373,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
     var offset_x = 200;
 
     region.append("text")
-      .attr("y", barHeight /2).attr("dy", ".35em").text(trimLongStr(group_keys[i]))
+      .attr("y", barHeight /2).attr("dy", ".35em").text(trimLongStr(group_keys[i], 25))
       .attr("style","font-family: monospace; font-size: 12px; text-anchor: start");
 
     for(var j = 0; j < data.length; j++) {
