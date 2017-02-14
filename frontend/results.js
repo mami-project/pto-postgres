@@ -280,11 +280,12 @@ function table(data) {
 
 function trimLongStr(str) {
   str = str.toString();
-  var max_len = 31;
+  var max_len = 33;
   if(str.length > max_len)
     return str.substring(0,max_len-2) + "...";
   return str;
 }
+
 
 function to_e(num) {
   if(num < 10000)
@@ -371,7 +372,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
 
     region.append("text")
       .attr("y", barHeight /2).attr("dy", ".35em").text(trimLongStr(group_keys[i]))
-      .attr("style","font-family: sans-serif; font-size: 12px; text-anchor: start");
+      .attr("style","font-family: monospace; font-size: 13px; text-anchor: start");
 
     for(var j = 0; j < data.length; j++) {
       region.append("rect")
