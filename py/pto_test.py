@@ -21,12 +21,21 @@ except ObservationSetStateError as e:
 os1.commit()
 
 os2 = ObservationSet(db)
-os2.load(os1.osid())
+os2.load(os1.osid)
 
 print(os1)
 print(os2)
 
 assert os1.is_review_pending() and os2.is_review_pending()
+
+try:
+	# Raises ObservationSetStateError
+	os2.resume(os1.osid)
+	assert False
+except ObservationSetStateError as e:
+	print(e)
+	assert e.observed_state == ObservationSetState.pending_review \
+		and e.expected_state == ObservationSetState.in_progress
 
 os1.publish()
 os1.make_permanent()
