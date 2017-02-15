@@ -15,6 +15,7 @@ import os.path
 from werkzeug.utils import secure_filename
 import hashlib
 
+
 def sha1_hash(s):
   return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
@@ -78,6 +79,30 @@ def to_int(value):
     return int(value, 10)
   except:
     return 0
+
+
+def get_upload_stats():
+  """
+  Return upload statistics
+  """
+
+  stats = get_from_cache('upload-stats')
+  if stats != None:
+    return stats
+
+  sql = """
+  SELECT campaign, COUNT(*) AS count_ FROM uploads GROUP BY campaign;
+  """
+
+  dr = get_db().query(sql).dictresult()
+
+  stats = {}
+  for e in dr:
+    stats[e['campaign']] = e['count_']
+
+  put_to_cache('upload-stats', stats, timeout = 15 * 60)
+
+  return stats
 
 
 def count_queued_queries():
@@ -338,6 +363,16 @@ def api_rate_limit():
     return json429({"error" : "Too many requests!"})
 
   return json200({"msg":"ok"})
+
+
+@app.route('/upload-stats')
+def api_upload_stats():
+  try:
+    return json200(get_upload_stats())
+
+  except Exception as error:
+    print(error)
+    return json500({"error": "Internal Server Error"})
 
 
 @app.route('/query')
