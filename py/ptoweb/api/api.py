@@ -688,6 +688,8 @@ def api_raw_upload():
   data.save(os.path.join(path_prefix, path))
 
   try:
+    file_size = os.path.getsize(os.path.join(path_prefix, path))
+    metadata['file_size'] = file_size
     insert_upload(path, campaign, file_hash, start_time, stop_time, uploader, metadata)
   except Exception as error:
     print(error)
