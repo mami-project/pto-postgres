@@ -91,14 +91,16 @@ def get_upload_stats():
     return stats
 
   sql = """
-  SELECT campaign, COUNT(*) AS count_ FROM uploads GROUP BY campaign;
+  SELECT campaign, count(*) as count_, 
+         SUM((metadata ->> 'file_size')::BIGINT)/(1024.0*1024.0) as file_size
+  FROM uploads GROUP BY campaign;
   """
 
   dr = get_db().query(sql).dictresult()
 
   stats = {}
   for e in dr:
-    stats[e['campaign']] = e['count_']
+    stats[e['campaign']] = {'count' : e['count_'], 'file_size' : e['file_size']}
 
   put_to_cache('upload-stats', stats, timeout = 15 * 60)
 
