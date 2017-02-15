@@ -20,7 +20,11 @@ function sizeToStr(size) {
     return Math.round(10*size / (1024))/10 + "GB";
   }
   if(size == null || size == undefined)
+    return "n/a";
+
+  if(size < 1)
     return "<1MB";
+
   return size + "MB";
 }
 
