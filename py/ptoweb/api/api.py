@@ -10,6 +10,7 @@ import iql.convert as iqlc
 import pprint
 import hashlib
 from pg import escape_string
+import pg
 import os
 import os.path
 from werkzeug.utils import secure_filename
@@ -45,6 +46,9 @@ class CustomEncoder(json.JSONEncoder):
   def default(self, o):
     if(isinstance(o, datetime)):
       return o.timestamp()
+    if(isinstance(o, pg.Decimal)):
+      return float(str(o))
+    return str(o);
 
 
 
@@ -87,6 +91,8 @@ def get_upload_stats():
   """
 
   stats = get_from_cache('upload-stats')
+  print(stats)
+
   if stats != None:
     return stats
 
