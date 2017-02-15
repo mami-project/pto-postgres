@@ -111,6 +111,11 @@ function runQuery() {
     return;
   }
 
+  if(per == 'no' && (group_by != "no" || then_by != "no")) {
+    $("#query_msg").empty().append("Group by/then by specified but nothing for per. The group order must be per -> group by -> then by");
+    return;
+  }
+
   console.log("conditions",conditions);
   console.log("group_by", group_by);
   console.log("time_from", time_from);
@@ -201,7 +206,7 @@ function runQuery() {
 
 
   if(count == 'no') { // no distinct counting
-    if(group_by == 'no' && then_by == 'no') { //absolutely no grouping
+    if(group_by == 'no' && then_by == 'no' && per == 'no') { //absolutely no grouping
       query = {"query":{"count":[{"simple":[exp_]}]}};
     }
     else {
