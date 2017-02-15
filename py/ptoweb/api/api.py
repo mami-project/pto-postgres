@@ -661,12 +661,16 @@ def api_raw_upload():
 
   secure_campaign_ = secure_filename(metadata['campaign'])
   secure_filename_ = secure_filename(metadata['filename'])
-  path = os.path.join(secure_campaign_, secure_filename_)
+  secure_filetype_ = secure_filetype(metadata['filetype'])
+  path = os.path.join(secure_campaign_, secure_filetype_, secure_filename_)
 
   path_prefix = app.config['RAW_UPLOAD_FOLDER']
   
   if not os.path.isdir(os.path.join(path_prefix, secure_campaign_)):
     os.mkdir(os.path.join(path_prefix, secure_campaign_))
+
+  if not os.path.isdir(os.path.join(path_prefix, secure_campaign_, secure_filetype_)):
+    os.mkdir(os.path.join(path_prefix, secure_campaign_, secure_filetype_))
   
   save_path = os.path.join(path_prefix, path)
 
