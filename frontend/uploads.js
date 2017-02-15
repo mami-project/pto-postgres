@@ -11,6 +11,20 @@ function showError() {
   cell.append('There was an error downloading the upload statistics from the server. Please come back later.');
 }
 
+
+function sizeToStr(size) {
+  if(size >= 1024*1024) {
+    return Math.round(10*size / (1024*1024))/10 + "TB";
+  }
+  if(size >= 1024) {
+    return Math.round(10*size / (1024))/10 + "GB";
+  }
+  if(size == null || size == undefined)
+    return "<1MB";
+  return size + "MB";
+}
+
+
 function renderUploadStats(data) {
   var table = d3.select("#uploadstats");
 
@@ -21,13 +35,15 @@ function renderUploadStats(data) {
   var hrow = table.append("tr");
   hrow.append("th").text("Campaign");
   hrow.append("th").text("Uploads");
+  hrow.append("th").text("Size");
 
 
   for(var i = 0; i < cols.length; i++) {
     var row = table.append("tr");
     console.log(data[cols[i]]);
     row.append("td").text(cols[i]);
-    row.append("td").text(data[cols[i]]);
+    row.append("td").text(data[cols[i]]['count']).attr("style","text-align: right;");
+    row.append("td").text(sizeToStr(data[cols[i]]['file_size'])).attr("style","text-align: right;");
     console.log('row added');
   }
 
