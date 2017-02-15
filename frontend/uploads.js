@@ -25,7 +25,7 @@ function sizeToStr(size) {
   if(size < 1)
     return "<1MB";
 
-  return size + "MB";
+  return Math.round(10*size)/10 + "MB";
 }
 
 
