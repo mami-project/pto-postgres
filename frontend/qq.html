@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PTO - Query Queue</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="cfg.js"></script>
+    <script src="qq.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="nav" class="clear-float">
+        <ul style="float: left;">
+          <li><a href="index.html">PTO</a></li>
+          <li><a href="observatory.html">Observatory</a></li>
+          <li><a href="uploadstats.html">Upload statistics</a></li>
+        </ul>
+        <img style="height: 2rem; float: right;" src="logo.png" alt="Logo of the MAMI project"/>
+      </div>
+      <div id="main">
+        <div class="jumbo">
+          <p class="txt-center txt-huge txt-gray">PTO - Query Queue</p>
+          <div class="txt-center auto-margin-85">
+            <a href="https://mami-project.eu"><img style="width: 10%" src="logo2.png" alt="Logo spelling MAMI"/></a>
+          </div>
+          <div class="row-1 row-margin">
+            <div class="cell">
+              Queries submitted to our observatory can be long running and are therefore queued. Click on any button below. Recent queries
+              will display queries that recentely completed. Running queries will show queries that are currently being executed. New queries
+              are queries still waiting in the query queue for an execution slot to become available.
+            </div>
+          </div>
+          <div class="row-3 row-margin">
+             <div class="cell"><button onclick="getRecent()">Show recent queries</button></div>
+             <div class="cell"><button onclick="getRunning()">Show running queries</button></div>
+             <div class="cell"><button onclick="getNew()">Show new queries</button></div>
+          </div>
+          <div class="row-1 row-margin">
+            <div class="cell" id="qq_cell">
+              <div id="qqerr"></div>
+              <table class="table" id="qq">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

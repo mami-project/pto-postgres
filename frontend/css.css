@@ -168,7 +168,7 @@ h5 {
   font-style: italic;
 }
 
-code {
+code{
   padding: 1rem;
   display: block;
   border-radius: 1rem;
@@ -177,14 +177,20 @@ code {
   color: steelblue;
 }
 
+td.code {
+  font-family: monospace, monospace;
+  font-size: 0.8rem;
+  color: steelblue;
+}
 
-.row-2 {
+
+.row-2, .row-3 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
 
-.row-2 .cell {
+.row-2 .cell, .row-3 .cell {
   flex: 1;
   padding: 0.1rem;
   box-sizing: border-box;
