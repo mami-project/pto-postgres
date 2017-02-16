@@ -481,7 +481,7 @@ def api_qq_running():
          EXTRACT( EPOCH FROM (stop_time - start_time) )
      ELSE 
        EXTRACT(
-           EPOCH FROM ( (NOW()::TIMESTAMP WITHOUT TIME ZONE) - start_time )
+           EPOCH FROM ( ((NOW() AT TIME ZONE 'UTC')::TIMESTAMP WITHOUT TIME ZONE) - start_time )
        )
      END) as duration 
       FROM query_queue WHERE state = 'running' ORDER BY start_time ;
@@ -503,7 +503,7 @@ def api_qq_new():
          EXTRACT( EPOCH FROM (stop_time - start_time) )
      ELSE 
        EXTRACT(
-           EPOCH FROM ( (NOW()::TIMESTAMP WITHOUT TIME ZONE) - start_time )
+           EPOCH FROM ( ((NOW() AT TIME ZONE 'UTC')::TIMESTAMP WITHOUT TIME ZONE) - start_time )
        )
      END) as duration 
       FROM query_queue WHERE state = 'new' ORDER BY start_time ;
