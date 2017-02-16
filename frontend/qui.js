@@ -100,6 +100,13 @@ function runQuery() {
   var count = $("#i_count").val();
   var per = $('#i_per').val();
 
+  if(count == 'no_') {
+    if(group_by != "no" || then_by != "no" || per != "no") {
+      $('#query_msg').empty().append('You chose to not count anything. In this case you can not have any grouping/per set!');
+      return;
+    }
+  }
+
 
   if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
     $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
@@ -204,18 +211,21 @@ function runQuery() {
     iql_count_parts.push('@'+per);
   }
 
-
-  if(count == 'no') { // no distinct counting
-    if(group_by == 'no' && then_by == 'no' && per == 'no') { //absolutely no grouping
-      query = {"query":{"count":[{"simple":[exp_]}]}};
+  if(count != 'no_') { //agreggation?
+    if(count == 'no') { // no distinct counting
+      if(group_by == 'no' && then_by == 'no' && per == 'no') { //absolutely no grouping
+        query = {"query":{"count":[{"simple":[exp_]}]}};
+      }
+      else {
+        query = {"query":{"count":[iql_count_parts,{"simple":[exp_]},"asc"]}};
+      }
     }
     else {
-      query = {"query":{"count":[iql_count_parts,{"simple":[exp_]},"asc"]}};
+      iql_count_parts.push('@'+count);
+      query = {"query":{"count-distinct":[iql_count_parts,{"simple":[exp_]},"asc"]}};
     }
-  }
-  else {
-    iql_count_parts.push('@'+count);
-    query = {"query":{"count-distinct":[iql_count_parts,{"simple":[exp_]},"asc"]}};
+  } else { // count == no_ means absolutely no aggregation
+    query = {"query":{"all":[{"simple":[exp_]}]}};
   }
   
   var str_query = JSON.stringify(query);

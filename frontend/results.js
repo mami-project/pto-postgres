@@ -279,10 +279,26 @@ function table(data) {
 }
 
 function trimLongStr(str, max_len_) {
+  if(str == null || str == undefined) return "";
+
+
   if(max_len_ == undefined)
     max_len_ = 30;
+
   str = str.toString();
   var max_len = max_len_;
+
+  if(str.length > max_len) {
+    if(str.indexOf("ecn.") >= 0) {
+      parts = str.split(".");
+      for(var i = 0; i < parts.length; i++) {
+        parts[i] = trimLongStr(parts[i], Math.floor(max_len / parts.length));
+      }
+      return trimLongStr(parts.join("."), max_len - 1)
+    }
+  }
+
+
   if(str.length > max_len)
     return str.substring(0,max_len-2) + "...";
   return str;
