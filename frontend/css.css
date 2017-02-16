@@ -188,7 +188,10 @@ td.code {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  overflow: auto;
 }
+
+.cell { overflow: auto; }
 
 .row-2 .cell, .row-3 .cell {
   flex: 1;
@@ -328,4 +331,28 @@ input:hover, select:hover, textarea:hover, button:hover {
 
 .linky2:hover {
   color: salmon;
+}
+
+
+@media (max-width: 45em)
+{
+.row-1, .row-2, .row-3 { display: block; }
+.cell + .cell { margin-left: 0rem; }
+td,th { display: block; }
+tr { display: block;
+  margin: 0.5rem;
+  border: none;
+}
+.table tr:first-child {
+    border: solid 0.2rem black;
+}
+.table tr {
+    border: solid 0.1rem darkgray;
+}
+.table { display: block; }
+.table td + td {
+  text-align: left;
+  border: none;
+}
+
 }

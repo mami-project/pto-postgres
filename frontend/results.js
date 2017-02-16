@@ -348,9 +348,12 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   var figure = d3.select("#figures").append("div").attr("class","figure");
       figure.append("div").attr("class","title").html(title);
 
+  var cheight = (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2));
+
   var chart = figure.append("svg")
-      .attr("width", width)
-      .attr("height", (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2)));
+      .attr("width", "80%")
+      .attr("height", "auto")
+      .attr("viewBox","0 0 " + width + " " + cheight);
 
   if(caption !== undefined) {
     figure.append("div").attr("class","caption").html(caption);
@@ -460,9 +463,12 @@ function renderHBar(data, title, counted_attribute) {
   var figure = d3.select("#figures").append("div").attr("class","figure");
       figure.append("div").attr("class","title").html(title);
 
+  var cheight = (5+barHeight) * (data.length + 1);
+
   var chart = figure.append("svg")
-       .attr("width", width)
-       .attr("height", (5+barHeight) * (data.length + 1));
+       .attr("width", "80%")
+       .attr("height", "auto")
+       .attr("viewBox","0 0 " + width + " " + cheight);
 
   var bar = chart.selectAll(".bars")
        .data(data)
