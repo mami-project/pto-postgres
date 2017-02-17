@@ -98,6 +98,16 @@ li {
   font-style: italic;
 }
 
+.table-g {
+  border-collapse: collapse;
+}
+
+.table-g td {
+  border: solid 0.1rem black;
+  padding: 0.75rem;
+  vertical-align: top;
+}
+
 .table {
   box-sizing: border-box;
   padding: 1rem;

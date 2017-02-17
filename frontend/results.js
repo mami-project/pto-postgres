@@ -282,9 +282,29 @@ function renderTable(data, group_order) {
   true_cols.sort();
 
   console.log('true_cols', true_cols);
+  var rows = [];
+  toRows(grouped, rows, undefined, true_cols);
+  console.log('rows', rows);
 
 
-  renderTableStructure(grouped, table, true_cols, 2);
+  var tbl = table.append("table").attr("class","table-g");
+
+  var hrow = tbl.append("tr");
+
+  for(var i = 0; i < group_order.length; i++) {
+    hrow.append("th").text(group_order[i]);
+  }
+
+  for(var i = 0; i < true_cols.length; i++) {
+    hrow.append("th").text(true_cols[i]);
+  }
+
+  for(var i = 0; i < rows.length; i++) {
+    var tr = tbl.append("tr");
+    for(var j = 0; j < rows[i].length; j++) {
+      var td = tr.append("td").attr("rowspan",rows[i][j]['rowspan']).text(rows[i][j]['value']);
+    }
+  }
 
   $('#table_section').css('display','block');
 }
@@ -300,6 +320,47 @@ function calcRowSpan(data) {
       sum += calcRowSpan(data[group_keys[i]]);
     }
     return sum;
+  }
+}
+
+function toRows(data, rows, parent_row, cols) {
+  if($.isArray(data)) {
+    if(data.length > 0) { 
+
+      for(var i = 0; i < data.length; i++) {
+        var row = [];
+        if(i == 0) row = parent_row;
+        for(var c = 0; c < cols.length; c++) {
+          row.push({'value':data[i][cols[c]], 'rowspan':1});
+        }
+        if(i != 0) rows.push(row);
+      }
+    }
+  }
+  else {
+    var group_keys = Object.keys(data);
+    group_keys.sort();    
+
+    if(group_keys.length > 0) {
+
+      for(var i = 0; i < group_keys.length; i++) {
+        if(i == 0)  {
+          if(parent_row != undefined)
+            parent_row.push({'value':group_keys[i], 'rowspan':calcRowSpan(data[group_keys[i]])});
+          else {
+            parent_row = [{'value':group_keys[i], 'rowspan':calcRowSpan(data[group_keys[i]])}];
+            rows.push(parent_row);
+          }
+
+          toRows(data[group_keys[i]], rows, parent_row, cols);
+        }
+        else {
+          var row = [{'value':group_keys[i], 'rowspan':calcRowSpan(data[group_keys[i]])}];
+          rows.push(row);
+          toRows(data[group_keys[i]], rows, row, cols);
+        }
+      }
+    }
   }
 }
 
@@ -352,7 +413,7 @@ function groupAll(data, bys) {
 function group(data, by) {
   var groups = {};
   for(var i = 0; i < data.length; i++) {
-    var key = attrNameToDisplay(by) + ': ' + data[i][by];
+    var key = data[i][by];
     delete data[i][key];
     if(key in groups) {
       groups[key].push(data[i]);
