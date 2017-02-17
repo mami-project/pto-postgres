@@ -81,6 +81,8 @@ function renderCounts(results, group_order, distinct) {
   console.log('cols', cols);
   console.log('counted_attribute', counted_attribute);
 
+  renderTable(results, group_order);
+
   if(group_order.length == 2) {
     var top_group_by = group_order[0];
     var bot_group_by = group_order[1];
@@ -190,7 +192,7 @@ function renderResults(results) {
 
   var rawResultsDiv = document.getElementById('raw_results');
   var result = results['result'];
-  $('#raw_results').append('<pre>'+JSON.stringify(result, null, ' ')+'</pre>');
+  $('#raw_results').append('<a href="' + api_base + '/result?id=' + encodeURIComponent(results['id']) + '">Download raw results</a>');
   var iql = results['iql'];
   $('#raw_query').append(JSON.stringify(iql));
 
@@ -229,8 +231,9 @@ function renderResults(results) {
       renderCounts(results, query['count-distinct'][0], true);
   }
 
-  if(results.length > 0)
+  else if(results.length > 0) {
     table(results);
+  }
 
   $('#results_msg').empty().append('<span class="txt-info">Your results are visible below.</span> ');
 
@@ -260,9 +263,110 @@ function getResults(id) {
      .fail(showError);
 }
 
+function renderTable(data, group_order) {
+  console.log('render_table');
+  console.log('group_order', group_order);
+
+  var grouped = (groupAll(data, group_order));
+
+  var table = d3.select("#tables"); //.append("table").attr("class","");
+
+  var cols = Object.keys(data[0]);
+
+  var true_cols = [];
+  for(var i = 0; i < cols.length; i++) {
+    if(group_order.indexOf(cols[i]) < 0)
+      true_cols.push(cols[i]);
+  }
+
+  true_cols.sort();
+
+  console.log('true_cols', true_cols);
+
+
+  renderTableStructure(grouped, table, true_cols, 2);
+
+  $('#table_section').css('display','block');
+}
+
+function calcRowSpan(data) {
+  if($.isArray(data)) {
+    return data.length;
+  }
+  else {
+    var sum = 0;
+    var group_keys = Object.keys(data);
+    for(var i = 0; i < group_keys.length; i++) {
+      sum += calcRowSpan(data[group_keys[i]]);
+    }
+    return sum;
+  }
+}
+
+function renderTableStructure(data, tbl, cols, lvl) {
+  if($.isArray(data)) {
+    console.log("got array");
+    var table = tbl.append("table").attr("class","table").attr("style","margin: 1rem; margin-left: 2rem");
+
+    var hrow = table.append("tr");
+
+    for(var i = 0; i < cols.length; i++) {
+      hrow.append("th").text(attrNameToDisplay(cols[i]));
+    }
+
+    for(var i = 0; i < data.length; i++) {
+      var tr = table.append("tr");
+      for(var j = 0; j < cols.length; j++) {
+        tr.append("td").text(data[i][cols[j]]);
+      }
+    }
+  }
+  else {
+    console.log("got not array");
+    var group_keys = Object.keys(data);
+    for(var i = 0; i < group_keys.length; i++) {
+      var row_span = calcRowSpan(data[group_keys[i]]);
+      var tr = tbl.append("div").attr("style","margin: 1rem; margin-left: 2rem;");
+      tr.append("h"+lvl).text(group_keys[i]);
+      var td = tr.append("div");
+      renderTableStructure(data[group_keys[i]], td, cols, lvl+1);
+    }
+  }
+}
+
+function groupAll(data, bys) {
+  if(bys.length == 0)
+    return data;
+
+  var groups = group(data, bys[0]);
+  var bys = bys.slice(1);
+
+  var group_keys = Object.keys(groups);
+  for(var i = 0; i < group_keys.length; i++) {
+    groups[group_keys[i]] = groupAll(groups[group_keys[i]], bys);
+  }
+
+  return groups;
+}
+
+function group(data, by) {
+  var groups = {};
+  for(var i = 0; i < data.length; i++) {
+    var key = attrNameToDisplay(by) + ': ' + data[i][by];
+    delete data[i][key];
+    if(key in groups) {
+      groups[key].push(data[i]);
+    }
+    else {
+      groups[key] = [data[i]];
+    }
+  }
+
+  return groups;
+}
 
 function table(data) {
-  var table = d3.select(".table");
+  var table = d3.select("#tables").append("table").attr("class","table");
 
   var cols = Object.keys(data[0]);
   cols.sort();
