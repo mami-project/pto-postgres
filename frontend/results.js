@@ -232,11 +232,11 @@ function renderResults(results) {
   if(results.length > 0)
     table(results);
 
-  $('#results_msg').empty().append('<span class="txt-info">Your results are visible below.</span>');
+  $('#results_msg').empty().append('<span class="txt-info">Your results are visible below.</span> ');
 
   if(results.length >= 4096) {
-    $('#results_msg').append('<span class="txt-warn">You are viewing an incomplete result set because too many results were available!<span>');
-    $('#results_msg').append('<span class="txt-warn">Aggregations done by the UI will be incomplete!</span>');
+    $('#results_msg').append('<span class="txt-warn">You are viewing an incomplete result set because too many results were available!<span> ');
+    $('#results_msg').append('<span class="txt-warn">Aggregations done by the UI will be incomplete!</span> ');
   }
 }
 
