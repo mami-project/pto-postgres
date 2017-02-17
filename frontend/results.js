@@ -292,11 +292,11 @@ function renderTable(data, group_order) {
   var hrow = tbl.append("tr");
 
   for(var i = 0; i < group_order.length; i++) {
-    hrow.append("th").text(group_order[i]);
+    hrow.append("th").text(attrNameToDisplay(group_order[i]));
   }
 
   for(var i = 0; i < true_cols.length; i++) {
-    hrow.append("th").text(true_cols[i]);
+    hrow.append("th").text(attrNameToDisplay(true_cols[i]));
   }
 
   for(var i = 0; i < rows.length; i++) {

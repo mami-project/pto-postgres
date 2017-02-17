@@ -99,13 +99,29 @@ li {
 }
 
 .table-g {
+  width: 100%;
   border-collapse: collapse;
 }
 
-.table-g td {
-  border: solid 0.1rem black;
+.table-g tr {
+  border-bottom: solid 0.1rem black;
   padding: 0.75rem;
   vertical-align: top;
+}
+
+.table-g td {
+  padding: 0.3rem;
+  text-align: left;
+}
+
+.table-g th {
+  text-align: left;
+}
+
+
+#tables {
+  border: solid 0.2rem black;
+  padding: 1rem;
 }
 
 .table {
