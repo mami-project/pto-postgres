@@ -484,7 +484,7 @@ def api_qq_summary():
        EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - start_time))
       ELSE
        NULL END) END) AS duration
-  FROM query_queue WHERE state = 'running' OR state = 'new')
+  FROM query_queue WHERE state = 'running' OR state = 'new' OR state = 'failed')
   UNION
   (SELECT id, state, iql,
    (CASE WHEN ( (stop_time IS NOT NULL) AND (start_time IS NOT NULL) ) THEN
