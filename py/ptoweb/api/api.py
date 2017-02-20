@@ -438,7 +438,7 @@ def api_aquery():
 
   time_now = int(datetime.utcnow().timestamp())
 
-  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state, submit_time) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new','%d');" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql), time_now)
+  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state, submit_time) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new',to_timestamp(%d)::TIMESTAMP WITHOUT TIME ZONE);" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql), time_now)
 
   try:
     get_db().query(sql)
@@ -491,7 +491,7 @@ def api_qq_summary():
      (CASE WHEN (start_time IS NOT NULL) THEN
        EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - start_time))
       ELSE
-       EXTRCACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - submit_time)) END) END) AS duration
+       EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - submit_time)) END) END) AS duration
   FROM query_queue WHERE state = 'running' OR state = 'new' OR state = 'failed')
   UNION
   (SELECT stop_time, id, state, iql,
