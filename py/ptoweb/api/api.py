@@ -433,7 +433,7 @@ def api_aquery():
 
   time_now = int(datetime.utcnow().timestamp())
 
-  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state, submit_time) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new',%d);" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql), time_now)
+  sql = "INSERT INTO query_queue(id, iql, sql_query, result, state, submit_time) VALUES('%s', '%s'::JSONB, '%s', NULL, 'new',to_timestamp(%d)::TIMESTAMP WITHOUT TIME ZONE);" % (escape_string(query_hash), escape_string(iqls), escape_string(iql_sql), time_now)
 
   try:
     get_db().query(sql)
