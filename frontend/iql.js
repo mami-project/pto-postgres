@@ -20,6 +20,8 @@ function attrNameToDisplay(name) {
 function convertGrouping(grouping, distinct) {
   var count_str;
 
+  console.log('grouping',grouping);
+
   if(grouping.length == 1) {
     count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[0]) + '</i>';
   }
