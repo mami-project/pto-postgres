@@ -121,6 +121,12 @@ def metadata_to_string(md):
     else:
         return md.__str__()
 
+def campaign_name_to_string(campaign):
+    if campaign is None:
+        return '(no campaign)'
+    else:
+        return campaign
+
 class ObservationSet:
     def __init__(self, db):
         self._db = db
@@ -129,8 +135,8 @@ class ObservationSet:
     def load(self, osid):
         self._load(osid)
 
-    def create(self, name, metadata):
-        self._create(name, metadata)
+    def create(self, name, campaign, metadata):
+        self._create(name, campaign, metadata)
 
     def __str__(self):
         if self._state == ObservationSetState.unknown:
@@ -139,9 +145,10 @@ class ObservationSet:
             roc = revision_id_string(self._roc)
             rov = revision_id_string(self._rov)
             rod = revision_id_string(self._rod)
+            campaign = campaign_name_to_string(self._campaign)
             md = metadata_to_string(self._metadata)
-            return 'OSID {2:d} \'{0:s}\', {1:s}, roc {3:s}, rov {4:s}, rod {5:s} {6:s}' \
-                .format(self.name, self._state.name, self.osid, roc, rov, rod, md)
+            return 'OSID {2:d} \'{0:s}\' on \'{7:s}\', {1:s}, roc {3:s}, rov {4:s}, rod {5:s} {6:s}' \
+                .format(self.name, self._state.name, self.osid, roc, rov, rod, md, campaign)
 
     @staticmethod
     def find_sets_by_name(db, name):
@@ -186,18 +193,19 @@ class ObservationSet:
         '''
         return db.insert('observation_set_revision', creator=name)
 
-    def _create(self, name, metadata=None):
+    def _create(self, name, campaign, metadata=None):
         '''
-        Creates a new observation set with a new, unised observation set ID
+        Creates a new observation set with a new, unused observation set ID
         '''
         with self._db as db:
             revid = self._create_revid(db, name)
             observation_set = db.insert('observation_set', name=name,
-                state=ObservationSetState.in_progress.name,
+                campaign=campaign, state=ObservationSetState.in_progress.name,
                 roc=revid['revision'])
 
             self.osid = observation_set['osid']
             self.name = observation_set['name']
+            self._campaign = observation_set['campaign']
             self._state = ObservationSetState(observation_set['state'])
             self._roc = observation_set['roc']
             self._rov = observation_set['rov'] # None
@@ -215,6 +223,7 @@ class ObservationSet:
         if observation_set is not None:
             self.osid = observation_set['osid']
             self.name = observation_set['name']
+            self._campaign = observation_set['campaign']
             self._state = ObservationSetState(observation_set['state'])
             self._roc = observation_set['roc']
             self._rov = observation_set['rov']
@@ -227,6 +236,9 @@ class ObservationSet:
                 self._metadata[m[1]] = m[2]
         else:
             raise ObservationSetNotFoundError(osid)
+
+    def campaign(self):
+        return self._campaign
 
     def resume(self, osid):
         '''

@@ -6,7 +6,7 @@ db = DB(dbname='pto', host='localhost', port=5432,
 	user='sten', passwd='sten')
 
 os1 = ObservationSet(db)
-os1.create('O RLY', { 'test' : 'one', 'other test' : 'two'})
+os1.create('O RLY', 'ecn-june', { 'test' : 'one', 'other test' : 'two'})
 
 try:
 	# Raises ObservationSetStateError
@@ -44,7 +44,7 @@ os1.deprecate()
 print('Observation set 1: {0:s}'.format(os1.__str__()))
 
 os1 = ObservationSet(db)
-os1.create('O RLY 1', None)
+os1.create('O RLY 1', None, None)
 
 sets = ObservationSet.find_sets_by_name(db, 'O RLY')
 for set in sets:

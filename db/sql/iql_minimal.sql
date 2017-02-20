@@ -47,7 +47,12 @@ CREATE TABLE observation_set_revision (
 
 CREATE TABLE observation_set (
   osid BIGSERIAL NOT NULL PRIMARY KEY,
+  -- The name of the analyser creating this observation set
   name VARCHAR(255) NOT NULL,
+  -- Contains the name of the measurement campaign, for analysers that take
+  -- raw data. May contain additional information for other analysers, or
+  -- may be NULL in these cases
+  campaign VARCHAR(255),
   state os_state,
   -- Revision ID when this observation set was created
   roc BIGINT NOT NULL,
