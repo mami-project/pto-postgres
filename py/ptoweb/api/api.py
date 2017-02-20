@@ -476,7 +476,7 @@ def api_qq_recent():
 @app.route('/qq/summary')
 def api_qq_summary():
   sql = """
-  (SELECT id, iql,
+  (SELECT id, state, iql,
    (CASE WHEN ( (stop_time IS NOT NULL) AND (start_time IS NOT NULL) ) THEN
      EXTRACT ( EPOCH FROM (stop_time - start_time ) )
     ELSE
@@ -486,7 +486,7 @@ def api_qq_summary():
        NULL END) END) AS duration
   FROM query_queue WHERE state = 'running' OR state = 'new')
   UNION
-  (SELECT id, iql,
+  (SELECT id, state, iql,
    (CASE WHEN ( (stop_time IS NOT NULL) AND (start_time IS NOT NULL) ) THEN
      EXTRACT ( EPOCH FROM (stop_time - start_time ) )
     ELSE
