@@ -63,21 +63,38 @@ function submitQuery(query) {
   request.fail(process_failed_response); 
 }
 
-function ecnSupportQuery() {
-  var selected_window = $('#i_ecn_support_time_window').val();
-
-  var windows = {
+var windows = {
     "Nov 2016" : [toDate("01 Nov 2016 start"), toDate("30 Nov 2016 end")],
     "Dec 2016" : [toDate("01 Dec 2016 start"), toDate("31 Dec 2016 end")],
     "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2017 end")]
-  };
+};
 
-  var exp_conditions = {"or":[
-        {"eq":["@name","ecn.connectivity.works"]},
-        {"eq":["@name","ecn.connectivity.broken"]},
-        {"eq":["@name","ecn.connectivity.transient"]},
-        {"eq":["@name","ecn.connectivity.offline"]}
+function ecnNegotiationQuery() {
+  var selected_window = $('#i_ecn_negotiation_time_window').val();
+
+  var exp_conditions = {"in":['@name',[
+      'ecn.negotiation_attempt.succeeded',
+      'ecn.negotiation_attempt.failed'
+   ]]};
+
+  var exp_ = {"and":[
+     exp_conditions,
+     {"ge":["@time_from",{"time":[windows[selected_window][0]]}]},
+     {"le":["@time_to",{"time":[windows[selected_window][1]]}]}
    ]};
+
+  query = {"query":{"count":[["@name"],{"simple":[exp_]},"asc"]}};
+
+  submitQuery(query);
+}
+
+function ecnConnectivityQuery() {
+  var selected_window = $('#i_ecn_connectivity_time_window').val();
+
+  var exp_conditions = {"in":['@name',[
+     "ecn.connectivity.works", "ecn.connectivity.broken",
+     "ecn.connectivity.transient", "ecn.connectivity.offline"
+   ]]};
 
   var exp_ = {"and":[
      exp_conditions,

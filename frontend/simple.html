@@ -22,11 +22,25 @@
         <div class="jumbo">
           <p class="txt-center txt-huge txt-gray row-margin">PTO - Observatory - Simple</p>
           <div class="row-1 row-margin">
-            <p class="bold-emph">ECN Support</p>
-            <form action="javascript:ecnSupportQuery();">
+            <p class="bold-emph">ECN Connectivity</p>
+            <form action="javascript:ecnConnectivityQuery();">
               <p>
-                Show me information about ECN support in the time window
-                <select class="inline" id="i_ecn_support_time_window">
+                Show me information about ECN connectivity in the time window
+                <select class="inline" id="i_ecn_connectivity_time_window">
+                  <option value="Nov 2016" selected>Nov 2016</option>
+                  <option value="Dec 2016">Dec 2016</option>
+                  <option value="Jan 2017">Jan 2017</option>
+                </select>.
+              </p>
+              <button type="submit" class="inline">Submit query</button>
+            </form>
+          </div>
+          <div class="row-1 row-margin">
+            <p class="bold-emph">ECN Negotiation</p>
+            <form action="javascript:ecnNegotiationQuery();">
+              <p>
+                Show me information about ECN negotiation in the time window
+                <select class="inline" id="i_ecn_negotiation_time_window">
                   <option value="Nov 2016" selected>Nov 2016</option>
                   <option value="Dec 2016">Dec 2016</option>
                   <option value="Jan 2017">Jan 2017</option>
