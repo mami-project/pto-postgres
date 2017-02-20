@@ -29,6 +29,11 @@ function sizeToStr(size) {
 }
 
 
+function convertDate(date) {
+  return new Date(date).toUTCString();
+}
+
+
 function renderUploadStats(data) {
   var table = d3.select("#uploadstats");
 
@@ -39,6 +44,8 @@ function renderUploadStats(data) {
   var hrow = table.append("tr");
   hrow.append("th").text("Campaign");
   hrow.append("th").text("Uploads");
+  hrow.append("th").text("From");
+  hrow.append("th").text("To");
   hrow.append("th").text("Size");
 
 
@@ -47,6 +54,8 @@ function renderUploadStats(data) {
     console.log(data[cols[i]]);
     row.append("td").text(cols[i]);
     row.append("td").text(data[cols[i]]['count']).attr("style","text-align: right;");
+    row.append("td").text(convertDate(data[cols[i]]['first_msmnt']));
+    row.append("td").text(convertDate(data[cols[i]]['last_msmnt']));
     row.append("td").text(sizeToStr(data[cols[i]]['file_size'])).attr("style","text-align: right;");
     console.log('row added');
   }
