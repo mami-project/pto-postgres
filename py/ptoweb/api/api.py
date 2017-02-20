@@ -98,6 +98,8 @@ def get_upload_stats():
 
   sql = """
   SELECT campaign, count(*) as count_, 
+         MIN(start_time) AS first_msmnt,
+         MAX(stop_time) AS last_msmnt,
          SUM((metadata ->> 'file_size')::BIGINT)/(1024.0*1024.0) as file_size
   FROM uploads GROUP BY campaign;
   """
@@ -106,7 +108,10 @@ def get_upload_stats():
 
   stats = {}
   for e in dr:
-    stats[e['campaign']] = {'count' : e['count_'], 'file_size' : e['file_size']}
+    stats[e['campaign']] = {'count' : e['count_'], 
+       'first_msmnt' : e['first_msmnt'],
+       'last_msmnt' : e['last_msmnt'],
+       'file_size' : e['file_size']}
 
   put_to_cache('upload-stats', stats, timeout = 15 * 60)
 
