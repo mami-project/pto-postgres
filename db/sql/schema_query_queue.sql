@@ -19,7 +19,8 @@ CREATE TABLE query_queue(
   -- will be filled in by worker. NULL if no
   -- worker has yet looked at this
   start_time TIMESTAMP WITHOUT TIME ZONE,
-  stop_time TIMESTAMP WITHOUT TIME ZONE
+  stop_time TIMESTAMP WITHOUT TIME ZONE,
+  submit_time TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_query_id ON query_queue (id);

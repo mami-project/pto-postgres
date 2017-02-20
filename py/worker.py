@@ -73,7 +73,7 @@ class Worker(th.Thread):
 
       return None
 
-    time_now = int(datetime.now().timestamp())
+    time_now = int(datetime.utcnow().timestamp())
 
     self.db.query("""
     UPDATE %s SET state = 'done', result = '%s'::JSONB,
