@@ -329,11 +329,11 @@ function toRows(data, rows, parent_row, cols) {
 
       for(var i = 0; i < data.length; i++) {
         var row = [];
-        if(i == 0) row = parent_row;
+        if(i == 0 && parent_row != undefined) row = parent_row;
         for(var c = 0; c < cols.length; c++) {
           row.push({'value':data[i][cols[c]], 'rowspan':1});
         }
-        if(i != 0) rows.push(row);
+        if(i != 0 || parent_row == undefined) rows.push(row);
       }
     }
   }

@@ -8,7 +8,7 @@
     <script src="cfg.js"></script>
     <script src="qq.js"></script>
   </head>
-  <body>
+  <body onload="getSummary()">
     <div id="container">
       <div id="nav" class="clear-float">
         <ul style="float: left;">
@@ -26,15 +26,10 @@
           </div>
           <div class="row-1 row-margin">
             <div class="cell">
-              Queries submitted to our observatory can be long running and are therefore queued. Click on any button below. Recent queries
-              will display queries that recentely completed. Running queries will show queries that are currently being executed. New queries
-              are queries still waiting in the query queue for an execution slot to become available.
+              Queries submitted to our observatory can be long running and are therefore queued. The table below shows the most recent queries
+              as well as running or queued queries. For running queries duration shows for how long the query has run so far, for queue queries
+              duration refers to how long the query has been waiting so far and for completed queries duration shows how long the query took to execute.
             </div>
-          </div>
-          <div class="row-3 row-margin">
-             <div class="cell"><button onclick="getRecent()">Show recent queries</button></div>
-             <div class="cell"><button onclick="getRunning()">Show running queries</button></div>
-             <div class="cell"><button onclick="getNew()">Show new queries</button></div>
           </div>
           <div class="row-1 row-margin">
             <div class="cell" id="qq_cell">
