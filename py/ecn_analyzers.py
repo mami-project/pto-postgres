@@ -111,9 +111,9 @@ class PathspiderECNSuperAnalyzer:
         writer.commit()
 
     def interested(self, conditions, metadata):
-        if     'ecn.connectivity.works' not in conditions && \
-               'ecn.connectivity.broken' not in conditions && \
-               'ecn.connectivity.transient' not in conditions && \
+        if     'ecn.connectivity.works' not in conditions and \
+               'ecn.connectivity.broken' not in conditions and \
+               'ecn.connectivity.transient' not in conditions and \
                'ecn.connectivity.offline' not in conditions:
             return false
 
@@ -164,10 +164,10 @@ class PathspiderECNPathDepAnalyzer:
                                value = None)
 
     def interested(self, conditions, metadata):
-        if     'ecn.connectivity.super.works' not in conditions && \
-               'ecn.connectivity.super.broken' not in conditions && \
-               'ecn.connectivity.super.transient' not in conditions && \
-               'ecn.connectivity.super.offline' not in conditions && \
+        if     'ecn.connectivity.super.works' not in conditions and \
+               'ecn.connectivity.super.broken' not in conditions and \
+               'ecn.connectivity.super.transient' not in conditions and \
+               'ecn.connectivity.super.offline' not in conditions and \
                'ecn.connectivity.super.weird' not in conditions
             return false
 
