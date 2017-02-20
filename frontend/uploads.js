@@ -30,7 +30,7 @@ function sizeToStr(size) {
 
 
 function convertDate(date) {
-  return new Date(date).toUTCString();
+  return new Date(date*1000).toUTCString();
 }
 
 
