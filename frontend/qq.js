@@ -67,7 +67,7 @@ function renderSummary(data) {
     tr.append("td").append("a").text(d['id'].substring(0,6)+'...').attr("href","results.html?" + encodeURIComponent(d['id'])).attr("class","linky2");
     tr.append("td").text(states[d['state']]);
     tr.append("td").text(toMinutes(d['duration']));
-    tr.append("td").text(JSON.stringify(d['iql'])).attr("class","code").attr("style", "text-align: left");
+    tr.append("td").html(toEnglish(d['iql'])).attr("class","code").attr("style", "text-align: left");
   }
 }
 

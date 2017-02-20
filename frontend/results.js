@@ -7,21 +7,6 @@ function loadResults() {
   getResults(id);
 }
 
-var attr_display_names = {
-  "observation_set" : "Observation set",
-  "full_path" : "Path",
-  "name" : "Condition",
-  "count" : "Count",
-  "location" : "Location",
-  "week" : "Week",
-  "month" : "Month"
-};
-
-function attrNameToDisplay(name) {
-  if(name in attr_display_names)
-    return attr_display_names[name];
-  return name;
-}
 
 function findInJSON(query, what, arr) {
   if(typeof(query) != 'object') return;

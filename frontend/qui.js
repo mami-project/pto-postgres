@@ -173,7 +173,7 @@ function runQuery() {
   var iql_condition_parts = [];
 
   for(var i = 0; i < related_conditions.length; i++) {
-    iql_condition_parts.push({"eq":["@name",related_conditions[i]]});
+    iql_condition_parts.push(related_conditions[i]);
   }
 
   console.log('iql_condition_parts', JSON.stringify(iql_condition_parts));
@@ -181,12 +181,16 @@ function runQuery() {
   iql_time_parts = [];
 
   if(time_from != "")
-    iql_time_parts.push({"ge":["@time_from",{"time":[toDate(time_from)]}]})
+    iql_time_parts.push({"ge":["@time_from",{"time":[toDate(time_from)]}]});
+  else
+    iql_time_parts.push({"ge":["@time_from",{"time":[0]}]});
 
   if(time_to != "")
-    iql_time_parts.push({"le":["@time_to",{"time":[toDate(time_to)]}]})
+    iql_time_parts.push({"le":["@time_to",{"time":[toDate(time_to)]}]});
+  else
+    iql_time_parts.push({"le":["@time_to",{"time":[Math.floor(new Date().getTime()/1000)]}]});
 
-  var exp_ = {"or":iql_condition_parts};
+  var exp_ = {"in":["@name",iql_condition_parts]};
 
   if(iql_time_parts.length == 0) {
     exp_ = exp_;
