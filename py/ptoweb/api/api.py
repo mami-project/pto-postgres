@@ -473,6 +473,39 @@ def api_qq_recent():
     return json500({"error": "Internal Server Error"})
 
 
+@app.route('/qq/summary')
+def api_qq_summary():
+  sql = """
+  (SELECT id, iql,
+   (CASE WHEN ( (stop_time IS NOT NULL) AND (start_time IS NOT NULL) ) THEN
+     EXTRACT ( EPOCH FROM (stop_time - start_time ) )
+    ELSE
+     (CASE WHEN (start_time IS NOT NULL) THEN
+       EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - start_time))
+      ELSE
+       NULL END) END) AS duration
+  FROM query_queue WHERE state = 'running' OR state = 'new')
+  UNION
+  (SELECT id, iql,
+   (CASE WHEN ( (stop_time IS NOT NULL) AND (start_time IS NOT NULL) ) THEN
+     EXTRACT ( EPOCH FROM (stop_time - start_time ) )
+    ELSE
+     (CASE WHEN (start_time IS NOT NULL) THEN
+       EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - start_time))
+      ELSE
+       NULL END) END) AS duration
+  FROM query_queue WHERE state = 'done' ORDER BY stop_time DESC
+  LIMIT 12);
+  """
+  
+  try:
+    dr = get_db().query(sql).dictresult()
+    return json200(dr)
+  except Exception as error:
+    print(error)
+    return json500({"error" : "Internal Server Error!"})
+
+
 @app.route('/qq/running')
 def api_qq_running():
   query = """
