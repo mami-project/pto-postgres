@@ -24,12 +24,12 @@ function convertGrouping(grouping, distinct) {
     count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[0]) + '</i>';
   }
   else if(grouping.length == 2) {
-    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[0]) + '</i> grouped by ';
-    count_str += '<i>' + attrNameToDisplay(grouping[1]) + '</i>';
+    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[1]) + '</i> grouped by ';
+    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i>';
   }
   else if(grouping.length == 3) {
-    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[0]) + '</i> grouped by ';
-    count_str += '<i>' + attrNameToDisplay(grouping[2]) + '</i> then by <i>' + attrNameToDisplay(grouping[1]) + '</i>';
+    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[2]) + '</i> grouped by ';
+    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i> then by <i>' + attrNameToDisplay(grouping[1]) + '</i>';
   }
   
   return count_str;
