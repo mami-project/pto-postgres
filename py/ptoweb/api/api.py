@@ -496,7 +496,7 @@ def api_qq_summary():
       ELSE
        NULL END) END) AS duration
   FROM query_queue WHERE state = 'done' ORDER BY stop_time DESC
-  LIMIT 12)) ORDER BY stop_time DESC;
+  LIMIT 12)) summary ORDER BY stop_time DESC;
   """
   
   try:
