@@ -2,12 +2,24 @@
 
 $().ready(loadResults);
 
+/**
+ * loadResults
+ *
+ * Download results from server. Reads window.location for the query id
+ */
 function loadResults() {
   var id = window.location.search.substring(1);
   getResults(id);
 }
 
-
+/**
+ * findINJSON
+ *  - query - query
+ *  - what - what to look for
+ *  - arr - where to place results
+ *
+ * searches through JSON
+ */
 function findInJSON(query, what, arr) {
   if(typeof(query) != 'object') return;
   var keys = Object.keys(query);
@@ -19,6 +31,13 @@ function findInJSON(query, what, arr) {
   }
 }
 
+/**
+ * extractTimestamps
+ *  - query - query
+ *
+ * Tries to extract timestamps from a query and convert
+ * them to human readable strings
+ */
 function extractTimestamps(query) {
   var timestamps = [];
   findInJSON(query, 'time', timestamps);
@@ -35,6 +54,12 @@ function extractTimestamps(query) {
   return timestamps;
 }
 
+/**
+ * renderCounts
+ *  - results - results
+ *  - group_order - grouping of the query
+ *  - distinct - distinct count or regular count?
+ */
 function renderCounts(results, group_order, distinct) {
   if(!Array.isArray(group_order)) {
     console.log("group_order not an array");
@@ -168,7 +193,12 @@ function renderCounts(results, group_order, distinct) {
   }
 }
 
-
+/**
+ * renderResults
+ *  - results - results
+ *
+ * Renders the results
+ */
 function renderResults(results) {
 
   if(results['state'] == 'new') {
@@ -247,7 +277,11 @@ function renderResults(results) {
   }
 }
 
-
+/**
+ * showError
+ * 
+ * AJAX callback. Called on error
+ */
 function showError(xhr, status) {
   console.log('estatus',xhr.status);
   if(xhr.status == 404) {
@@ -258,7 +292,12 @@ function showError(xhr, status) {
   }
 }
 
-
+/**
+ * getResults
+ *  - id - query id
+ *
+ * Make an AJAX request to the API to download the results
+ */
 function getResults(id) {
   var request = 
     $.ajax(
@@ -267,6 +306,13 @@ function getResults(id) {
      .fail(showError);
 }
 
+/**
+ * renderTable
+ *  - data - data
+ *  - group_order - grouping
+ *
+ * Render the table
+ */
 function renderTable(data, group_order) {
   console.log('render_table');
   console.log('group_order', group_order);
@@ -313,6 +359,12 @@ function renderTable(data, group_order) {
   $('#table_section').css('display','block');
 }
 
+/**
+ * calcRowSpan
+ *  - data
+ *
+ * Calculate row span
+ */
 function calcRowSpan(data) {
   if($.isArray(data)) {
     return data.length;
@@ -327,6 +379,15 @@ function calcRowSpan(data) {
   }
 }
 
+/**
+ * toRows
+ *  - data
+ *  - rows
+ *  - parent_row
+ *  - cols - "true" columns not affected by row spans
+ *
+ * Convert data structure to html table structure with row spans
+ */
 function toRows(data, rows, parent_row, cols) {
   if($.isArray(data)) {
     if(data.length > 0) { 
@@ -368,6 +429,7 @@ function toRows(data, rows, parent_row, cols) {
   }
 }
 
+/** DEPRECATED **/
 function renderTableStructure(data, tbl, cols, lvl) {
   if($.isArray(data)) {
     console.log("got array");
@@ -399,6 +461,13 @@ function renderTableStructure(data, tbl, cols, lvl) {
   }
 }
 
+/**
+ * groupAll
+ *  - data
+ *  - bys
+ *
+ * Group data into a dict
+ */
 function groupAll(data, bys) {
   if(bys.length == 0)
     return data;
@@ -414,6 +483,7 @@ function groupAll(data, bys) {
   return groups;
 }
 
+/** helper function for groupAll **/
 function group(data, by) {
   var groups = {};
   for(var i = 0; i < data.length; i++) {
@@ -430,6 +500,7 @@ function group(data, by) {
   return groups;
 }
 
+/** Simple table for ungrouped data **/
 function table(data) {
   var table = d3.select("#tables").append("table").attr("class","table");
 
@@ -452,6 +523,14 @@ function table(data) {
   $('#table_section').css('display','block');
 }
 
+/**
+ * trimLongStr
+ *  - str
+ *  - max_len_
+ * 
+ * Trim long strings to max_len_ length
+ * using ...
+ */
 function trimLongStr(str, max_len_) {
   if(str == null || str == undefined) return "";
 
@@ -479,6 +558,12 @@ function trimLongStr(str, max_len_) {
 }
 
 
+/**
+ * to_e
+ *  - num
+ *
+ * Convert a number to e-notation
+ */
 function to_e(num) {
   if(num < 10000)
     return num;
@@ -488,7 +573,16 @@ function to_e(num) {
   return "" + b + "e" + lg;
 }
 
-
+/**
+ * renderHBarStacked
+ *  - groups - groups (data)
+ *  - title - title of the graph
+ *  - counted_attribute - the attribute that was counted
+ *  - group_by - by what was grouped by
+ *  - caption - caption
+ *
+ * render a stacked hbar chart
+ */
 function renderHBarStacked(groups, title, counted_attribute, group_by, caption) {
   console.log('renderHBarStacked', groups, title, counted_attribute);
 
@@ -631,6 +725,14 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   $('#chart_section').css('display','block');
 }
 
+/**
+ * renderHBar
+ *  - data
+ *  - title - title of the chart
+ *  - counted_attribute - the attribute that was counted
+ *
+ * render an hbar chart
+ */
 function renderHBar(data, title, counted_attribute) {
 
   console.log('chart',data);

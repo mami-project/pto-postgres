@@ -1,4 +1,10 @@
-
+/**
+ * is_prefix
+ *  - xs
+ *  - ys
+ *
+ * Returns true if xs is a prefix of ys
+ */
 function is_prefix(xs, ys) {
   if (xs.length > ys.length) {
     return false;
@@ -12,11 +18,24 @@ function is_prefix(xs, ys) {
   return true;
 }
 
+
+/**
+ * process_failed_response
+ *
+ * AJAX callback
+ * called on failure
+ */
 function process_failed_response(data) {
   alert('failed :(');
   console.log(JSON.stringify(data));
 }
 
+/**
+ * process_successful_response
+ *
+ * AJAX callback
+ * called on success
+ */
 function process_successful_response(data) {
   console.log(JSON.stringify(data));
   if("already" in data) {
@@ -36,7 +55,12 @@ function process_successful_response(data) {
 
 }
 
-
+/**
+ * toDate
+ *  date_s - date as string
+ *
+ * convert to unix timestamp
+ */
 function toDate(date_s) {
 
   date_s = date_s.replace("start","00:00:00 GMT+0000");
@@ -51,6 +75,12 @@ function toDate(date_s) {
 }
 
 
+/**
+ * submitQuery
+ *  - query : json
+ *
+ * submit the query to the api
+ */
 function submitQuery(query) {
   var str_query = JSON.stringify(query);
 
@@ -63,12 +93,21 @@ function submitQuery(query) {
   request.fail(process_failed_response); 
 }
 
+/**
+ * Time window presets for simple querys
+ */
 var windows = {
     "Nov 2016" : [toDate("01 Nov 2016 start"), toDate("30 Nov 2016 end")],
     "Dec 2016" : [toDate("01 Dec 2016 start"), toDate("31 Dec 2016 end")],
     "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2017 end")]
 };
 
+/**
+ * ecnNegotiationQuery
+ *
+ * simple query for ecn.negotiation_attempt
+ * reads time_window
+ */
 function ecnNegotiationQuery() {
   var selected_window = $('#i_ecn_negotiation_time_window').val();
 
@@ -88,6 +127,12 @@ function ecnNegotiationQuery() {
   submitQuery(query);
 }
 
+/**
+ * ecnConnectivityQuery
+ *
+ * simple query for ecn.connectivity.*
+ * reads time_window
+ */
 function ecnConnectivityQuery() {
   var selected_window = $('#i_ecn_connectivity_time_window').val();
 
@@ -107,6 +152,12 @@ function ecnConnectivityQuery() {
   submitQuery(query);
 }
 
+/**
+ * toggle
+ *  - ids - suffixes of elements to hide
+ *
+ * will also set values of the i_ elements to empty
+ */
 function toggle(ids) {
   for(var i = 0; i < ids.length; i++) {
     $('#i_' + ids[i]).val('');
@@ -120,6 +171,11 @@ function toggle(ids) {
   }
 }
 
+/**
+ * hideGroups
+ * 
+ * hide the per/group by/then by if count is no_
+ */
 function hideGroups() {
   var count = $('#i_count').val();
 
@@ -139,7 +195,10 @@ function hideGroups() {
   }
 }
 
-
+/**
+ * submit/run a query
+ * will read the inputs
+ */
 function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
