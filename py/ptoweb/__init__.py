@@ -1,5 +1,7 @@
 from flask import Flask, g
 from pg import DB
+from pto_config import DefaultConfig
+
 import iql.convert as iqlc
 
 app = Flask(__name__)

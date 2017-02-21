@@ -1,0 +1,12 @@
+GRANT SELECT, UPDATE ON SEQUENCE public.condition_tree_cid_seq TO sten;
+GRANT SELECT, UPDATE ON SEQUENCE public.observation_set_osid_seq TO sten;
+GRANT SELECT, UPDATE ON SEQUENCE public.observation_oid_seq TO sten;
+GRANT SELECT, UPDATE ON SEQUENCE public.observation_set_metadata_osid_seq TO sten;
+GRANT SELECT, UPDATE ON SEQUENCE public.observation_set_osid_seq TO sten;
+GRANT SELECT, UPDATE ON SEQUENCE public.observation_set_revision_revision_seq TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.condition_tree TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.observation TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.observation_set TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.observation_set_dependencies TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.observation_set_metadata TO sten;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE public.observation_set_revision TO sten;
