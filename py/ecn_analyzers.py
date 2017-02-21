@@ -14,13 +14,12 @@ class PathspiderECNRawAnalyzer:
         pass
 
     def run(self, reader, writer, metadata):
-
         writer.begin()
         
-        writer['pathspider.ecn'] = 'yes'
-
         for line in reader:
             raw_obs = json.loads(line)
+
+            #FIXME rewrite observation names here as needed.
 
             for condition in raw_obs['conditions']:
                 writer.observe(start_time = dateutil.parser.parse(raw_obs['time']['from']),
