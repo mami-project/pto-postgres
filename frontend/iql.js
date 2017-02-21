@@ -8,6 +8,13 @@ var attr_display_names = {
   "month" : "Month"
 };
 
+/**
+ * attrNameToDisplay
+ *  - name
+ *
+ * Convert the name of an attribute to human readable
+ * names.
+ */
 function attrNameToDisplay(name) {
   if(name.indexOf('@') == 0 || name.indexOf('$') == 0)
     name = name.substring(1);
@@ -17,6 +24,11 @@ function attrNameToDisplay(name) {
   return name;
 }
 
+/**
+ * convertGrouping
+ *  - grouping - arr (group order)
+ *  - distinct (ALREADY AS DISPLAY) - name of the attribute that was counted. (or observations)
+ */
 function convertGrouping(grouping, distinct) {
   var count_str;
 
@@ -40,6 +52,12 @@ function convertGrouping(grouping, distinct) {
   return count_str;
 }
 
+/**
+ * extractPathCriteria
+ *  - ands - query part
+ *
+ * Tries to extract the path criteria from a query if possible
+ */
 function extractPathCriteria(ands) {
   if(ands.length == 0)
     return "";
@@ -64,6 +82,12 @@ function extractPathCriteria(ands) {
   return parts.join('<br><b>and</b> ');
 }
 
+/**
+ * convertSimple
+ *  - simple - query part
+ *
+ * converts the 'simple' part of a query to english.
+ */
 function convertSimple(simple) {
   console.log('simple', JSON.stringify(simple));
 
@@ -174,6 +198,9 @@ function convertSimple(simple) {
   return str;
 }
 
+/**
+ * helper function for toEnglish
+ */
 function convertIQL(iql) {
   var query = iql['query'];
   
@@ -215,6 +242,17 @@ function convertIQL(iql) {
   throw "Can't convert this at all";
 }
 
+/**
+ * toEnglish
+ *  - iql
+ *  - default_ - default text
+ * 
+ * convert IQL to english (html).
+ * if default_ is undefined in case no translation
+ * is available it returns the IQL as string.
+ * if default_ is set in case no translation is available
+ * it returns default_.
+ */
 function toEnglish(iql, default_) {
   try {
     return convertIQL(iql);
