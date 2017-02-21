@@ -154,6 +154,9 @@ function runQuery() {
   var sources = source.split(',');
   var targets = target.split(',');
 
+  if(source == "") sources = [];
+  if(target == "") targets = [];
+
   for(var i = 0; i < sources.length; i++)
     sources[i] = sources[i].trim();
 
