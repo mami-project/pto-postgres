@@ -56,8 +56,10 @@ function renderCounts(results, group_order, distinct) {
   if(distinct === true) {
     if(group_order.length >= 1)
       counted_attribute = group_order.pop().substring(1);
-    else
+    else {
+      renderTable(results, group_order);
       return;
+    }
   }
 
   for(var i = 0; i < group_order.length; i++) {
