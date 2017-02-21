@@ -20,12 +20,20 @@
       </div>
       <div id="main">
         <h1>Custom Query</h1>
+        <div class="msg" id="query_msg">
+          Please specify your query criteria 
+          and then click on 'Run Query' to submit the query. 
+          Your query will be submitted to a queue and 
+          you'll be provided a link to retrieve the results. 
+        </div>
+        <br>
         <form action="javascript:runQuery();">
           <fieldset>
-            <legend>Conditions</legend>
+            <legend>Query</legend>
             <div class="row-2">
               <div class="cell">
                 <label>Conditions</label>
+                <!--<img src="information-circle.jpg" height="10px" onmouseover="do()">-->
               </div>
               <div class="cell">
                 <select id="i_conditions">
@@ -45,76 +53,85 @@
                 <label>Count</label>
               </div>
               <div class="cell">
-                <select id="i_count" onchange="hideGroups()">
-                  <option value="no" selected>Observations (default)</option>
-                  <option value="full_path">Paths</option>
-                  <option value="target">Target</option>
-                  <option value="source">Source</option>
-                  <option value="observation_set">Observation sets</option>
-                  <option value="name">Conditions</option>
-                  <option value="no_">Don't count</option>
-                </select><br>
+				  <div class="row-3">
+					  <div class="cell">
+						<select id="i_count" onchange="hideGroups()">
+						  <option value="no" selected>Observations</option>
+						  <!--<option value="full_path">Paths</option>-->
+						  <option value="target">Target</option>
+						  <option value="source">Source</option>
+						  <!--<option value="observation_set">Observation sets</option>-->
+						  <!--<option value="name">Conditions</option>-->
+						  <!--<option value="no_">Don't count</option>-->
+						</select>
+					  </div>
+					  <div class="mylabel">
+						<label>per</label>
+					  </div>
+					  <div class="cell">
+						<select id="i_per" disabled onchange="disableSelection()">
+						  <option value="name" selected>Condition</option>
+						  <option value="week">Week</option>
+						  <option value="month">Month</option>
+						  <option value="year">Year</option>
+						  <!--<option value="full_path">Path</option>--!
+						  <option value="target">Target</option>
+						  <option value="source">Source</option>
+						  <!--<option value="no">globally (don't group)</option>-->
+						</select>
+					  </div>
+					  <div class="lock">
+						<img src="unlock.png" height="100%" onclick="unlockPer()">
+					  </div>
+				  </div>
               </div>
             </div>
-            <div class="row-2" id="c_per">
-              <div class="cell">
-                <label>per</label>
-              </div>
-              <div class="cell">
-                <select id="i_per">
-                  <option value="name" selected>Condition (default)</option>
-                  <option value="week">Week</option>
-                  <option value="month">Month</option>
-                  <option value="year">Year</option>
-                  <option value="full_path">Path</option>
-                  <option value="target">Target</option>
-                  <option value="source">Source</option>
-                  <option value="no">globally (don't group)</option>
-                </select><br>
-              </div>
-            </div>
+            </fieldset>
+            <fieldset>
+            <legend>Grouping (optional)</legend>
+            <p>Select additional criteria to group the results data (in separate rows in results table and as input for graphical representation) or leave empty.<br><br></p>
             <div class="row-2" id="c_group_by">
               <div class="cell">
-                <label>grouped by</label>
+                <label>1. level </label>
               </div>
               <div class="cell">
-                <select id="i_group_by">
+                <select id="i_group_by" onchange="showThenBy()">
                   <option value="observation_set">Observation set</option>
-                  <option value="full_path">Path</option>
-                  <option value="name">Condition</option>
+                  <!--<option value="full_path">Path</option>-->
+                  <option value="name" disabled>Condition</option>
                   <option value="week">Week</option>
                   <option value="month">Month</option>
                   <option value="year">Year</option>
-                  <option value="location">Location</option>
+                  <!--<option value="location">Location</option>-->
                   <option value="target">Target</option>
                   <option value="source">Source</option>
-                  <option value="no" selected>Don't group (default)</option>
+                  <option value="no" selected></option>
                 </select>
               </div>
             </div>
-            <div class="row-2" id="c_then_by">
+            <div class="row-2" id="c_then_by" style="display:none">
               <div class="cell">
-                <label>... then by</label>
+                <label>2. level</label>
               </div>
               <div class="cell">
                 <select id="i_then_by">
                   <option value="observation_set">Observation set</option>
-                  <option value="full_path">Path</option>
-                  <option value="name">Condition</option>
+                  <!--<option value="full_path">Path</option>-->
+                  <option value="name" disabled>Condition</option>
                   <option value="week">Week</option>
                   <option value="month">Month</option>
                   <option value="year">Year</option>
-                  <option value="location">Location</option>
+                  <!--<option value="location">Location</option>-->
                   <option value="target">Target</option>
                   <option value="source">Source</option>
-                  <option value="no" selected>Don't group (default)</option>
+                  <option value="no" selected></option>
                 </select>
               </div>
             </div>   
           </fieldset>
           <fieldset>
-            <legend>Time window <a href="#" onclick="toggle(['time_to','time_from'])">[hide/unhide]</a></legend>
-            <p>Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.</p>
+            <legend>Time window <a href="#" onclick="toggle(['time_to','time_from', 'time_text'])">[hide/unhide]</a></legend>
+            <p id="c_time_text">Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.<br><br></p>
             <div class="row-2" id="c_time_from">
               <div class="cell">
                 <label>From</label>
@@ -159,10 +176,6 @@
           <button type="submit">Run query</button>
           </div>
         </form>
-        <div class="msg" id="query_msg">
-          Please specify your query criteria and then click on 'Run Query' to submit the query. Your query
-          will be submitted to a queue and you'll be provided a link to retrieve the results. 
-        </div>
       </div>
     </div>
   </body>

@@ -195,6 +195,36 @@ function hideGroups() {
   }
 }
 
+function unlockPer() {
+  $("#i_per").prop('disabled', false);
+}
+
+function disableSelection() {
+   var per = $("#i_per").val();
+   
+   $('#i_group_by option[value="'+per+'"]').prop('disabled', true).siblings().removeAttr("disabled");
+   
+   $('#i_then_by option[value="'+per+'"]').prop('disabled', true).siblings().removeAttr("disabled");
+   
+   var group_by = $("#i_group_by").val();
+   
+   $('#i_then_by option[value="'+group_by+'"]').prop('disabled', true); 
+}
+
+function showThenBy() {
+  disableSelection()
+  var group_by = $("#i_group_by").val();
+  
+  if(group_by == 'no') {
+    $('#c_then_by').hide();
+    $('#i_then_by').val('no');
+  }
+  else {
+    $('#c_then_by').show();
+  }
+
+}
+
 /**
  * submit/run a query
  * will read the inputs

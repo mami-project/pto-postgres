@@ -225,6 +225,21 @@ td.code {
   box-sizing: border-box;
 }
 
+.mylabel {
+  width: 5%;
+  padding: 10px;
+}
+
+.lock {
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+}
+
+.lock:hover {
+  cursor: pointer
+}
+
 fieldset {
   box-sizing: border-box;
   padding: 0.5rem;
