@@ -113,9 +113,9 @@
             </div>   
           </fieldset>
           <fieldset>
-            <legend>Time window</legend>
+            <legend>Time window <a href="#" onclick="toggle(['time_to','time_from'])">[hide/unhide]</a></legend>
             <p>Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.</p>
-            <div class="row-2">
+            <div class="row-2" id="c_time_from">
               <div class="cell">
                 <label>From</label>
               </div>
@@ -124,12 +124,33 @@
                 <span class="input_info">Leave blank for no restriction.</span>
               </div>
             </div>
-            <div class="row-2">
+            <div class="row-2" id="c_time_to">
               <div class="cell">
                 <label>To</label>
               </div>
               <div class="cell">
                 <input id="i_time_to" type="text"/><br>
+                <span class="input_info">Leave blank for no restriction.</span>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Path criteria <a href="#" onclick="toggle(['source','target'])">[hide/unhide]</a></legend>
+            <div class="row-2" id="c_source">
+              <div class="cell">
+                <label>Source</label>
+              </div>
+              <div class="cell">
+                <input id="i_source" type="text"/><br>
+                <span class="input_info">Leave blank for no restriction.</span>
+              </div>
+            </div>
+            <div class="row-2" id="c_target">
+              <div class="cell">
+                <label>Target</label>
+              </div>
+              <div class="cell">
+                <input id="i_target" type="text"/><br>
                 <span class="input_info">Leave blank for no restriction.</span>
               </div>
             </div>

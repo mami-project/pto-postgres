@@ -46,13 +46,19 @@ function renderCounts(results, group_order, distinct) {
     return;
   }
 
+  console.log('group_order', group_order);
+
   var counted_attribute = group_order[group_order.length-1].substring(1);
   var distinct_attribute = counted_attribute;
 
   group_order.pop();
 
-  if(distinct === true)
-    counted_attribute = group_order.pop().substring(1);
+  if(distinct === true) {
+    if(group_order.length >= 1)
+      counted_attribute = group_order.pop().substring(1);
+    else
+      return;
+  }
 
   for(var i = 0; i < group_order.length; i++) {
     group_order[i] = group_order[i].substring(1);
@@ -208,12 +214,16 @@ function renderResults(results) {
 
 
   var query = iql['query'];
-  var english = toEnglish(iql);
+  var english = toEnglish(JSON.parse(JSON.stringify(iql)), "No english translation for your query available.");
 
   if('count' in query) {
+      console.log('regular count');
       renderCounts(results, query['count'][0]);
   }
   else if('count-distinct' in query) {
+      console.log('distinct count');
+      console.log('qq', JSON.stringify(query['count-distinct']));
+      console.log('[0]', query['count-distinct'][0]);
       renderCounts(results, query['count-distinct'][0], true);
   }
 
@@ -225,7 +235,7 @@ function renderResults(results) {
 
   try {
     console.log('iql', JSON.stringify(iql));
-    $('#results_msg').append('<br><br><span class="">' + english + '</span> ');
+    $('#results_msg').append('<br><br><span class="">' + english + '</span><br>');
   }
   catch(err) { }
 

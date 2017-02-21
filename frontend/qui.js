@@ -107,6 +107,19 @@ function ecnConnectivityQuery() {
   submitQuery(query);
 }
 
+function toggle(ids) {
+  for(var i = 0; i < ids.length; i++) {
+    $('#i_' + ids[i]).val('');
+    var c = $('#c_' + ids[i]);
+    if(c.css('display') == 'none') {
+      c.css('display', 'flex');
+    }
+    else {
+      c.css('display', 'none');
+    }
+  }
+}
+
 function hideGroups() {
   var count = $('#i_count').val();
 
@@ -135,6 +148,17 @@ function runQuery() {
   var time_to = $("#i_time_to").val();
   var count = $("#i_count").val();
   var per = $('#i_per').val();
+  var source = $('#i_source').val();
+  var target = $('#i_target').val();
+
+  var sources = source.split(',');
+  var targets = target.split(',');
+
+  for(var i = 0; i < sources.length; i++)
+    sources[i] = sources[i].trim();
+
+  for(var i = 0; i < targets.length; i++)
+    targets[i] = targets[i].trim();
 
   if(count == 'no_') {
     if(group_by != "no" || then_by != "no" || per != "no") {
@@ -237,6 +261,12 @@ function runQuery() {
   else if(iql_time_parts.length == 2) {
     exp_ = {"and":[exp_,iql_time_parts[0],iql_time_parts[1]]};
   }
+
+  if(targets.length > 0)
+    exp_['and'].push({'in':['@target', targets]});
+
+  if(sources.length > 0)
+    exp_['and'].push({'in':['@source', sources]});
 
   var iql_count_parts = [];
   var query = {};

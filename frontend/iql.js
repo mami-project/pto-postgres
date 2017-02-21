@@ -22,19 +22,46 @@ function convertGrouping(grouping, distinct) {
 
   console.log('grouping',grouping);
 
+  if(grouping.length == 0) {
+    count_str = '<b>Count</b> <i>' + distinct + 's</i>';
+  }
   if(grouping.length == 1) {
-    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[0]) + '</i>';
+    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[0]) + '</i>';
   }
   else if(grouping.length == 2) {
-    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[1]) + '</i> grouped by ';
+    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[1]) + '</i><br><b>grouped by</b> ';
     count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i>';
   }
   else if(grouping.length == 3) {
-    count_str = 'Count <i>' + distinct + 's</i> per <i>' + attrNameToDisplay(grouping[2]) + '</i> grouped by ';
-    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i> then by <i>' + attrNameToDisplay(grouping[1]) + '</i>';
+    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[2]) + '</i><br><b>grouped by</b> ';
+    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i><br><b>then by</b> <i>' + attrNameToDisplay(grouping[1]) + '</i>';
   }
   
   return count_str;
+}
+
+function extractPathCriteria(ands) {
+  if(ands.length == 0)
+    return "";
+
+  var parts = [];
+  for(var i = 0; i < ands.length; i++) {
+    var and_ = ands[i];
+    if(!('in' in and_))
+      throw "Can't convert this. #19";
+
+    var in_ = and_['in'];
+
+    if(in_.length != 2)
+      throw "Can't convert this. #20";
+
+    var attr = in_[0];
+    var values = in_[1];
+
+    parts.push(attrNameToDisplay(attr) + ' <b>is one of</b> (' + values.join(', ') + ')');
+  }
+
+  return parts.join('<br><b>and</b> ');
 }
 
 function convertSimple(simple) {
@@ -135,9 +162,16 @@ function convertSimple(simple) {
     throw "Can't convert this. #18";
     
   var time_to = le_time[0];
-  
-  return " for conditions " + condition + '<br>from <i>' + new Date(time_from*1000.0).toUTCString()
-    + '</i><br>to <i>' + new Date(time_to*1000.0).toUTCString() + '</i>';
+
+  var path_criteria = extractPathCriteria(ands.slice(3));
+
+  var str = " <b>restricted to</b> conditions <u>" + condition + '</u><br><b>from</b> <i>' + new Date(time_from*1000.0).toUTCString()
+    + '</i><br><b>to</b> <i>' + new Date(time_to*1000.0).toUTCString() + '</i>';
+
+  if(path_criteria != "")
+    str += '<br><b>where</b> ' + path_criteria;
+
+  return str;
 }
 
 function convertIQL(iql) {
@@ -173,14 +207,23 @@ function convertIQL(iql) {
 
     return count_str;
   }
+  else if('all' in query) {
+    console.log('all');
+    return "All observations " + convertSimple(query['all'][0]['simple']);
+  }
+  
+  throw "Can't convert this at all";
 }
 
-function toEnglish(iql) {
+function toEnglish(iql, default_) {
   try {
     return convertIQL(iql);
   }
   catch(err) {
     console.log(err, JSON.stringify(iql));
-    return JSON.stringify(iql);
+    if(default_ == undefined)
+      return JSON.stringify(iql);
+    else
+      return default_;
   }
 }
