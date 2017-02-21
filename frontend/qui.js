@@ -107,6 +107,25 @@ function ecnConnectivityQuery() {
   submitQuery(query);
 }
 
+function hideGroups() {
+  var count = $('#i_count').val();
+
+  if(count == 'no_') {
+    $('#c_group_by').css("display","none");
+    $('#c_per').css("display","none");
+    $('#c_then_by').css("display","none");
+
+    $('#i_group_by').val('no');
+    $('#i_per').val('no');
+    $('#i_then_by').val('no');
+  }
+  else {
+    $('#c_group_by').css("display","flex");
+    $('#c_per').css("display","flex");
+    $('#c_then_by').css("display","flex");
+  }
+}
+
 
 function runQuery() {
   var conditions = $("#i_conditions").val();

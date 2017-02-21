@@ -45,7 +45,7 @@
                 <label>Count</label>
               </div>
               <div class="cell">
-                <select id="i_count">
+                <select id="i_count" onchange="hideGroups()">
                   <option value="no" selected>Observations (default)</option>
                   <option value="full_path">Paths</option>
                   <option value="target">Target</option>
@@ -56,7 +56,7 @@
                 </select><br>
               </div>
             </div>
-            <div class="row-2">
+            <div class="row-2" id="c_per">
               <div class="cell">
                 <label>per</label>
               </div>
@@ -73,7 +73,7 @@
                 </select><br>
               </div>
             </div>
-            <div class="row-2">
+            <div class="row-2" id="c_group_by">
               <div class="cell">
                 <label>grouped by</label>
               </div>
@@ -92,7 +92,7 @@
                 </select>
               </div>
             </div>
-            <div class="row-2">
+            <div class="row-2" id="c_then_by">
               <div class="cell">
                 <label>... then by</label>
               </div>
