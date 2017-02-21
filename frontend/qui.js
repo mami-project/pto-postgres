@@ -248,7 +248,7 @@ function runQuery() {
   if(time_to != "")
     iql_time_parts.push({"le":["@time_to",{"time":[toDate(time_to)]}]});
   else
-    iql_time_parts.push({"le":["@time_to",{"time":[Math.floor(new Date().getTime()/1000)]}]});
+    iql_time_parts.push({"le":["@time_to",{"time":[Math.floor(new Date("31 Dec 2037 23:59:59 GMT").getTime()/1000)]}]});
 
   var exp_ = {"in":["@name",iql_condition_parts]};
 
