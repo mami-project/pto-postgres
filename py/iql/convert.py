@@ -217,8 +217,8 @@ def convert(query, config = Config()):
         U.expect_int(settings['limit'], "`settings.limit'")
         context.limit = settings['limit']
 
-        if context.limit >= 500 or context.limit <= 0:
-          context.limit = 500
+        if context.limit >= context.MAX_LIMIT or context.limit <= 0:
+          context.limit = context.MAX_LIMIT
 
         if 'skip' in settings:
           U.expect_int(settings['skip'], "`settings.skip'")
