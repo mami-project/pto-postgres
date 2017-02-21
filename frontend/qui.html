@@ -37,11 +37,11 @@
               </div>
               <div class="cell">
                 <select id="i_conditions">
-                  <option value="ecn.ce">ecn.ce.*</option>
                   <option value="ecn.connectivity">ecn.connectivity.*</option>
                   <option value="ecn.connectivity.super">ecn.connectivity.super.*</option>
-                  <option value="ecn.ect_one">ect.ect_one.*</option>
-                  <option value="ecn.ect_zero">ect.ect_zero.*</option>
+                  <option value="ecn.ce">ecn.ipmark.ce.*</option>
+                  <option value="ecn.ect_one">ecn.ipmark.ect_one.*</option>
+                  <option value="ecn.ect_zero">ecn.ipmark.ect_zero.*</option>
                   <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.*</option>
                   <option value="ecn.site_dependent">ecn.site_dependent.*</option>
                   <option value="ecn.path_dependent">ecn.path_dependent.*</option>
@@ -55,7 +55,7 @@
               <div class="cell">
 				  <div class="row-3">
 					  <div class="cell">
-						<select id="i_count" onchange="hideGroups()">
+						<select id="i_count" <!--onchange="hideGroups()"-->>
 						  <option value="no" selected>Observations</option>
 						  <!--<option value="full_path">Paths</option>-->
 						  <option value="target">Target</option>
