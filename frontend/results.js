@@ -9,7 +9,10 @@ $().ready(loadResults);
  */
 function loadResults() {
   var id = window.location.search.substring(1);
-  getResults(id);
+  if(id.length > 1)
+    getResults(id);
+  else
+   console.log('no query string');
 }
 
 /**
@@ -199,7 +202,9 @@ function renderCounts(results, group_order, distinct) {
  *
  * Renders the results
  */
-function renderResults(results) {
+function renderResults(results, query_id) {
+
+  $('#results').css('display','block');
 
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
@@ -264,6 +269,7 @@ function renderResults(results) {
   }
 
   $('#results_msg').empty().append('<span class="txt-info">Your results are visible below.</span> ');
+  $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
 
   try {
     console.log('iql', JSON.stringify(iql));
@@ -302,7 +308,7 @@ function getResults(id) {
   var request = 
     $.ajax(
       {'url' : api_base + '/result?id=' + encodeURIComponent(id)})
-     .done(renderResults)
+     .done(function(data) { renderResults(data, id) })
      .fail(showError);
 }
 

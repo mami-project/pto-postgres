@@ -39,20 +39,11 @@ function process_failed_response(data) {
 function process_successful_response(data) {
   console.log(JSON.stringify(data));
   if("already" in data) {
-    $("#query_msg").empty()
-    .append(new Date().toString() + '<br>')
-    .append('The results for your query are already present. ')
-    .append('Please click on the link below to retrieve your results: <br>')
-    .append('<a href="results.html?' + encodeURIComponent(data['query_id']) + '">Retrieve results</a>');
+    renderResults(data['already'], data['query_id']);
   }
   else {
-    $("#query_msg").empty()
-    .append(new Date().toString() + '<br>')
-    .append('Your query has been submitted and has been put into a queue. You can retrieve your results ')
-    .append('through the link below: <br>')
-    .append('<a href="results.html?' + encodeURIComponent(data['query_id']) + '">Retrieve results</a>');
+    getResults(data['query_id']);
   }
-
 }
 
 /**
