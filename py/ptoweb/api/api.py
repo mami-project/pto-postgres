@@ -57,6 +57,9 @@ def cors(resp):
   resp.headers['Access-Control-Allow-Origin'] = '*'
   return resp
 
+def json200_octet_stream(obj):
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=200, mimetype='application/octet-stream'))
+
 def json200(obj):
   return cors(Response(json.dumps(obj, cls=CustomEncoder), status=200, mimetype='application/json'))
 
@@ -70,7 +73,7 @@ def json404(obj):
   return cors(Response(json.dumps(obj, cls=CustomEncoder), status=404, mimetype='application/json'))
 
 def json500(obj):
-  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=404, mimetype='application/json'))
+  return cors(Response(json.dumps(obj, cls=CustomEncoder), status=500, mimetype='application/json'))
 
 def text200(obj):
   return cors(Response(obj, status=200, mimetype='text/plain'))
@@ -326,7 +329,7 @@ def api_revoke_key():
 @app.route("/result")
 def api_result():
   query_id = request.args.get('id')
-
+  download = request.agrs.get('download')
 
   sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_id))
 
@@ -346,8 +349,10 @@ def api_result():
   if type(item['result']) == type(''):
     item['result'] = json.loads(item['result'])
 
-
-  return json200(dr[0])
+  if download != 'y':
+    return json200(dr[0])
+  else:
+    return jsonn200_octet_stream(dr[0])
 
 
 def check_rate_limit(req, max_reqs = 4):
