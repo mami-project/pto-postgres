@@ -45,7 +45,9 @@ function extractGrouping(grouping, dict) {
 
 
 function extractQuery(iql) {
+  console.log('ex iql', JSON.stringify(iql));
   var query = iql['query'];
+  console.log('ex query', JSON.stringify(query));
 
   var dict = {};
   

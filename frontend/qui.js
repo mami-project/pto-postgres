@@ -222,6 +222,8 @@ function showThenBy() {
  * will read the inputs
  */
 function runQuery() {
+  $('#results').css('display','none'); //hide it
+
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
   var then_by = $("#i_then_by").val();

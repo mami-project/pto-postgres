@@ -71,7 +71,7 @@ function renderCounts(results, group_order, distinct) {
     return;
   }
 
-  if(results.length < 0) {
+  if(results.length <= 0) {
     console.log("empty result set");
     return;
   }
@@ -207,6 +207,7 @@ function renderCounts(results, group_order, distinct) {
 function renderResults(results, query_id) {
 
   $('#results').css('display','block');
+  document.getElementById('results').scrollIntoView();
 
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
@@ -255,6 +256,15 @@ function renderResults(results, query_id) {
   var query = iql['query'];
   var english = toEnglish(JSON.parse(JSON.stringify(iql)), "No english translation for your query available.");
 
+  /** If possible try to extract form params back from the iql query **/
+  try {
+    var params = extractQuery(iql);
+
+    fillForms(params);
+    $('#qui').css('display','block');
+  }
+  catch(err) {}
+
   if('count' in query) {
       console.log('regular count');
       renderCounts(results, query['count'][0]);
@@ -283,7 +293,33 @@ function renderResults(results, query_id) {
     $('#results_msg').append('<br><span class="txt-warn">You are viewing an incomplete result set because too many results were available!<span> ');
     $('#results_msg').append('<span class="txt-warn">Aggregations done by the UI will be incomplete!</span> ');
   }
+
+
 }
+
+
+function fillForms(params) {
+  console.log(params);
+  var keys = Object.keys(params);
+
+  for(var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var value = params[key];
+
+    if(key.indexOf('time_') >= 0)
+      value = new Date(value*1000).toUTCString();
+
+    if(value.indexOf('@') == 0 || value.indexOf('$') == 0)
+      value = value.substring(1);
+
+    if(key == 'count' && value == 'observations')
+      value = 'no';
+    
+    $('#i_' + key).val(value);
+    console.log('#i_'+key, value);
+  }
+}
+
 
 /**
  * showError
