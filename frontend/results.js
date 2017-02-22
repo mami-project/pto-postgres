@@ -9,8 +9,10 @@ $().ready(loadResults);
  */
 function loadResults() {
   var id = window.location.search.substring(1);
-  if(id.length > 1)
+  if(id.length > 1) {
+    $('#qui').css('display','none');
     getResults(id);
+  }
   else
    console.log('no query string');
 }
