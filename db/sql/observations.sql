@@ -1,6 +1,6 @@
 -- FIX THIS FILE observation schema goes here.
 
-DROP VIEW IF EXISTS iql_minimal;
+DROP VIEW IF EXISTS observation_view;
 DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS condition_tree;
 DROP TABLE IF EXISTS observation_set_metadata;
@@ -117,8 +117,7 @@ CREATE TABLE observation (
 
 CREATE UNIQUE INDEX idx_observation_unique_oid ON observation (oid);
 
-
-CREATE VIEW iql_minimal AS
+CREATE VIEW observation_view AS
  SELECT o.oid AS oid, 
         o.full_path AS full_path, 
         o.time_from AS time_from,
@@ -128,7 +127,7 @@ CREATE VIEW iql_minimal AS
         os.roc AS roc,
         os.rov AS rov,
         os.rod AS rod,
-        c.full_name as name
+        c.full_name as condition
  FROM observation o
  JOIN observation_set os
    ON o.observation_set = os.osid
