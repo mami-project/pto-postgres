@@ -209,6 +209,10 @@ function renderResults(results, query_id) {
   $('#results').css('display','block');
   document.getElementById('results').scrollIntoView();
 
+  /** clear previously rendered stuff **/
+  $('#tables').empty();
+  $('#figures').empty();
+
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
     return;
