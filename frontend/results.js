@@ -215,11 +215,13 @@ function renderResults(results, query_id) {
 
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
+    $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
     return;
   }
 
   if(results['state'] == 'running') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is currently being executed and the results are not available yet. Please try again in an hour.</span>');
+    $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
     return;
   }
 
