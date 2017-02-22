@@ -229,7 +229,7 @@ function renderResults(results, query_id) {
 
   var rawResultsDiv = document.getElementById('raw_results');
   var result = results['result'];
-  $('#raw_results').append('<a href="' + api_base + '/result?id=' + encodeURIComponent(results['id']) + '">Download raw results</a>');
+  $('#raw_results').append('<a href="' + api_base + '/result?download=y&id=' + encodeURIComponent(results['id']) + '">Download raw results</a>');
   var iql = results['iql'];
   $('#raw_query').append(JSON.stringify(iql));
 
