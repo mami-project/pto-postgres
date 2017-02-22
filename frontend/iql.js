@@ -247,6 +247,10 @@ function toEnglish(iql, default_) {
       str += '<b>then by</b> ' + attrNameToDisplay(params['then_by']) + '<br>';
     }
 
+    if('conditions' in params) {
+      str += '<b>restricted to</b> conditions <b>matching</b> <u>' + params['conditions'] + '.*</u><br>';
+    }
+
     if('time_from' in params) {
       str +=' <b>from</b> ' + new Date(params['time_from']*1000).toUTCString() + '<br>';
     }
