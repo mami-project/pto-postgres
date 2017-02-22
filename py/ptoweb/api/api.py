@@ -352,7 +352,7 @@ def api_result():
   if download != 'y':
     return json200(dr[0])
   else:
-    return jsonn200_octet_stream(dr[0])
+    return json200_octet_stream(dr[0])
 
 
 def check_rate_limit(req, max_reqs = 4):
