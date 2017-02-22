@@ -207,7 +207,9 @@ function renderCounts(results, group_order, distinct) {
 function renderResults(results, query_id) {
 
   $('#results').css('display','block');
-  document.getElementById('results').scrollIntoView();
+  $('#results_msg').css('display','block');
+  $('#query_msg').css('display','none');
+  $("#results")[0].scrollIntoView();
 
   /** clear previously rendered stuff **/
   $('#tables').empty();
@@ -260,7 +262,7 @@ function renderResults(results, query_id) {
 
 
   var query = iql['query'];
-  var english = toEnglish(JSON.parse(JSON.stringify(iql)), "No english translation for your query available.");
+  var querytext = toEnglish(JSON.parse(JSON.stringify(iql)), "No english translation for your query available.");
 
   /** If possible try to extract form params back from the iql query **/
   try {
@@ -286,12 +288,12 @@ function renderResults(results, query_id) {
     table(results);
   }
 
-  $('#results_msg').empty().append('<span class="txt-info">Your results are visible below.</span> ');
-  $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
+  $('#results_msg').empty().append('<span class="txt-info"><a href=#results>Your results are visible below.</a></span> ');
+  $('#results_msg').append('<br><br><span class="txt-small">Query ID: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
 
   try {
     console.log('iql', JSON.stringify(iql));
-    $('#results_msg').append('<br><br><span class="">' + english + '</span><br>');
+    $('#results_msg').append('<br><br><span class="txt-small">' + querytext + '</span><br>');
   }
   catch(err) { }
 
@@ -300,6 +302,8 @@ function renderResults(results, query_id) {
     $('#results_msg').append('<span class="txt-warn">Aggregations done by the UI will be incomplete!</span> ');
   }
 
+  //$('#runbutton').prop('value', 'Run new query');
+  $("#runbutton").html("Run new query");
 
 }
 

@@ -163,6 +163,62 @@ function toggle(ids) {
 }
 
 /**
+ * toggle
+ *  - ids - first element is image of button and others are suffixes of elements to hide
+ *
+ * will also set values of the i_ elements to empty
+ */
+function togglebutton(ids) {
+  var img = $('#' + ids[0]);
+  
+  if(img.attr("src") == "hide.png") {
+    img.attr("src", "show.png");
+    for(var i = 1; i < ids.length; i++) {
+      hideAndClear(ids[i]);
+    }
+  }
+  else {
+    img.attr("src", "hide.png");
+    for(var i = 1; i < ids.length; i++) {
+      //$('#i_' + ids[i]).val('');
+      if(ids[i] != "then_by")
+        show(ids[i]);
+    }
+  }
+}
+
+/**
+  * hideAndClear
+  *
+  * hide div C_ and clear value i_
+  */
+function hideAndClear(id) {
+  $('#i_' + id).val('');
+  var c = $('#c_' + id);
+  c.css('display', 'none');
+}
+
+/**
+  * hide
+  *
+  * hide div C_
+  */
+function hide(id) {
+  var c = $('#c_' + id);
+  c.css('display', 'none');
+}
+
+/**
+  * show
+  *
+  * shows div c_
+  */
+function show(id) {
+  var c = $('#c_' + id);
+  c.css('display', 'flex');
+}
+
+/**
  * hideGroups
  * 
  * hide the per/group by/then by if count is no_
@@ -227,12 +283,22 @@ function runQuery() {
   var conditions = $("#i_conditions").val();
   var group_by = $("#i_group_by").val();
   var then_by = $("#i_then_by").val();
-  var time_from = $("#i_time_from").val();
-  var time_to = $("#i_time_to").val();
+  //var time_from = $("#i_time_from").val();
+  //var time_to = $("#i_time_to").val();
   var count = $("#i_count").val();
   var per = $('#i_per').val();
-  var source = $('#i_source').val();
-  var target = $('#i_target').val();
+  var source = ""; //$('#i_source').val();
+  var target = ""; //$('#i_target').val();
+  
+
+  var source_type = $("input[name='source']:checked"); 
+  if (source_type.length > 0) source = $('#i_source_'+source_type.val()).val();
+  var target_type = $("input[name='target']:checked");
+  if (target_type.length > 0) target = $('#i_target_'+target_type.val()).val();
+
+  
+  var time_from = $("#i_day_from").val() + " " + $("#i_month_from").val() + " " + $("#i_year_from").val() + " 00:00:00 GMT";
+  var time_to = $("#i_day_to").val() + " " + $("#i_month_to").val() + " " + $("#i_year_to").val() + " 23:59:59 GMT";
 
   var sources = source.split(',');
   var targets = target.split(',');
@@ -254,10 +320,11 @@ function runQuery() {
   }
 
 
-  if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
-    $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
-    return;
-  }
+//   if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
+//     $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
+//     $("#query_msg").append(time_from);
+//     return;
+//   }
 
   if(group_by == "no" && then_by != "no") {
     $("#query_msg").empty().append("Can't not group and then group. Please correct grouping!");

@@ -23,12 +23,16 @@
       </div>
       <div id="main">
       <div id="qui">
+        <div id="run_query">
         <h1>Custom Query</h1>
         <div class="msg" id="query_msg">
           Please specify your query criteria 
           and then click on 'Run Query' to submit the query. 
           Your query will be submitted to a queue and 
           you'll be provided a link to retrieve the results. 
+        </div>
+        </div>
+        <div id="results_msg" style="display: none">
         </div>
         <br>
         <form action="javascript:runQuery();">
@@ -85,15 +89,17 @@
 						</select>
 					  </div>
 					  <div class="lock">
-						<img src="unlock.png" height="100%" onclick="unlockPer()">
+						<img class="clickimg" src="unlock.png" height="100%" onclick="unlockPer()">
 					  </div>
 				  </div>
               </div>
             </div>
             </fieldset>
             <fieldset>
-            <legend>Grouping (optional)</legend>
-            <p>Select additional criteria to group the results data (in separate rows in results table and as input for graphical representation) or leave empty.<br><br></p>
+            <legend>Grouping (optional)
+            <img class="clickimg" id="hideshow3" src="hide.png" onclick="togglebutton(['hideshow3', 'group_by','then_by', 'group_text'])">
+            </legend>
+            <p id="c_group_text">Select additional criteria to group the results data (in separate rows in results table and as input for graphical representation) or leave empty.<br><br></p>
             <div class="row-2" id="c_group_by">
               <div class="cell">
                 <label>1. level </label>
@@ -134,15 +140,59 @@
             </div>   
           </fieldset>
           <fieldset>
-            <legend>Time window <a href="#" onclick="toggle(['time_to','time_from', 'time_text'])">[hide/unhide]</a></legend>
-            <p id="c_time_text">Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.<br><br></p>
+            <legend>Time window<!-- (optional)
+            <img class="clickimg" id="hideshow1" src="hide.png" onclick="togglebutton(['hideshow1', 'time_to','time_from'])">-->
+            </legend>
+            <!--<p id="c_time_text">Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.<br><br></p>-->
             <div class="row-2" id="c_time_from">
               <div class="cell">
                 <label>From</label>
               </div>
               <div class="cell">
-                <input id="i_time_from" type="text" value="01 Jan 1970 00:00:00 GMT"/><br>
-                <span class="input_info">Leave blank for no restriction.</span>
+                <div class="row-3">
+                  <div class="mylabel">
+                    <label>Year</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_year_from">
+                      <option value="2016">2016</option>
+                      <option value="2017">2017</option>
+                    </select>
+                  </div>
+                  <div class="mylabel">
+                    <label>Month</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_month_from">
+                      <option value="Jan">-</option>
+                      <option value="Jan">January</option>
+                      <option value="Feb">February</option>
+                      <option value="Mar">March</option>
+                      <option value="Apr">April</option>
+                      <option value="May">May</option>
+                      <option value="Jun">June</option>
+                      <option value="Jul">July</option>
+                      <option value="Aug">August</option>
+                      <option value="Sep">September</option>
+                      <option value="Oct" selected>October</option>
+                      <option value="Nov">November</option>
+                      <option value="Dec">December</option>
+                    </select>
+                  </div>
+                  <div class="mylabel">
+                    <label>Day</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_day_from">
+                      <option value="01">-</option>
+                      <option value="01">1</option>
+                      <option value="02">2</option>
+                      <option value="03">3</option>
+                    </select>
+                  </div>
+                </div>
+                <!--<input id="i_time_from" type="text" value="01 Jan 1970 00:00:00 GMT"/><br>
+                <span class="input_info">Leave blank for no restriction.</span>-->
               </div>
             </div>
             <div class="row-2" id="c_time_to">
@@ -150,20 +200,87 @@
                 <label>To</label>
               </div>
               <div class="cell">
-                <input id="i_time_to" type="text" value="31 Dec 2037 22:59:59 GMT"/><br>
-                <span class="input_info">Leave blank for no restriction.</span>
+                <div class="row-3">
+                  <div class="mylabel">
+                    <label>Year</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_year_to">
+                      <option value="2016">2016</option>
+                      <option value="2017"selected>2017</option>
+                    </select>
+                  </div>
+                  <div class="mylabel">
+                    <label>Month</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_month_to">
+                      <option value="Jan">-</option>
+                      <option value="Jan" selected>January</option>
+                      <option value="Feb">February</option>
+                      <option value="Mar">March</option>
+                      <option value="Apr">April</option>
+                      <option value="May">May</option>
+                      <option value="Jun">June</option>
+                      <option value="Jul">July</option>
+                      <option value="Aug">August</option>
+                      <option value="Sep">September</option>
+                      <option value="Oct">October</option>
+                      <option value="Nov">November</option>
+                      <option value="Dec">December</option>
+                    </select>
+                  </div>
+                  <div class="mylabel">
+                    <label>Day</label>
+                  </div>
+				  <div class="cell">
+                    <select id="i_day_to">
+                      <option value="31">-</option>
+                      <option value="01">1</option>
+                      <option value="02">2</option>
+                      <option value="03">3</option>
+                    </select>
+                  </div>
+                </div>
+                <!--<input id="i_time_to" type="text" value="31 Dec 2037 22:59:59 GMT"/><br>
+                <span class="input_info">Leave blank for no restriction.</span>-->
               </div>
             </div>
           </fieldset>
           <fieldset>
-            <legend>Path criteria <a href="#" onclick="toggle(['source','target'])">[hide/unhide]</a></legend>
+            <legend>Path criteria (optional)
+            <img class="clickimg" id="hideshow2" src="hide.png" onclick="togglebutton(['hideshow2', 'target','source', 'path_text'])">
+            </legend>
+            <p id="c_path_text">Leave blank for no restriction.<br><br></p>
             <div class="row-2" id="c_source">
               <div class="cell">
                 <label>Vantage Point</label>
               </div>
               <div class="cell">
-                <input id="i_source" type="text"/><br>
-                <span class="input_info">Leave blank for no restriction.</span>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="source" value="ip"> IP-address 
+                </div>
+				<div class="cell">
+                  <input id="i_source_ip" type="text"/>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="source" value="asn"> AS-number 
+                </div>
+				<div class="cell">
+                  <input id="i_source_asn" type="text"/>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="source" value="id"> Name/identifier string 
+                </div>
+				<div class="cell">
+                  <input id="i_source_id" type="text"/>
+                </div>
+              </div>
               </div>
             </div>
             <div class="row-2" id="c_target">
@@ -171,21 +288,40 @@
                 <label>Target</label>
               </div>
               <div class="cell">
-                <input id="i_target" type="text"/><br>
-                <span class="input_info">Leave blank for no restriction.</span>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="target" value="ip"> IP-address 
+                </div>
+				<div class="cell">
+                  <input id="i_target_ip" type="text"/>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="target" value="asn"> AS-number 
+                </div>
+				<div class="cell">
+                  <input id="i_target_asn" type="text"/>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="cell">
+                  <input type="radio" name="target" value="id"> Name/identifier string 
+                </div>
+				<div class="cell">
+                  <input id="i_target_id" type="text"/>
+                </div>
+              </div>
               </div>
             </div>
           </fieldset>
           <div class="margin-top-bottom">
-          <button type="submit">Run query</button>
+          <button type="submit" id="runbutton">Run query</button>
           </div>
         </form>
       </div>
       <div id="results" style="display: none">
         <h1>Query Result</h1>
-        <div id="results_msg">
-          
-        </div> 
         <div id="chart_section">
           <h2>Chart</h2>
           <div id="figures">
