@@ -329,7 +329,7 @@ def api_revoke_key():
 @app.route("/result")
 def api_result():
   query_id = request.args.get('id')
-  download = request.agrs.get('download')
+  download = request.args.get('download')
 
   sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_id))
 
