@@ -212,7 +212,8 @@ function disableSelection() {
 }
 
 function showThenBy() {
-  disableSelection()
+  disableSelection();
+
   var group_by = $("#i_group_by").val();
   
   if(group_by == 'no') {
