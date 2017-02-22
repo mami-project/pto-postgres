@@ -24,75 +24,67 @@ function attrNameToDisplay(name) {
   return name;
 }
 
-/**
- * convertGrouping
- *  - grouping - arr (group order)
- *  - distinct (ALREADY AS DISPLAY) - name of the attribute that was counted. (or observations)
- */
-function convertGrouping(grouping, distinct) {
-  var count_str;
 
-  console.log('grouping',grouping);
-
+function extractGrouping(grouping, dict) {
   if(grouping.length == 0) {
-    count_str = '<b>Count</b> <i>' + distinct + 's</i>';
+    return;
   }
-  if(grouping.length == 1) {
-    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[0]) + '</i>';
+  else if(grouping.length == 1) {
+    dict['per'] = grouping[0];
   }
   else if(grouping.length == 2) {
-    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[1]) + '</i><br><b>grouped by</b> ';
-    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i>';
+    dict['group_by'] = grouping[0];
+    dict['per'] = grouping[1];
   }
   else if(grouping.length == 3) {
-    count_str = '<b>Count</b> <i>' + distinct + 's</i> <b>per</b> <i>' + attrNameToDisplay(grouping[2]) + '</i><br><b>grouped by</b> ';
-    count_str += '<i>' + attrNameToDisplay(grouping[0]) + '</i><br><b>then by</b> <i>' + attrNameToDisplay(grouping[1]) + '</i>';
+    dict['group_by'] = grouping[0];
+    dict['then_by'] = grouping[1];
+    dict['per'] = grouping[2];
+  }
+}
+
+
+function extractQuery(iql) {
+  var query = iql['query'];
+
+  var dict = {};
+  
+  if('count' in query) {  
+    var operands = query['count'];
+
+    if(operands.length == 3) {
+      dict['count'] = 'observations'
+      extractGrouping(operands[0], dict);
+      extractSimple(operands[1]['simple'], dict);
+      return dict;
+    }
+
+  }
+  else if('count-distinct' in query) {
+    var operands = query['count-distinct'];
+
+    if(operands.length == 3) {
+      var distinct_attr = operands[0][operands[0].length-1];
+      dict['count'] = distinct_attr;
+
+      operands[0] = operands[0].slice(0,operands[0].length-1);
+
+      extractGrouping(operands[0], dict);
+      extractSimple(operands[1]['simple'], dict);
+      return dict;
+    }
+
   }
   
-  return count_str;
+  throw "Can't extract";
 }
 
-/**
- * extractPathCriteria
- *  - ands - query part
- *
- * Tries to extract the path criteria from a query if possible
- */
-function extractPathCriteria(ands) {
-  if(ands.length == 0)
-    return "";
 
-  var parts = [];
-  for(var i = 0; i < ands.length; i++) {
-    var and_ = ands[i];
-    if(!('in' in and_))
-      throw "Can't convert this. #19";
-
-    var in_ = and_['in'];
-
-    if(in_.length != 2)
-      throw "Can't convert this. #20";
-
-    var attr = in_[0];
-    var values = in_[1];
-
-    parts.push(attrNameToDisplay(attr) + ' <b>is one of</b> (' + values.join(', ') + ')');
-  }
-
-  return parts.join('<br><b>and</b> ');
-}
-
-/**
- * convertSimple
- *  - simple - query part
- *
- * converts the 'simple' part of a query to english.
- */
-function convertSimple(simple) {
+function extractSimple(simple, dict) {
   console.log('simple', JSON.stringify(simple));
 
   if(simple.length != 1) {
-    throw "Can't convert this. #1";
+    throw "Can't extract";
   }
   
   simple = simple[0];
@@ -105,142 +97,121 @@ function convertSimple(simple) {
     ands = simple['and'];
   
   if(!(ands.length >= 1))
-    throw "Can't convert this. #3";
+    throw "Can't extract";
     
   var in_ = ands[0];
   
   if(!('in' in in_))
-    throw "Can't convert this. #4";
+    throw "Can't extract";
     
   in_ = in_['in'];
   
   if(!(in_.length == 2))
-    throw "Can't convert this. #5";
+    throw "Can't extract";
     
   if(in_[0] != '@name')
-    throw "Can't convert this. #6";
+    throw "Can't extract";
     
   if(in_[1].length < 1)
-    throw "Can't convert this. #7";
+    throw "Can't extract";
     
   var condition = in_[1][0];
   
   var parts = condition.split('.');
   parts = parts.slice(0,parts.length-1);
-  condition = parts.join('.') + '.';
+  condition = parts.join('.') ;
   
   for(var i = 0; i < in_[1].length; i++)
     if(in_[1][i].indexOf(condition) != 0)
-      throw "Can't convert this. #8";
-  
-  condition = condition + '*';
+      throw "Can't extract";
+
 
   console.log('condition', condition);
+
+  dict['conditions'] = condition;
 
   var ge = ands[1];
   
   if(!('ge' in ge))
-    throw "Can't convert this. #9";
+    throw "Can't extract";
     
   ge = ge['ge'];
   
   if(ge.length != 2)
-    throw "Can't convert this. #10";
+    throw "Can't extract";
     
   if(ge[0] != "@time_from")
-    throw "Can't convert this. #11";
+    throw "Can't extract";
     
   var ge_time = ge[1];
   
   if(!('time' in ge_time))
-    throw "Can't convert this. #12";
+    throw "Can't extract";
     
   ge_time = ge_time['time'];
   
   if(ge_time.length != 1)
-    throw "Can't convert this. #13";
+    throw "Can't extract";
     
   var time_from = ge_time[0];
+
+  dict['time_from'] = time_from;
   
   var le = ands[2];
   
   if(!('le' in le))
-    throw "Can't convert this. #14";
+    throw "Can't extract";
   
   le = le['le'];
   
   if(le.length != 2)
-    throw "Can't convert this. #15";
+    throw "Can't extract";
     
   if(le[0] != "@time_to")
-    throw "Can't convert this. #16";
+    throw "Can't extract";
     
   var le_time = le[1];
   
   if(!('time' in le_time))
-    throw "Can't convert this. #17";
+    throw "Can't extract";
     
   le_time = le_time['time'];
   
   if(le_time.length != 1)
-    throw "Can't convert this. #18";
+    throw "Can't extract";
     
   var time_to = le_time[0];
 
-  var path_criteria = extractPathCriteria(ands.slice(3));
+  dict['time_to'] = time_to;
 
-  var str = " <b>restricted to</b> conditions <u>" + condition + '</u><br><b>from</b> <i>' + new Date(time_from*1000.0).toUTCString()
-    + '</i><br><b>to</b> <i>' + new Date(time_to*1000.0).toUTCString() + '</i>';
-
-  if(path_criteria != "")
-    str += '<br><b>where</b> ' + path_criteria;
-
-  return str;
+  extractPathCriteria(ands.slice(3), dict);
 }
 
-/**
- * helper function for toEnglish
- */
-function convertIQL(iql) {
-  var query = iql['query'];
-  
-  if('count' in query) {
-    var count_str = "";
-  
-    var operands = query['count'];
-    if(operands.length == 3) {
-      count_str = convertGrouping(operands[0], 'observation') + '<br>';
-      count_str += convertSimple(operands[1]['simple']);
+
+function extractPathCriteria(ands, dict) {
+  if(ands.length == 0)
+    return "";
+
+  for(var i = 0; i < ands.length; i++) {
+    var and_ = ands[i];
+    if(!('in' in and_))
+      throw "Can't extract";
+
+    var in_ = and_['in'];
+
+    if(in_.length != 2)
+      throw "Can't extract";
+
+    var attr = in_[0];
+    var values = in_[1];
+
+    if(attr == "@source" || attr == "@target") {
+      dict[attr.substring(1)] = values.join(', ');
     }
-    
-
-    
-    return count_str;
   }
-  else if('count-distinct' in query) {
-    
-    
-    var count_str = "";
-
-    var operands = query['count-distinct'];
-
-    if(operands.length == 3) {
-      var distinct_attr = operands[0][operands[0].length-1];
-      operands[0] = operands[0].slice(0,operands[0].length-1);
-
-      count_str = convertGrouping(operands[0], attrNameToDisplay(distinct_attr)) + '<br>';
-      count_str += convertSimple(operands[1]['simple']);
-    }
-
-    return count_str;
-  }
-  else if('all' in query) {
-    console.log('all');
-    return "All observations " + convertSimple(query['all'][0]['simple']);
-  }
-  
-  throw "Can't convert this at all";
 }
+
+
 
 /**
  * toEnglish
@@ -254,8 +225,52 @@ function convertIQL(iql) {
  * it returns default_.
  */
 function toEnglish(iql, default_) {
+  iql = JSON.parse(JSON.stringify(iql)); // work on a copy to be on the safe side.
+
   try {
-    return convertIQL(iql);
+    var params = extractQuery(iql);
+    var str = "";
+
+    if('count' in params) {
+      str += '<b>Count</b> ' + attrNameToDisplay(params['count']) + ' ';
+    }
+
+    if('per' in params) {
+      str += '<b>per</b> ' + attrNameToDisplay(params['per']) + '<br>';
+    }
+
+    if('group_by' in params) {
+      str += '<b>grouped by</b> ' + attrNameToDisplay(params['group_by']) + '<br>';
+    }
+
+    if('then_by' in params) {
+      str += '<b>then by</b> ' + attrNameToDisplay(params['then_by']) + '<br>';
+    }
+
+    if('time_from' in params) {
+      str +=' <b>from</b> ' + new Date(params['time_from']*1000).toUTCString() + '<br>';
+    }
+
+    if('time_to' in params) {
+      str += '<b>to</b> ' + new Date(params['time_to']*1000).toUTCString() + '<br>';
+    }
+
+    if('source' in params || 'target' in params) {
+      str += '<b>where</b> ';
+    }
+
+    if('source' in params) {
+      str += 'Vantaga Point <b>is one of</b> (' + params['source'] + ')<br>';
+    }
+
+    if('target' in params) {
+      if('source' in params) 
+        str += '<b>and</b> ';
+
+      str += 'Target <b>is one of</b> (' + params['target'] + ')';
+    }
+
+    return str;
   }
   catch(err) {
     console.log(err, JSON.stringify(iql));
