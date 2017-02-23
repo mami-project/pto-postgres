@@ -150,10 +150,11 @@ function renderCounts(results, group_order, distinct) {
       console.log('part_groups', groups);
 
       var caption = attrNameToDisplay(top_group_by) + ' ' + top_group_keys[i];
-      var title = "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
+      var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i>";
 
       if(distinct === true) {
-        title = "Counts of distinct <i>" + attrNameToDisplay(distinct_attribute) + "s</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(bot_group_by) + "</i>";
+        title = "Counts of distinct <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "s</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) +
+            "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i>";
       }
 
       renderHBarStacked(groups, title, counted_attribute, bot_group_by, caption);
@@ -182,10 +183,11 @@ function renderCounts(results, group_order, distinct) {
     //  chart(groups[group_keys[i]], attrNameToDisplay(group_by) + ": " + group_keys[i], counted_attribute);
     //}
 
-    var title = "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(group_by) + "</i>";
+    var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i>";
 
     if(distinct === true) {
-      title = "Counts of distinct <i>" + attrNameToDisplay(distinct_attribute) + "s</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i> grouped by <i>" + attrNameToDisplay(group_by) + "</i>";
+      title = "Counts of distinct <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "s</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute))
+            + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i>";
     }
 
     renderHBarStacked(groups, title, counted_attribute, group_by);
@@ -193,10 +195,10 @@ function renderCounts(results, group_order, distinct) {
   }
   else if(group_order.length == 0) {
     if(distinct === true) {
-      renderHBar(results, "Counts of <i>" + attrNameToDisplay(distinct_attribute) + "</i> per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
+      renderHBar(results, "Counts of <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i>", counted_attribute);
     }
     else {
-      renderHBar(results, "Counts of observations per <i>" + attrNameToDisplay(counted_attribute) + "</i>", counted_attribute);
+      renderHBar(results, "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i>", counted_attribute);
     }
   }
 }

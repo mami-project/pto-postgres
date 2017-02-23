@@ -237,6 +237,16 @@ function extractPathCriteria(ands, dict) {
   }
 }
 
+function escapeHtml(str) {
+  str = str.replace('&', '&amp;');
+  str = str.replace('<', '&lt;');
+  str = str.replace('>', '&gt;');
+  str = str.replace('\'', '&apos;');
+  str = str.replace('"', '&quot;');
+
+  return str;
+}
+
 
 
 /**
@@ -258,31 +268,31 @@ function toEnglish(iql, default_) {
     var str = "";
 
     if('count' in params) {
-      str += '<b>Count</b> ' + attrNameToDisplay(params['count']) + ' ';
+      str += '<b>Count</b> ' + escapeHtml(attrNameToDisplay(params['count'])) + ' ';
     }
 
     if('per' in params) {
-      str += '<b>per</b> ' + attrNameToDisplay(params['per']) + '<br>';
+      str += '<b>per</b> ' + escapeHtml(attrNameToDisplay(params['per'])) + '<br>';
     }
 
     if('group_by' in params) {
-      str += '<b>grouped by</b> ' + attrNameToDisplay(params['group_by']) + '<br>';
+      str += '<b>grouped by</b> ' + escapeHtml(attrNameToDisplay(params['group_by'])) + '<br>';
     }
 
     if('then_by' in params) {
-      str += '<b>then by</b> ' + attrNameToDisplay(params['then_by']) + '<br>';
+      str += '<b>then by</b> ' + escapeHtml(attrNameToDisplay(params['then_by'])) + '<br>';
     }
 
     if('conditions' in params) {
-      str += '<b>restricted to</b> conditions <b>matching</b> <u>' + params['conditions'] + '.*</u><br>';
+      str += '<b>restricted to</b> conditions <b>matching</b> <u>' + escapeHtml(params['conditions']) + '.*</u><br>';
     }
 
     if('time_from' in params) {
-      str +=' <b>from</b> ' + new Date(params['time_from']*1000).toUTCString() + '<br>';
+      str +=' <b>from</b> ' + escapeHtml(new Date(params['time_from']*1000).toUTCString()) + '<br>';
     }
 
     if('time_to' in params) {
-      str += '<b>to</b> ' + new Date(params['time_to']*1000).toUTCString() + '<br>';
+      str += '<b>to</b> ' + escapeHtml(new Date(params['time_to']*1000).toUTCString()) + '<br>';
     }
 
     if('source' in params || 'target' in params) {
@@ -290,14 +300,14 @@ function toEnglish(iql, default_) {
     }
 
     if('source' in params) {
-      str += 'Vantage Point <b>is one of</b> (' + params['source'] + ')<br>';
+      str += 'Vantage Point <b>is one of</b> (' + escapeHtml(params['source']) + ')<br>';
     }
 
     if('target' in params) {
       if('source' in params) 
         str += '<b>and</b> ';
 
-      str += 'Target <b>is one of</b> (' + params['target'] + ')';
+      str += 'Target <b>is one of</b> (' + escapeHtml(params['target']) + ')';
     }
 
     return str;
