@@ -290,7 +290,7 @@ function toEnglish(iql, default_) {
     }
 
     if('source' in params) {
-      str += 'Vantaga Point <b>is one of</b> (' + params['source'] + ')<br>';
+      str += 'Vantage Point <b>is one of</b> (' + params['source'] + ')<br>';
     }
 
     if('target' in params) {
