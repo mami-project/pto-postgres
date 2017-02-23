@@ -128,6 +128,9 @@ function renderCounts(results, group_order, distinct) {
     top_group_keys.sort()
     console.log('top_group_keys', top_group_keys);
 
+    if(top_group_keys.length > 16) //abort... too much stuff to render
+      return;
+
     for(var i = 0; i < top_group_keys.length; i++) { 
       var results = top_groups[top_group_keys[i]];
       console.log('part_results', results);
@@ -647,6 +650,10 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   console.log('renderHBarStacked', groups, title, counted_attribute);
 
   var group_keys = Object.keys(groups);
+
+  if(group_keys.length > 16) //abort... too much to render
+    return;
+
   group_keys.sort()
   console.log('group_keys', group_keys);
   var max_overall = 0;
@@ -673,6 +680,9 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
 
     max_overall = d3.max([max_overall, temp]);
   }
+
+  if(cols.length > 16) //abort... too much to render
+    return;
 
   cols.sort();
   console.log('cols', cols);
@@ -796,6 +806,9 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
 function renderHBar(data, title, counted_attribute) {
 
   console.log('chart',data);
+
+  if(data.length > 16) //abort... too much stuff to render
+    return;
 
   var counts = [];
 
