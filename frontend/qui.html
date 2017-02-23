@@ -153,7 +153,7 @@
                   <div class="mylabel">
                     <label>Year</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_year_from">
                       <option value="2016">2016</option>
                       <option value="2017">2017</option>
@@ -162,9 +162,9 @@
                   <div class="mylabel">
                     <label>Month</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_month_from">
-                      <option value="Jan">-</option>
+                      <!--<option value="Jan">-</option>-->
                       <option value="Jan">January</option>
                       <option value="Feb">February</option>
                       <option value="Mar">March</option>
@@ -182,9 +182,9 @@
                   <div class="mylabel">
                     <label>Day</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_day_from">
-                      <option value="01">-</option>
+                      <!--<option value="01">-</option>-->
                       <option value="01">1</option>
                       <option value="02">2</option>
                       <option value="03">3</option>
@@ -204,7 +204,7 @@
                   <div class="mylabel">
                     <label>Year</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_year_to">
                       <option value="2016">2016</option>
                       <option value="2017"selected>2017</option>
@@ -213,9 +213,9 @@
                   <div class="mylabel">
                     <label>Month</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_month_to">
-                      <option value="Jan">-</option>
+                      <!--<option value="Jan">-</option>-->
                       <option value="Jan" selected>January</option>
                       <option value="Feb">February</option>
                       <option value="Mar">March</option>
@@ -233,12 +233,15 @@
                   <div class="mylabel">
                     <label>Day</label>
                   </div>
-				  <div class="cell">
+				          <div class="cell">
                     <select id="i_day_to">
-                      <option value="31">-</option>
                       <option value="01">1</option>
                       <option value="02">2</option>
                       <option value="03">3</option>
+                      <option value="28">28</option>
+                      <option value="29">29</option>
+                      <option value="30">30</option>
+                      <option value="31">31</option>
                     </select>
                   </div>
                 </div>
@@ -257,30 +260,16 @@
                 <label>Vantage Point</label>
               </div>
               <div class="cell">
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="source" value="ip"> IP-address 
+                <div class="row-2">
+                  <div class="cell">
+                    <input type="radio" name="source" value="ip"> IP-address <br>
+                    <input type="radio" name="source" value="asn"> AS-number <br>
+                    <input type="radio" name="source" value="id"> Name/identifier string <br>
+                  </div>
+				          <div class="cell">
+                    <input id="i_source" type="text"/>
+                  </div>
                 </div>
-				<div class="cell">
-                  <input id="i_source_ip" type="text"/>
-                </div>
-              </div>
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="source" value="asn"> AS-number 
-                </div>
-				<div class="cell">
-                  <input id="i_source_asn" type="text"/>
-                </div>
-              </div>
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="source" value="id"> Name/identifier string 
-                </div>
-				<div class="cell">
-                  <input id="i_source_id" type="text"/>
-                </div>
-              </div>
               </div>
             </div>
             <div class="row-2" id="c_target">
@@ -288,30 +277,16 @@
                 <label>Target</label>
               </div>
               <div class="cell">
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="target" value="ip"> IP-address 
+                <div class="row-2">
+                  <div class="cell">
+                    <input type="radio" name="target" value="ip"> IP-address <br>
+                    <input type="radio" name="target" value="asn"> AS-number <br>
+                    <input type="radio" name="target" value="id"> Name/identifier string <br>
+                  </div>
+				          <div class="cell">
+                    <input id="i_target" type="text"/>
+                  </div>
                 </div>
-				<div class="cell">
-                  <input id="i_target_ip" type="text"/>
-                </div>
-              </div>
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="target" value="asn"> AS-number 
-                </div>
-				<div class="cell">
-                  <input id="i_target_asn" type="text"/>
-                </div>
-              </div>
-              <div class="row-2">
-                <div class="cell">
-                  <input type="radio" name="target" value="id"> Name/identifier string 
-                </div>
-				<div class="cell">
-                  <input id="i_target_id" type="text"/>
-                </div>
-              </div>
               </div>
             </div>
           </fieldset>

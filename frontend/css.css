@@ -253,6 +253,7 @@ label {
   font-weight: bold;
 }
 
+
 select, input, textarea, button {
   padding: 0.5rem;
   border: solid 0.2rem lightgray;
@@ -261,6 +262,10 @@ select, input, textarea, button {
   width: 100%;
   box-sizing: border-box;
   font-size: 0.8rem;
+}
+
+input[type="radio"] {
+  width: auto;
 }
 
 button {

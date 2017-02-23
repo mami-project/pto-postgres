@@ -308,6 +308,12 @@ function renderResults(results, query_id) {
 }
 
 
+/**
+ * fillForms
+ *  - params
+ *
+ * Fill form fields (the ones with i_)
+ */
 function fillForms(params) {
   console.log(params);
   var keys = Object.keys(params);

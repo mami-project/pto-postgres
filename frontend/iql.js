@@ -158,6 +158,7 @@ function extractSimple(simple, dict) {
   var time_from = ge_time[0];
 
   dict['time_from'] = time_from;
+  splitDate('from', dict);
   
   var le = ands[2];
   
@@ -185,8 +186,31 @@ function extractSimple(simple, dict) {
   var time_to = le_time[0];
 
   dict['time_to'] = time_to;
+  splitDate('to', dict);
 
   extractPathCriteria(ands.slice(3), dict);
+}
+
+
+function splitDate(what, dict) {
+  if(!(('time_' + what) in dict)) {
+    return false;
+  }
+
+  var d = new Date(dict['time_' + what]*1000);
+
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  var day =  d.getUTCDate().toString();
+  if(day.length != 2)
+    day = '0' + day;
+
+  var year = d.getUTCFullYear().toString();
+
+  dict['month_' + what] = months[d.getUTCMonth()];
+  dict['day_' + what] = day;
+  dict['year_' + what] = year;
+  
 }
 
 
