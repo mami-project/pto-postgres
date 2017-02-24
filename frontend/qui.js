@@ -26,6 +26,7 @@ function is_prefix(xs, ys) {
  * called on failure
  */
 function process_failed_response(data) {
+  $("body").css("cursor", "default");
   clearPreviousResults();
   alert('failed :(');
   console.log(JSON.stringify(data));
@@ -94,6 +95,8 @@ function submitQuery(query) {
   var url = api_base + '/query?q=' + encodeURIComponent(str_query);
 
   console.log('str_query',str_query);
+
+  $("body").css("cursor", "progress");
 
   var request = $.ajax({'url': url});
   request.done(process_successful_response_redirect);
@@ -473,12 +476,13 @@ function runQuery() {
 
   console.log('str_query',str_query);
 
-  
+  $("body").css("cursor", "progress");
+  $('#runbutton').attr('disabled', true);
+
+  clearPreviousResults();
 
   var request = $.ajax({'url': url});
   request.done(process_successful_response);
   request.fail(process_failed_response); 
 
-  $('#runbutton').attr('disabled', true);
-  clearPreviousResults();
 }

@@ -228,6 +228,7 @@ function clearPreviousResults() {
  * Renders the results
  */
 function renderResults(results, query_id) {
+  $("body").css("cursor", "default");
 
   /** clear previously rendered stuff **/
   clearPreviousResults();
