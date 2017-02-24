@@ -209,11 +209,15 @@ function clearPreviousResults() {
   $('#figures').empty();
   $('#raw_query').empty();
   $('#raw_results').empty();
+  $('#results_msg').empty();
+  $('#results_msg_top').empty();
 
   $('#table_section').css('display','none');
   $('#raw_results_section').css('display','none');
   $('#raw_query_section').css('display','none');
   $('#chart_section').css('display','none');
+  $('#results_msg').css('display', 'none');
+  $('#results_msg_top').css('display', 'none');
 }
 
 
@@ -227,6 +231,7 @@ function renderResults(results, query_id) {
 
   $('#results').css('display','block');
   $('#results_msg').css('display','block');
+  $('#results_msg_top').css('display','block');
   $('#query_msg').css('display','none');
   $("#results")[0].scrollIntoView();
 
@@ -306,8 +311,8 @@ function renderResults(results, query_id) {
     table(results);
   }
 
-  $('#results_msg').empty().append('<span class="txt-info"><a href=#results>Your results are visible below.</a></span> ');
-  $('#results_msg').append('<br><br><span class="txt-small">Query ID: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
+  $('#results_msg_top').empty().append('<span class="txt-info"><a href=#results>Your results are visible below.</a></span> ');
+  $('#results_msg_top').append('<br><br><span class="txt-small">Query ID: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
 
   try {
     console.log('iql', JSON.stringify(iql));
