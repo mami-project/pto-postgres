@@ -98,6 +98,17 @@ li {
   font-style: italic;
 }
 
+button[disabled], button[disabled]:hover {
+  background-color: gray;
+  color: white;
+  border: solid 0.2rem darkgray;
+  font-weight: bold;
+}
+
+button[disabled]::after {
+  content: ' (disabled, waiting for response)';
+}
+
 .table-g {
   width: 100%;
   border-collapse: collapse;

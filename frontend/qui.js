@@ -28,6 +28,7 @@ function is_prefix(xs, ys) {
 function process_failed_response(data) {
   alert('failed :(');
   console.log(JSON.stringify(data));
+  $('#runbutton').removeAttr("disabled");
 }
 
 /**
@@ -462,4 +463,6 @@ function runQuery() {
   var request = $.ajax({'url': url});
   request.done(process_successful_response);
   request.fail(process_failed_response); 
+
+  $('#runbutton').attr('disabled', true);
 }

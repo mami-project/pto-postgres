@@ -309,7 +309,7 @@ function renderResults(results, query_id) {
 
   //$('#runbutton').prop('value', 'Run new query');
   $("#runbutton").html("Run new query");
-
+  $('#runbutton').removeAttr("disabled");
 }
 
 
