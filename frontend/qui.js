@@ -45,7 +45,7 @@ function process_successful_response(data) {
     renderResults(data['already'], data['query_id']);
   }
   else {
-    getResults(data['query_id']);
+    window.setTimeout( function() { getResults(data['query_id']); }, 8000);
   }
 }
 
@@ -303,14 +303,14 @@ function runQuery() {
   //var time_to = $("#i_time_to").val();
   var count = $("#i_count").val();
   var per = $('#i_per').val();
-  var source = ""; //$('#i_source').val();
-  var target = ""; //$('#i_target').val();
+  var source = $('#i_source').val();
+  var target = $('#i_target').val();
   
 
-  var source_type = $("input[name='source']:checked"); 
-  if (source_type.length > 0) source = $('#i_source_'+source_type.val()).val();
-  var target_type = $("input[name='target']:checked");
-  if (target_type.length > 0) target = $('#i_target_'+target_type.val()).val();
+  //var source_type = $("input[name='source']:checked"); 
+  //if (source_type.length > 0) source = $('#i_source_'+source_type.val()).val();
+  //var target_type = $("input[name='target']:checked");
+  //if (target_type.length > 0) target = $('#i_target_'+target_type.val()).val();
 
   
   var time_from = $("#i_day_from").val() + " " + $("#i_month_from").val() + " " + $("#i_year_from").val() + " 00:00:00 GMT";
