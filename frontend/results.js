@@ -239,6 +239,9 @@ function renderResults(results, query_id) {
   $('#query_msg').css('display','none');
   $("#results")[0].scrollIntoView();
 
+  $("#runbutton").html("Run new query");
+  $('#runbutton').removeAttr("disabled");
+
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
     $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
@@ -327,8 +330,6 @@ function renderResults(results, query_id) {
   }
 
   //$('#runbutton').prop('value', 'Run new query');
-  $("#runbutton").html("Run new query");
-  $('#runbutton').removeAttr("disabled");
 }
 
 
