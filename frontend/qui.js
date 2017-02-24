@@ -480,4 +480,5 @@ function runQuery() {
   request.fail(process_failed_response); 
 
   $('#runbutton').attr('disabled', true);
+  clearPreviousResults();
 }
