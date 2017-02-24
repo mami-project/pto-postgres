@@ -50,6 +50,19 @@ function process_successful_response(data) {
 }
 
 /**
+ * process_successful_response_redirect
+ *
+ * AJAX callback
+ * called on success. from the simple page
+ */
+function process_successful_response_redirect(data) {
+  clearPreviousResults();
+  console.log(JSON.stringify(data));
+  window.location.href = './qui.html?' + encodeURIComponent(data['query_id']);
+}
+
+
+/**
  * toDate
  *  date_s - date as string
  *
@@ -83,7 +96,7 @@ function submitQuery(query) {
   console.log('str_query',str_query);
 
   var request = $.ajax({'url': url});
-  request.done(process_successful_response);
+  request.done(process_successful_response_redirect);
   request.fail(process_failed_response); 
 }
 
