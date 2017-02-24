@@ -213,7 +213,7 @@ function clearPreviousResults() {
   $('#table_section').css('display','none');
   $('#raw_results_section').css('display','none');
   $('#raw_query_section').css('display','none');
-  $('#chart_section)'.css('display','none');
+  $('#chart_section').css('display','none');
 }
 
 
