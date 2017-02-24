@@ -229,14 +229,14 @@ function clearPreviousResults() {
  */
 function renderResults(results, query_id) {
 
+  /** clear previously rendered stuff **/
+  clearPreviousResults();
+
   $('#results').css('display','block');
   $('#results_msg').css('display','block');
   $('#results_msg_top').css('display','block');
   $('#query_msg').css('display','none');
   $("#results")[0].scrollIntoView();
-
-  /** clear previously rendered stuff **/
-  clearPreviousResults();
 
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
