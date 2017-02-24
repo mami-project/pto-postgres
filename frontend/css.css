@@ -349,6 +349,11 @@ input:hover, select:hover, textarea:hover, button:hover {
   font-size: 0.8rem;
 }
 
+.txt-tiny {
+  font-size: 0.5rem;
+}
+
+
 .txt-gray {
   color: darkgray;
 }
@@ -372,7 +377,7 @@ input:hover, select:hover, textarea:hover, button:hover {
   padding: 0.1rem;
 }
 
-.linky, .linky:visited {
+a, a:visited, .linky, .linky:visited {
   color: firebrick;
   text-decoration: none;
 }
