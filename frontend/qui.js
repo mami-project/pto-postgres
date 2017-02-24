@@ -26,6 +26,7 @@ function is_prefix(xs, ys) {
  * called on failure
  */
 function process_failed_response(data) {
+  clearPreviousResults();
   alert('failed :(');
   console.log(JSON.stringify(data));
   $('#runbutton').removeAttr("disabled");
@@ -38,6 +39,7 @@ function process_failed_response(data) {
  * called on success
  */
 function process_successful_response(data) {
+  clearPreviousResults();
   console.log(JSON.stringify(data));
   if("already" in data) {
     renderResults(data['already'], data['query_id']);

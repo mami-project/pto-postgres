@@ -203,6 +203,15 @@ function renderCounts(results, group_order, distinct) {
   }
 }
 
+
+function clearPreviousResults() {
+  $('#tables').empty();
+  $('#figures').empty();
+  $('#raw_query').empty();
+  $('#raw_results').empty();
+}
+
+
 /**
  * renderResults
  *  - results - results
@@ -217,8 +226,7 @@ function renderResults(results, query_id) {
   $("#results")[0].scrollIntoView();
 
   /** clear previously rendered stuff **/
-  $('#tables').empty();
-  $('#figures').empty();
+  clearPreviousResults();
 
   if(results['state'] == 'new') {
     $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
