@@ -98,7 +98,7 @@ li {
   font-style: italic;
 }
 
-button[disabled], button[disabled]:hover {
+button[disabled], button[disabled]:hover, button[disabled]:active, button[disabled]:focus {
   background-color: gray;
   color: white;
   border: solid 0.2rem darkgray;
