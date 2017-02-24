@@ -28,7 +28,7 @@ function is_prefix(xs, ys) {
 function process_failed_response(data) {
   $("body").css("cursor", "default");
   clearPreviousResults();
-  alert('failed :(');
+  alert('Your query could not be submitted. This is either a network error or the server is too busy right now.');
   console.log(JSON.stringify(data));
   $('#runbutton').removeAttr("disabled");
 }
