@@ -14,12 +14,12 @@
     <div id="container">
       <div id="nav" class="clear-float">
         <ul style="float: left;">
-          <li><a href="/">PTO Main Page</a></li>
+          <li><a href="/">PTO Home</a></li>
           <li><a href="#">Run Query</a></li>
           <li><a href="qq.html">Query Queue</a></li>
           <li><a href="uploadstats.html">Upload statistics</a></li>
         </ul>
-        <a href="https://mami-project.eu"><img style="height: 2rem; float: right;" src="logo.png" alt="Logo of the MAMI project"/></a>
+        <a href="https://mami-project.eu"><img style="height: 2rem; float: right;" src="logo.png" alt="Go to MAMI project"/></a>
       </div>
       <div id="main">
       <div id="qui">
@@ -40,8 +40,11 @@
             <legend>Query</legend>
             <div class="row-2">
               <div class="cell">
-                <label>Conditions</label>
-                <!--<img src="information-circle.jpg" height="10px" onmouseover="do()">-->
+                <label>Conditions
+                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="open_dialog()">
+                <!--onmouseover="do()"-->
+                </label>
+                <div style="display:none" id="dialog-box" title="Text">This my first jQuery UI Dialog!</div>
               </div>
               <div class="cell">
                 <select id="i_conditions">
