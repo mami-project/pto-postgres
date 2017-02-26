@@ -11,6 +11,14 @@
     <script src="qui.js"></script>
   </head>
   <body>
+    <div id="dialog-overlay"></div>
+	<div id="dialog-box">
+	  <a href="#close" title="Close" class="close">x</a>
+	  <div class="dialog-content">
+	    <div id="dialog-message"></div>
+		<a href="#" class="button">Okay</a>
+	  </div>
+	</div>
     <div id="container">
       <div id="nav" class="clear-float">
         <ul style="float: left;">
@@ -41,10 +49,9 @@
             <div class="row-2">
               <div class="cell">
                 <label>Conditions
-                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="open_dialog()">
+                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popup('Testing')">
                 <!--onmouseover="do()"-->
                 </label>
-                <div style="display:none" id="dialog-box" title="Text">This my first jQuery UI Dialog!</div>
               </div>
               <div class="cell">
                 <select id="i_conditions">

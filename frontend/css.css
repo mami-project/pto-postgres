@@ -221,6 +221,132 @@ td.code {
   color: steelblue;
 }
 
+#dialog-overlay {
+
+	/* set it to fill the whil screen */
+	width:100%; 
+	height:100%;
+	
+	/* transparency for different browsers */
+	filter:alpha(opacity=50); 
+	-moz-opacity:0.5; 
+	-khtml-opacity: 0.5; 
+	opacity: 0.5; 
+	background:#000; 
+
+	/* make sure it appear behind the dialog box but above everything else */
+	position:absolute; 
+	top:0; left:0; 
+	z-index:3000; 
+
+	/* hide it by default */
+	display:none;
+}
+
+
+#dialog-box {
+	
+	/* css3 drop shadow */
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	
+	/* css3 border radius */
+	-moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+	
+	background:#eee;
+	/* styling of the dialog box with fixed dimension*/ 
+	width:450px; 
+	
+	/* make sure it has the highest z-index */
+	position:absolute; 
+	z-index:5000; 
+
+	/* hide it by default */
+	display:none;
+}
+
+#dialog-box .dialog-content {
+	/* style the content */
+	text-align:left; 
+	padding:10px; 
+	margin:13px;
+	color:#666; 
+	font-family:arial;
+	font-size:11px; 
+}
+
+/* extra styling */
+#dialog-box .dialog-content p {
+	font-weight:700; margin:0;
+}
+
+#dialog-box .dialog-content ul {
+	margin:10px 0 10px 20px; 
+	padding:0; 
+	height:50px;
+}
+
+a.button {
+	/* styles for button */
+	margin:10px auto 0 auto;
+	text-align:center;
+	display: block;
+	width:50px;
+	padding: 5px 10px 6px;
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: bold;
+	line-height: 1;
+	
+	/* button color */
+	background-color: #2B60DE;
+	
+	/* css3 implementation :) */
+	/* rounded corner */
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	
+	/* drop shadow */
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	
+	/* text shaow */
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	position: relative;
+	cursor: pointer;
+}
+
+a.button:hover {
+	background-color: #2554C7;	
+}
+
+.close {
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -12px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	
+	-moz-box-shadow: 1px 1px 3px #000;
+	-webkit-box-shadow: 1px 1px 3px #000;
+	box-shadow: 1px 1px 3px #000;
+	cursor: pointer;
+}
+
+.close:hover { 
+  background: #2554C7;
+}
 
 .row-2, .row-3 {
   display: flex;
@@ -377,13 +503,14 @@ input:hover, select:hover, textarea:hover, button:hover {
   padding: 0.1rem;
 }
 
-a, a:visited, .linky, .linky:visited {
+.linky, .linky:visited {
   color: firebrick;
   text-decoration: none;
 }
 
 .linky:hover::after {
   content: ' \2192';
+  text-decoration: none;
 }
 
 #chart_section, #table_section, #raw_query_section, #raw_results_section { display: none; }
@@ -397,6 +524,7 @@ a, a:visited, .linky, .linky:visited {
 
 .linky2:hover {
   color: salmon;
+  text-decoration: none;
 }
 
 
