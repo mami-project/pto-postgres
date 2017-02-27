@@ -531,12 +531,12 @@ p + p { margin-top: 1rem; }
   margin-left: 1rem;
 }
 
-.linky2, .linky2:visited {
+a, a:visited, .linky2, .linky2:visited {
   color: firebrick;
   text-decoration: none;
 }
 
-.linky2:hover {
+a:hover, .linky2:hover {
   color: salmon;
   text-decoration: none;
 }
