@@ -444,9 +444,19 @@ input:hover, select:hover, textarea:hover, button:hover {
   box-sizing: border-box;
 }
 
+p + p { margin-top: 1rem; }
+
+.top-margin {
+  margin-top: 1rem;
+}
+
 .txt-info { color: steelblue; }
 .txt-err { color: red; }
 .txt-warn { color: orangered; }
+
+.txt-justify { 
+  text-align: justify;
+}
 
 .auto-overflow {
   overflow: auto;
