@@ -1,14 +1,15 @@
 function Navigation() {
+  var me = this;
+
   this.m = [
     ["PTO Home" , "./"],
     ["Run Query" , "./qui.html"],
     ["Query Queue" , "./qq.html"],
     ["Upload statistics" , "./uploadstats.html"]
   ];
-}
 
-Navigation.prototype.render = 
-  function(targetElement) {
+  this.render = 
+   function(targetElement) {
     if(targetElement == undefined)
       targetElement = this.targetElement;
  
@@ -22,7 +23,14 @@ Navigation.prototype.render =
     }
 
     targetElement.empty().append(ul);
-  }
+   }
+
+  this.updateAndRender = 
+   function(mNew, targetElement) {
+     me.m = mNew;
+     me.render(targetElement);
+   }
+}
 
 var _Navigation = new Navigation();
 
