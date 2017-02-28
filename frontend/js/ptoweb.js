@@ -9,7 +9,9 @@ function Navigation() {
 
 Navigation.prototype.render = 
   function(targetElement) {
-    console.log(targetElement);
+    if(targetElement == undefined)
+      targetElement = this.targetElement;
+ 
     var ul = $('<ul>');
 
     for(var i = 0; i < this.m.length; i++) {
@@ -28,4 +30,24 @@ $(document).ready(function(){
   _Navigation.render($('#c_navigation'));
 });
 
+function secondsToDisplay(seconds) {
+  if(seconds < 90) {
+    return seconds + "s";
+  }
+  else if(seconds < 60*60) {
+    minutes = Math.round(10*seconds/60)/10;
+    return minutes + "min";
+  }
+  else {
+    hours = Math.round(10*seconds/(60*60))/10;
+    return hours + "h";
+  }
+}
 
+function getQQSummary(callback) {
+  var request =
+    $.ajax(
+      {'url' : api_base + '/qq/summary'})
+     .done(function (data) { callback(data); })
+     .fail(function() { callback(undefined); });
+}
