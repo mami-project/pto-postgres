@@ -781,8 +781,8 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   var figure = d3.select("#figures").append("div").attr("class","figure");
       figure.append("div").attr("class","title").html(title);
 
-  // Height of legend in pixels
-  var lheight = (5 + barHeight) * (group_keys.length - 0.5)
+  // Height of legend in pixels, plus some spacing pixels
+    var lheight = (5 + barHeight) * Math.ceil(cols.length/2) + 20
   var cheight = (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2));
 
   var chart = figure.append("svg")
@@ -844,16 +844,15 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   }
 
   var lines = chart.append("g")
-    .attr("transform", function() { return "translate(0," + ((group_keys.length - 0.5) * (5+barHeight)) + ")"; });
 
   var footer = chart.append("g")
-      .attr("transform", function() { return "translate(0," + ((group_keys.length+2.25) * (5+barHeight)) + ")"; });
+      .attr("transform", function() { return "translate(0," + (group_keys.length * (5+barHeight)) + ")"; });
 
-    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("fill","black").attr("x",width-2);
-    footer.append("text").attr("x",200).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return "0"; }).attr("fill","black");
+    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x",width-2).attr("y", lheight).attr("fill","black");
+    footer.append("text").attr("x",200).attr("y", lheight + barHeight /2).attr("dy", "0em").text(function() { return "0"; }).attr("fill","black");
 
-    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x", 200).attr("fill","black");
-    footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
+    lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x", 200).attr("y", lheight).attr("fill","black");
+    footer.append("text").attr("x",width).attr("y", lheight + barHeight /2).attr("dy", "0em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
 
   var legend = chart.append("g");
     // Legend is moved to top.
