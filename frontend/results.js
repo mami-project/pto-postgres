@@ -514,37 +514,6 @@ function toRows(data, rows, parent_row, cols) {
   }
 }
 
-/** DEPRECATED **/
-function renderTableStructure(data, tbl, cols, lvl) {
-  if($.isArray(data)) {
-    console.log("got array");
-    var table = tbl.append("table").attr("class","table").attr("style","margin: 1rem; margin-left: 2rem");
-
-    var hrow = table.append("tr");
-
-    for(var i = 0; i < cols.length; i++) {
-      hrow.append("th").text(attrNameToDisplay(cols[i]));
-    }
-
-    for(var i = 0; i < data.length; i++) {
-      var tr = table.append("tr");
-      for(var j = 0; j < cols.length; j++) {
-        tr.append("td").text(data[i][cols[j]]);
-      }
-    }
-  }
-  else {
-    console.log("got not array");
-    var group_keys = Object.keys(data);
-    for(var i = 0; i < group_keys.length; i++) {
-      var row_span = calcRowSpan(data[group_keys[i]]);
-      var tr = tbl.append("div").attr("style","margin: 1rem; margin-left: 2rem;");
-      tr.append("h"+lvl).text(group_keys[i]);
-      var td = tr.append("div");
-      renderTableStructure(data[group_keys[i]], td, cols, lvl+1);
-    }
-  }
-}
 
 /**
  * groupAll
