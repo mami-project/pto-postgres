@@ -266,14 +266,41 @@ td.code {
 	display:none;
 }
 
+
+#dialog-conditions {
+
+    padding:10px; 
+	margin:13px;
+	font-size:12px;
+	
+	/* css3 drop shadow */
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	
+	/* css3 border radius */
+	-moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+	
+	background:#eee;
+	/* styling of the dialog box with fixed dimension*/ 
+	width:800px; 
+	
+	/* make sure it has the highest z-index */
+	position:absolute; 
+	z-index:5000; 
+
+	/* hide it by default */
+	display:none;
+}
+
 #dialog-box .dialog-content {
 	/* style the content */
-	text-align:left; 
+	text-align:left;
 	padding:10px; 
 	margin:13px;
 	color:#666; 
 	font-family:arial;
-	font-size:11px; 
+	font-size:11px;
 }
 
 /* extra styling */
@@ -281,7 +308,7 @@ td.code {
 	font-weight:700; margin:0;
 }
 
-#dialog-box .dialog-content ul {
+#dialog-conditions .dialog-content ul {
 	margin:10px 0 10px 20px; 
 	padding:0; 
 	height:50px;

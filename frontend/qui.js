@@ -14,8 +14,8 @@ $(document).ready(function () {
   disableDays(true);
 
 	// if user clicked on button, the overlay layer or the dialogbox, close the dialog	
-	$('a.btn-ok, #dialog-overlay, #dialog-box').click(function () {		
-		$('#dialog-overlay, #dialog-box').hide();		
+	$('a.btn-ok, #dialog-overlay, #dialog-box, #dialog-conditions').click(function () {		
+		$('#dialog-overlay, #dialog-box, #dialog-conditions').hide();		
 		return false;
 	});
 	
@@ -55,6 +55,29 @@ function popup(message) {
 	
 	// display the message
 	$('#dialog-message').html(message);
+			
+}
+
+
+/**
+ * popupdialog
+ *  dialog - id of the dialog div
+ *
+ * opens dialog with given id
+ */
+function popupdialog(dialog) {
+		
+	// get the screen height and width  
+	var maskHeight = $(window).height();  
+	var maskWidth = $(window).width();
+	
+	// calculate the values for center alignment
+	var dialogTop =  (maskHeight/2) - ($('#dialog-'+dialog).height()/2);  
+	var dialogLeft = (maskWidth/2) - ($('#dialog-'+dialog).width()/2); 
+	
+	// assign values to the overlay and dialog box
+	$('#dialog-overlay').css({height:maskHeight, width:maskWidth}).show();
+	$('#dialog-'+dialog).css({top:dialogTop, left:dialogLeft}).show();
 			
 }
 
