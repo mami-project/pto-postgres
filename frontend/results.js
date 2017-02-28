@@ -242,13 +242,13 @@ function renderResults(results, query_id) {
   $('#runbutton').removeAttr("disabled");
 
   if(results['state'] == 'new') {
-    $('#results_msg').empty().append('<span class="txt-warn">Your query is in the queue waiting for execution. Please try again in an hour.</span>');
+    $('#results_msg').empty().append('<span class="txt-warn">Your query has been added to the <a href="qq.html">query queue</a> waiting for execution. Please come back later and check the <a href="qq.html">query queue</a> or remember the permanent link to your results below.</span>');
     $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
     return;
   }
 
   if(results['state'] == 'running') {
-    $('#results_msg').empty().append('<span class="txt-warn">Your query is currently being executed and the results are not available yet. Please try again in an hour.</span>');
+    $('#results_msg').empty().append('<span class="txt-warn">Your query has been added to the <a href="qq.html">query queue</a>. Unfortunately the execution of this query takes a while. Please come back later and check the <a href="qq.html">query queue</a> or remember the permanent link to your results below.</span>');
     $('#results_msg').append('<br><br><span>Permalink to your query: <a href="./qui.html?' + encodeURIComponent(query_id) + '">' + encodeURIComponent(query_id) + '</a></span>');
     return;
   }
@@ -403,7 +403,7 @@ function showError(xhr, status) {
     $('#results_msg').empty().append('<span class="txt-warn">The supplied result id could not be found in our database. Most likely the results expired and are no longer available. Please run a new query.</span>');
   }
   else {
-    $('#results_msg').empty().append('<span class="txt-err">Downloading results from server failed! Try again in an hour. If you keep seeing this message please contact us.</span>');
+    $('#results_msg').empty().append('<span class="txt-err">Downloading results from server failed! Please try later again. If you keep seeing this message please contact us.</span>');
   }
 }
 
