@@ -849,10 +849,10 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
       .attr("transform", function() { return "translate(0," + (group_keys.length * (5+barHeight)) + ")"; });
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x",width-2).attr("y", lheight).attr("fill","black");
-    footer.append("text").attr("x",200).attr("y", lheight + barHeight /2).attr("dy", "0em").text(function() { return "0"; }).attr("fill","black");
+    footer.append("text").attr("x",200).attr("y", lheight + barHeight/2 - 1).attr("dy", "0em").text(function() { return "0"; }).attr("fill","black");
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("x", 200).attr("y", lheight).attr("fill","black");
-    footer.append("text").attr("x",width).attr("y", lheight + barHeight /2).attr("dy", "0em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
+    footer.append("text").attr("x",width).attr("y", lheight + barHeight/2 - 1).attr("dy", "0em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
 
   var legend = chart.append("g");
     // Legend is moved to top.
