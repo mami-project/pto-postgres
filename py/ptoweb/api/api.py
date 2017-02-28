@@ -507,8 +507,8 @@ def api_qq_summary():
        EXTRACT ( EPOCH FROM ((NOW() AT TIME ZONE 'UTC') - start_time))
       ELSE
        NULL END) END) AS duration
-  FROM query_queue WHERE state = 'done' ORDER BY stop_time DESC
-  LIMIT 12)) summary ORDER BY stop_time DESC;
+  FROM query_queue WHERE state = 'done' AND result != '{"results":[]}'::JSONb ORDER BY stop_time DESC
+  LIMIT 24)) summary ORDER BY stop_time DESC;
   """
   
   try:
