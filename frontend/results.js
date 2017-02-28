@@ -362,6 +362,33 @@ function fillForms(params) {
   }
 
   disableDays(false);
+
+  var have_source = false;
+  var have_target = false;
+
+  if('source' in params)
+    if(params['source'] != '')
+      have_source = true;
+
+  if('target' in params)
+    if(params['target'] != '')
+      have_target = true;
+
+  if(!have_source && !have_target) {
+    togglebutton(['hideshow2', 'target','source', 'path_text']);
+  }
+
+  var have_group_by = false;
+
+  if('group_by' in params)
+    if(params['group_by'] != '')
+      have_group_by = true;
+
+  if(!have_group_by) {
+    togglebutton(['hideshow3', 'group_by','then_by', 'group_text']);
+  }
+
+  console.log(have_source, have_target);
 }
 
 
