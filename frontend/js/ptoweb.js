@@ -96,17 +96,17 @@ function getQQSummary(callback) {
 
 
 /*
-   Function: extractMonthFromTimestamp
+  Function: extractMonthFromTimestamp
 
-   Extracts the month as 3-letter string from the unix timestamp (seconds).
+  Extracts the month as 3-letter string from the unix timestamp (seconds).
 
-   Parameters:
+  Parameters:
 
-     timestamp - Unix timestamp as seconds passed since 1970.
+    timestamp - Unix timestamp as seconds passed since 1970.
 
-   Returns:
+  Returns:
 
-     3-letter string (Jan, Feb, ...)
+    3-letter string (Jan, Feb, ...)
  */
 function extractMonthFromTimestamp(timestamp) {
   var d = new Date(timestamp*1000);
@@ -117,17 +117,17 @@ function extractMonthFromTimestamp(timestamp) {
 
 
 /*
-   Function: extractDayFromTimestamp
+  Function: extractDayFromTimestamp
 
-   Extracts the day as 2-letter string from the unix timestamp (seconds).
+  Extracts the day as 2-letter string from the unix timestamp (seconds).
 
-   Parameters:
+  Parameters:
 
-     timestamp - Unix timestamp as seconds passed since 1970.
+    timestamp - Unix timestamp as seconds passed since 1970.
 
-   Returns:
+  Returns:
 
-     2-letter string (01, 31, ...)
+    2-letter string (01, 31, ...)
  */
 function extractDayFromTimestamp(timestamp) {
   var d = new Date(timestamp*1000);
@@ -165,18 +165,18 @@ function extractYearFromTimestamp(timestamp) {
 
 
 /*
- Function: toENotation
+  Function: toENotation
 
- Converts a (possibly big) number to e-notation. Sometimes also called scientific
- notation. Result is rounded to two decimal places.
+  Converts a (possibly big) number to e-notation. Sometimes also called scientific
+  notation. Result is rounded to two decimal places.
 
- Parameters:
+  Parameters:
 
-   num - Number
+    num - Number
 
- Returns:
+  Returns:
 
-   String (1.23e4)
+    String (1.23e4)
  */
 function toENotation(num) {
   if(num < 10000)
@@ -185,4 +185,30 @@ function toENotation(num) {
   var b = num / (Math.pow(10,lg));
       b = Math.round(10*b)/10;
   return "" + b + "e" + lg;
+}
+
+/*
+  Function: toTimestamp
+
+  Utility function to convert a string to unix timestamp.
+
+  Parameters:
+
+    date_s - Date as string
+
+  Returns:
+
+    unix timestamp. On error will return NaN.
+ */
+function toTimestamp(date_s) {
+
+  date_s = date_s.replace("start","00:00:00 GMT+0000");
+  date_s = date_s.replace("end","23:59:59 GMT+0000");
+
+  var t_ms = Date.parse(date_s);
+  if(isNaN(t_ms)) {
+    return t_ms;
+  }
+
+  return Math.floor(t_ms / 1000);
 }

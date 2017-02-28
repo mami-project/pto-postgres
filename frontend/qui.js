@@ -108,24 +108,6 @@ function process_successful_response_redirect(data) {
 }
 
 
-/**
- * toDate
- *  date_s - date as string
- *
- * convert to unix timestamp
- */
-function toDate(date_s) {
-
-  date_s = date_s.replace("start","00:00:00 GMT+0000");
-  date_s = date_s.replace("end","23:59:59 GMT+0000");
-
-  var t_ms = Date.parse(date_s);
-  if(isNaN(t_ms)) {
-    return t_ms;
-  }
-
-  return Math.floor(t_ms / 1000);
-}
 
 
 /**
@@ -152,9 +134,9 @@ function submitQuery(query) {
  * Time window presets for simple querys
  */
 var windows = {
-    "Nov 2016" : [toDate("01 Nov 2016 start"), toDate("30 Nov 2016 end")],
-    "Dec 2016" : [toDate("01 Dec 2016 start"), toDate("31 Dec 2016 end")],
-    "Jan 2017" : [toDate("01 Jan 2017 start"), toDate("31 Jan 2017 end")]
+    "Nov 2016" : [toTimestamp("01 Nov 2016 start"), toTimestamp("30 Nov 2016 end")],
+    "Dec 2016" : [toTimestamp("01 Dec 2016 start"), toTimestamp("31 Dec 2016 end")],
+    "Jan 2017" : [toTimestamp("01 Jan 2017 start"), toTimestamp("31 Jan 2017 end")]
 };
 
 /**
@@ -384,7 +366,7 @@ function runQuery() {
   }
 
 
-//   if((time_from != "" && isNaN(toDate(time_from))) || (time_to != "" && isNaN(toDate(time_to)))) {
+//   if((time_from != "" && isNaN(toTimestamp(time_from))) || (time_to != "" && isNaN(toTimestamp(time_to)))) {
 //     $("#query_msg").empty().append('time_to or time_from contain invalid input. Please correct them!');
 //     $("#query_msg").append(time_from);
 //     return;
@@ -458,12 +440,12 @@ function runQuery() {
   iql_time_parts = [];
 
   if(time_from != "")
-    iql_time_parts.push({"ge":["@time_from",{"time":[toDate(time_from)]}]});
+    iql_time_parts.push({"ge":["@time_from",{"time":[toTimestamp(time_from)]}]});
   else
     iql_time_parts.push({"ge":["@time_from",{"time":[0]}]});
 
   if(time_to != "")
-    iql_time_parts.push({"le":["@time_to",{"time":[toDate(time_to)]}]});
+    iql_time_parts.push({"le":["@time_to",{"time":[toTimestamp(time_to)]}]});
   else
     iql_time_parts.push({"le":["@time_to",{"time":[Math.floor(new Date("31 Dec 2037 23:59:59 GMT").getTime()/1000)]}]});
 
