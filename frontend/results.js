@@ -333,6 +333,8 @@ function renderResults(results, query_id) {
 }
 
 
+
+
 /**
  * fillForms
  *  - params
@@ -359,6 +361,8 @@ function fillForms(params) {
     $('#i_' + key).val(value);
     console.log('#i_'+key, value);
   }
+
+  disableDays(false);
 }
 
 
