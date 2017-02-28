@@ -64,7 +64,7 @@ function extractTimestamps(query) {
  *  - group_order - grouping of the query
  *  - distinct - distinct count or regular count?
  */
-function renderCounts(results, group_order, distinct) {
+function renderCounts(results, group_order, distinct, iql) {
   if(!Array.isArray(group_order)) {
     console.log("group_order not an array");
     return;
@@ -79,6 +79,31 @@ function renderCounts(results, group_order, distinct) {
 
   var counted_attribute = group_order[group_order.length-1].substring(1);
   var distinct_attribute = counted_attribute;
+
+  var date_str = "";
+  var cond_str = "";
+
+  try {
+    var params = extractQuery(iql);
+
+    if('conditions' in params)
+      cond_str = '(' + escapeHtml(params['conditions']) + '.*)';
+
+    if('year_from' in params &&
+       'year_to' in params &&
+       'month_from' in params &&
+       'month_to' in params) {
+      date_str = '(' + params['month_from'] + ' ' + params['year_from'] +
+                 ' - ' + params['month_to'] + ' ' + params['year_to'] + ')';
+    }
+
+    cond_str = '<span class="txt-small">' + cond_str + '</span>';
+    date_str = '<span class="txt-small">' + date_str + '</span>';
+      
+  }
+  catch(err) { console.log(err); }
+
+  console.log('cond_str', cond_str);
 
   group_order.pop();
 
@@ -149,11 +174,11 @@ function renderCounts(results, group_order, distinct) {
       console.log('part_groups', groups);
 
       var caption = attrNameToDisplay(top_group_by) + ' ' + top_group_keys[i];
-      var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i>";
+      var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> " + cond_str + " grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i> " + date_str;
 
       if(distinct === true) {
         title = "Counts of distinct <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "s</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) +
-            "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i>";
+            "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(bot_group_by)) + "</i> " + date_str;
       }
 
       renderHBarStacked(groups, title, counted_attribute, bot_group_by, caption);
@@ -182,11 +207,11 @@ function renderCounts(results, group_order, distinct) {
     //  chart(groups[group_keys[i]], attrNameToDisplay(group_by) + ": " + group_keys[i], counted_attribute);
     //}
 
-    var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i>";
+    var title = "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> " + cond_str + " grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i> " + date_str;
 
     if(distinct === true) {
       title = "Counts of distinct <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "s</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute))
-            + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i>";
+            + "</i> grouped by <i>" + escapeHtml(attrNameToDisplay(group_by)) + "</i> " + date_str;
     }
 
     renderHBarStacked(groups, title, counted_attribute, group_by);
@@ -194,10 +219,10 @@ function renderCounts(results, group_order, distinct) {
   }
   else if(group_order.length == 0) {
     if(distinct === true) {
-      renderHBar(results, "Counts of <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i>", counted_attribute);
+      renderHBar(results, "Counts of <i>" + escapeHtml(attrNameToDisplay(distinct_attribute)) + "</i> per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> " + date_str, counted_attribute);
     }
     else {
-      renderHBar(results, "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i>", counted_attribute);
+      renderHBar(results, "Counts of observations per <i>" + escapeHtml(attrNameToDisplay(counted_attribute)) + "</i> " + cond_str + " " + date_str, counted_attribute);
     }
   }
 }
@@ -272,6 +297,8 @@ function renderResults(results, query_id) {
 
   console.log('iql', JSON.stringify(iql));
 
+  var iql_ = JSON.parse(JSON.stringify(iql));
+
   if(!('query' in iql)) {
     return; //abort. something's more than fishy
   }
@@ -301,13 +328,13 @@ function renderResults(results, query_id) {
 
   if('count' in query) {
       console.log('regular count');
-      renderCounts(results, query['count'][0]);
+      renderCounts(results, query['count'][0], false, iql_);
   }
   else if('count-distinct' in query) {
       console.log('distinct count');
       console.log('qq', JSON.stringify(query['count-distinct']));
       console.log('[0]', query['count-distinct'][0]);
-      renderCounts(results, query['count-distinct'][0], true);
+      renderCounts(results, query['count-distinct'][0], true, iql_);
   }
 
   else if(results.length > 0) {
