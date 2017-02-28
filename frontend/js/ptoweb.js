@@ -43,6 +43,7 @@ $(document).ready(function(){
   _Navigation.render($('#c_navigation'));
 });
 
+
 /*
   Function: secondsToDisplay
 
@@ -71,6 +72,7 @@ function secondsToDisplay(seconds) {
   }
 }
 
+
 /*
   Function: getQQSummary
 
@@ -92,6 +94,7 @@ function getQQSummary(callback) {
      .fail(function() { callback(undefined); });
 }
 
+
 /*
    Function: extractMonthFromTimestamp
 
@@ -111,6 +114,7 @@ function extractMonthFromTimestamp(timestamp) {
 
   return months[d.getUTCMonth()];
 }
+
 
 /*
    Function: extractDayFromTimestamp
@@ -135,6 +139,7 @@ function extractDayFromTimestamp(timestamp) {
   return day;
 }
 
+
 /*
    Function: extractYearFromTimestamp
 
@@ -156,4 +161,28 @@ function extractYearFromTimestamp(timestamp) {
     year = '0' + year;
   
   return year;
+}
+
+
+/*
+ Function: toENotation
+
+ Converts a (possibly big) number to e-notation. Sometimes also called scientific
+ notation. Result is rounded to two decimal places.
+
+ Parameters:
+
+   num - Number
+
+ Returns:
+
+   String (1.23e4)
+ */
+function toENotation(num) {
+  if(num < 10000)
+    return num;
+  var lg = Math.floor(Math.log10(num));
+  var b = num / (Math.pow(10,lg));
+      b = Math.round(10*b)/10;
+  return "" + b + "e" + lg;
 }

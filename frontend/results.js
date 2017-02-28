@@ -643,20 +643,6 @@ function trimLongStr(str, max_len_) {
 }
 
 
-/**
- * to_e
- *  - num
- *
- * Convert a number to e-notation
- */
-function to_e(num) {
-  if(num < 10000)
-    return num;
-  var lg = Math.floor(Math.log10(num));
-  var b = num / (Math.pow(10,lg));
-      b = Math.round(10*b)/10;
-  return "" + b + "e" + lg;
-}
 
 /**
  * renderHBarStacked
@@ -803,7 +789,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
 
   for(var i = 0; i < cols.length; i++) {
     legend.append("rect").attr("y", offset_y).attr("x",offset_x + 0).attr("width", barHeight).attr("height", barHeight).attr("fill", colors[i]);
-    legend.append("text").attr("x",offset_x + barHeight+5).attr("y", offset_y + barHeight /2).attr("dy", ".35em").text(trimLongStr(cols[i]) + " (" + to_e(counted_total[cols[i]]) +")")
+    legend.append("text").attr("x",offset_x + barHeight+5).attr("y", offset_y + barHeight /2).attr("dy", ".35em").text(trimLongStr(cols[i]) + " (" + toENotation(counted_total[cols[i]]) +")")
      .attr("style","font-family: sans-serif; font-size: 14px; text-anchor: start;")
      .attr("fill", colors[i]);
     offset_x += Math.floor(width / 2);
