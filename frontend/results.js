@@ -724,6 +724,8 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   var figure = d3.select("#figures").append("div").attr("class","figure");
       figure.append("div").attr("class","title").html(title);
 
+  // Height of legend in pixels
+  var lheight = (5 + barHeight) * (group_keys.length - 1)
   var cheight = (5+barHeight) * (group_keys.length + 1 + Math.ceil((cols.length)/2));
 
   var chart = figure.append("svg")
@@ -739,7 +741,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
   for(var i = 0; i < group_keys.length; i++) {
     var data = groups[group_keys[i]];
 
-    var region = chart.append("g").attr("transform","translate(0," + i*(5+barHeight) + ")");
+      var region = chart.append("g").attr("transform","translate(0," + (lheight + i*(5+barHeight)) + ")");
     
     data.sort(function (a,b) { 
      if(a[counted_attribute] > b[counted_attribute]) return 1;
@@ -784,10 +786,11 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
         .attr("x", offset_x-2);
   }
 
-  var lines = chart.append("g");
+  var lines = chart.append("g")
+    .attr("transform", function() { return "translate(0," + ((group_keys.length - 1) * (5+barHeight)) + ")"; });
 
   var footer = chart.append("g")
-    .attr("transform", function() { return "translate(0," + (group_keys.length * (5+barHeight)) + ")"; });
+      .attr("transform", function() { return "translate(0," + ((group_keys.length+2) * (5+barHeight)) + ")"; });
 
     lines.append("rect").attr("width", 2).attr("height", (5+barHeight)*group_keys.length -5).attr("fill","black").attr("x",width-2);
     footer.append("text").attr("x",200).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return "0"; }).attr("fill","black");
@@ -796,9 +799,10 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
     footer.append("text").attr("x",width).attr("y", barHeight /2).attr("dy", ".35em").text(function() { return max_overall + ""; }).attr("fill","black").attr("style","text-anchor: end;");
 
   var legend = chart.append("g");
-      legend.attr("transform", "translate(0," + ((group_keys.length+1) * (5+barHeight)) + ")");
+    // Legend is moved to top.
+    legend.attr("transform", "translate(0," + (0*(group_keys.length+1) * (5+barHeight)) + ")");
 
-  offset_x = 0;
+  offset_x = 100;
   offset_y = 0;
 
   for(var i = 0; i < cols.length; i++) {
@@ -809,7 +813,7 @@ function renderHBarStacked(groups, title, counted_attribute, group_by, caption) 
     offset_x += Math.floor(width / 2);
     if(i % 2 == 1) {
       offset_y += barHeight+5;
-      offset_x = 0;
+      offset_x = 100;
     }
   }
 
