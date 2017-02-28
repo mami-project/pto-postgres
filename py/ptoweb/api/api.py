@@ -329,7 +329,7 @@ def api_revoke_key():
 @app.route("/result")
 def api_result():
   query_id = request.args.get('id')
-  download = request.agrs.get('download')
+  download = request.args.get('download')
 
   sql = "SELECT * FROM query_queue WHERE id = '%s';" % (escape_string(query_id))
 
@@ -352,7 +352,7 @@ def api_result():
   if download != 'y':
     return json200(dr[0])
   else:
-    return jsonn200_octet_stream(dr[0])
+    return json200_octet_stream(dr[0])
 
 
 def check_rate_limit(req, max_reqs = 4):
