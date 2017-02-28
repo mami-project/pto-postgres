@@ -261,7 +261,6 @@ function renderResults(results, query_id) {
   $('#results_msg').css('display','block');
   $('#results_msg_top').css('display','block');
   $('#query_msg').css('display','none');
-  $("#results")[0].scrollIntoView();
 
   $("#runbutton").html("Run new query");
   $('#runbutton').removeAttr("disabled");
@@ -278,7 +277,7 @@ function renderResults(results, query_id) {
     return;
   }
 
-  $('#results_msg').empty().append('<span class="txt-info">Rendering results...</span>');
+  //$('#results_msg').empty().append('<span class="txt-info">Rendering results...</span>');
 
   var rawResultsDiv = document.getElementById('raw_results');
   var result = results['result'];
@@ -354,6 +353,8 @@ function renderResults(results, query_id) {
     $('#results_msg').append('<br><span class="txt-warn">You are viewing an incomplete result set because too many results were available!<span> ');
     $('#results_msg').append('<span class="txt-warn">Aggregations done by the UI will be incomplete!</span> ');
   }
+
+  $("#results")[0].scrollIntoView();
 
   //$('#runbutton').prop('value', 'Run new query');
 }
