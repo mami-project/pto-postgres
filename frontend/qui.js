@@ -1,5 +1,18 @@
 $(document).ready(function () {
 
+  // populate the day inputs
+  for(var i = 1; i <= 31; i++) {
+    var i_s = i.toString();
+
+    if(i_s.length < 2)
+      i_s = '0' + i_s;
+
+    $('#i_day_to').append('<option value="' + i_s + '">' + i_s + '</option>');
+    $('#i_day_from').append('<option value="' + i_s + '">' + i_s + '</option>');
+  }
+
+  disableDays(true);
+
 	// if user clicked on button, the overlay layer or the dialogbox, close the dialog	
 	$('a.btn-ok, #dialog-overlay, #dialog-box').click(function () {		
 		$('#dialog-overlay, #dialog-box').hide();		
@@ -16,6 +29,9 @@ $(document).ready(function () {
 	
 	
 });
+
+
+
 
 /**
  * popup
@@ -418,9 +434,9 @@ function runQuery() {
     {"path":["ecn","connectivity","super","weird"],"id":-1},
     {"path":["ecn","negotiation_attempt","succeeded"],"id":7},
     {"path":["ecn","negotiation_attempt","failed"],"id":8},
-    {"path":["ecn","ect_one","seen"],"id":-1},
+    {"path":["ecn","ipmark","ect_one","seen"],"id":-1},
     {"path":["ecn","ect_zero","seen"],"id":-1},
-    {"path":["ecn","ce","seen"],"id":-1},
+    {"path":["ecn","ipmark","ce","seen"],"id":-1},
     {"path":["ecn","site_dependent","strict"],"id":-1},
     {"path":["ecn","site_dependent","strong"],"id":-1},
     {"path":["ecn","site_dependent","weak"],"id":-1},

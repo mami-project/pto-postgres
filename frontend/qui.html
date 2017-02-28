@@ -6,6 +6,66 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="cfg.js"></script>
+    <script type="text/javascript">
+      function disableDays(set) {
+        console.log('disableDays',set);
+        disableDaysFor(set, 'i_day_from', $('#i_year_from').val(), $('#i_month_from').val());
+        disableDaysFor(set, 'i_day_to', $('#i_year_to').val(), $('#i_month_to').val());
+      }
+
+      function disableDaysFor(set, select, year, month) {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        month = months.indexOf(month);
+
+        if(typeof(year) == 'string') year = parseInt(year);
+
+        var lastDay = new Date(Date.UTC(year, month+1,0)).getUTCDate();
+
+        console.log('lastDay', lastDay, year, month);
+
+        for(var i = 1; i <= 31; i++) {
+          var i_s = i.toString();
+          
+          if(i_s.length < 2)
+            i_s = '0' + i_s;
+
+          var prop_value = undefined;
+          if(i <= lastDay)
+            prop_value = false;
+          else
+            prop_value = true;
+          
+          $('#'+select + ' option[value="' + i_s + '"]').prop('disabled', prop_value);
+
+
+
+          if(select == 'i_day_to') {
+            if(i == lastDay) {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', true);
+              }
+            } else {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', false);
+              }
+            }
+          }
+
+          if(select == 'i_day_from') {
+            if(i == 1) {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', true);
+              }
+            } else {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', false);
+              }
+            }
+          }
+        }
+      }
+    </script>
     <script src="iql.js"></script>
     <script src="results.js"></script>
     <script src="qui.js"></script>
@@ -57,8 +117,8 @@
                 <select id="i_conditions">
                   <option value="ecn.connectivity">ecn.connectivity.(works, broken, offline, transient)</option>
                   <option value="ecn.connectivity.super">ecn.connectivity.super.(works, broken, offline, transient, weird)</option>
-                  <option value="ecn.ce">ecn.ipmark.ce.(seen)</option>
-                  <option value="ecn.ect_one">ecn.ipmark.ect_one.(seen)</option>
+                  <option value="ecn.ipmark.ce">ecn.ipmark.ce.(seen)</option>
+                  <option value="ecn.ipmark.ect_one">ecn.ipmark.ect_one.(seen)</option>
                   <option value="ecn.ect_zero">ecn.ipmark.ect_zero.(seen)</option>
                   <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.(succeeded, failed), </option>
                   <option value="ecn.site_dependent">ecn.site_dependent.(weak, strict, strong)</option>
@@ -164,7 +224,7 @@
                     <label>Year</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_year_from">
+                    <select onchange="disableDays(true);" id="i_year_from">
                       <option value="2016">2016</option>
                       <option value="2017">2017</option>
                     </select>
@@ -173,7 +233,7 @@
                     <label>Month</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_month_from">
+                    <select onchange="disableDays(true);" id="i_month_from">
                       <!--<option value="Jan">-</option>-->
                       <option value="Jan">January</option>
                       <option value="Feb">February</option>
@@ -194,10 +254,6 @@
                   </div>
 				          <div class="cell">
                     <select id="i_day_from">
-                      <!--<option value="01">-</option>-->
-                      <option value="01">1</option>
-                      <option value="02">2</option>
-                      <option value="03">3</option>
                     </select>
                   </div>
                 </div>
@@ -215,7 +271,7 @@
                     <label>Year</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_year_to">
+                    <select onchange="disableDays(true);" id="i_year_to">
                       <option value="2016">2016</option>
                       <option value="2017"selected>2017</option>
                     </select>
@@ -224,7 +280,7 @@
                     <label>Month</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_month_to">
+                    <select onchange="disableDays(true);" id="i_month_to">
                       <!--<option value="Jan">-</option>-->
                       <option value="Jan" selected>January</option>
                       <option value="Feb">February</option>
@@ -245,13 +301,6 @@
                   </div>
 				          <div class="cell">
                     <select id="i_day_to">
-                      <option value="01">1</option>
-                      <option value="02">2</option>
-                      <option value="03">3</option>
-                      <option value="28">28</option>
-                      <option value="29">29</option>
-                      <option value="30">30</option>
-                      <option value="31">31</option>
                     </select>
                   </div>
                 </div>
