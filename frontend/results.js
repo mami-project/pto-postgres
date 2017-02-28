@@ -1,4 +1,4 @@
-
+// Put legend on top of chart.
 
 $().ready(loadResults);
 
