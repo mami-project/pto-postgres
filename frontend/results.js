@@ -375,7 +375,7 @@ function fillForms(params) {
       have_target = true;
 
   if(!have_source && !have_target) {
-    togglebutton(['hideshow2', 'target','source', 'path_text']);
+    togglebutton(['hideshow2', 'target','source', 'path_text'], true);
   }
 
   var have_group_by = false;
@@ -385,7 +385,7 @@ function fillForms(params) {
       have_group_by = true;
 
   if(!have_group_by) {
-    togglebutton(['hideshow3', 'group_by','then_by', 'group_text']);
+    togglebutton(['hideshow3', 'group_by','then_by', 'group_text'], true);
   }
 
   console.log(have_source, have_target);
