@@ -79,6 +79,35 @@
 		<a href="#" class="button">Okay</a>
 	  </div>
 	</div>
+	<div id="dialog-conditions">
+	  <a href="#close" title="Close" class="close">x</a>
+	  <div class="dialog-content">
+	    <div>
+	    <h3>Overview of current conditions for observations in the PTO</h3>
+	    <table>
+	    <tr><td colspan=2><b>Condition</b></td><td><b>Description</b></td></tr>
+	    <tr><td rowspan=4 valign=top>ecn.connectivity.</td><td>works</td><td>TCP connections with and without ECN were established successfully.</td></tr>
+	    <tr><td>broken</td><td>A TCP connection without ECN negotiation attempt was established, but not with ECN.</td></tr>
+	    <tr><td>transient</td><td>A TCP connection with ECN negotiation was established, but not without. Since there is no reasonable model for a host that only responds
+to ECN-enable TCP handshakes at this time, we clearly consider this case as a transient measurement error.</td></tr>
+	    <tr><td>offline</td><td>No connection attempt to
+the target succeeded.</td></tr>
+<tr><td rowspan=2 valign=top>ecn.connectivity.super</td><td>works, broken, transient, offline</td><td>Each corresponding condition has been observed three times in three parallel trials.</td></tr>
+<tr><td>weird</td><td>Different conditions have been observed in the three parallel trials.</td></tr>
+        <tr><td rowspan=2 valign=top>ecn.negotiation_attempt.</td><td>succeeded</td><td>ECN was successfully negotiated.</td></tr>
+	    <tr><td>failed</td><td>A TCP connection with ECN negotiation attempt was established, but ECN was not successfully negotiated.</td></tr>
+	    <tr><td rowspan=3 valign=top>ecn.ipmark.</td><td>ce.seen</td><td>At least one CE mark observed on this connection.</td></tr>
+	    <tr><td>ect_zero.seen</td><td>At least one ECT(0) mark observed on this connection.</td></tr>
+	    <tr><td>ect_zero.seen</td><td>At least one ECT(1) mark observed on this connection.</td></tr>
+	    <tr><td rowspan=3 valign=top>ecn.path_dependent.</td><td>weak</td><td>A host is flagged as weakly path dependent if their is at least one <i>works</i> and at least one <i>broken</i> super condition for it from different vantage points.</td></tr>
+	    <tr><td>strict</td><td>A host is flagged as strictly path dependent if it is weakly path dependent and there are no <i>transient</i>, <i>offline</i>, or <i>weird</i> super conditions for it.</td></tr>
+	    <tr><td>strong</td><td>A host is flagged as strongly path dependent if it is strictly path dependent but there are at least two <i>broken</i> super conditions associated with it.</td></tr>
+	    <tr><td rowspan=2 valign=top>ecn.side_dependent.</td><td>weak</td><td>A host is flagged as weakly site dependent, if there are <i>broken</i> but no <i>works</i> and no <i>transient</i> super conditions associated with it.</td></tr>
+	    <tr><td>strong</td><td>A host is flagged as strongly site dependent, if there are only <i>broken</i> super conditions for it.</td></tr>
+	    </table>
+	    </div>
+	  </div>
+	</div>
     <div id="container">
       <div id="nav" class="clear-float">
         <ul style="float: left;">
@@ -109,8 +138,7 @@
             <div class="row-2">
               <div class="cell">
                 <label>Conditions
-                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popup('Testing')">
-                <!--onmouseover="do()"-->
+                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popupdialog('conditions')">
                 </label>
               </div>
               <div class="cell">
