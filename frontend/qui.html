@@ -6,24 +6,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="cfg.js"></script>
-    <script src="iql.js"></script>
-    <script src="results.js"></script>
-    <script src="qui.js"></script>
     <script src="js/ptoweb.js"></script>
+    <script src="js/qui.js"></script>
   </head>
   <body>
-    <div id="dialog-overlay"></div>
-	<div id="dialog-box">
-	  <a href="#close" title="Close" class="close">x</a>
-	  <div class="dialog-content">
-	    <div id="dialog-message"></div>
-		<a href="#" class="button">Okay</a>
-	  </div>
-	</div>
     <div id="container">
       <div id="nav" class="clear-float">
         <div style="float: left;" id="c_navigation"></div>
-        <a href="https://mami-project.eu"><img style="height: 2rem; float: right;" src="logo.png" alt="Go to MAMI project"/></a>
+        <a href="https://mami-project.eu"> <img style="height: 2rem; float: right;" src="logo.png" alt="Go to MAMI project"/> </a>
       </div>
       <div id="main">
       <div id="qui">
@@ -45,20 +35,12 @@
             <div class="row-2">
               <div class="cell">
                 <label>Conditions
-                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popup('Testing')">
-                <!--onmouseover="do()"-->
+                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popupdialog('conditions')">
                 </label>
               </div>
               <div class="cell">
                 <select id="i_conditions">
-                  <option value="ecn.connectivity">ecn.connectivity.(works, broken, offline, transient)</option>
-                  <option value="ecn.connectivity.super">ecn.connectivity.super.(works, broken, offline, transient, weird)</option>
-                  <option value="ecn.ce">ecn.ipmark.ce.(seen)</option>
-                  <option value="ecn.ect_one">ecn.ipmark.ect_one.(seen)</option>
-                  <option value="ecn.ect_zero">ecn.ipmark.ect_zero.(seen)</option>
-                  <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.(succeeded, failed), </option>
-                  <option value="ecn.site_dependent">ecn.site_dependent.(weak, strict, strong)</option>
-                  <option value="ecn.path_dependent">ecn.path_dependent.(weak, strong)</option>
+                 
                 </select>
               </div>
             </div>
@@ -69,29 +51,15 @@
               <div class="cell">
 				  <div class="row-3">
 					  <div class="cell">
-						<select id="i_count" <!--onchange="hideGroups()"-->>
-						  <option value="no" selected>Observations</option>
-						  <!--<option value="full_path">Paths</option>-->
-						  <option value="target">Targets</option>
-						  <option value="source">Vantage points</option>
-						  <!--<option value="observation_set">Observation sets</option>-->
-						  <!--<option value="name">Conditions</option>-->
-						  <!--<option value="no_">Don't count</option>-->
+						<select id="i_count">
 						</select>
 					  </div>
 					  <div class="mylabel">
 						<label>per</label>
 					  </div>
 					  <div class="cell">
-						<select id="i_per" disabled onchange="disableSelection()">
-						  <option value="name" selected>Condition</option>
-						  <option value="week">Week</option>
-						  <option value="month">Month</option>
-						  <option value="year">Year</option>
-						  <!--<option value="full_path">Path</option>-->
-						  <option value="target">Target</option>
-						  <option value="source">Vantage point</option>
-						  <!--<option value="no">globally (don't group)</option>-->
+						<select id="i_per">
+						 
 						</select>
 					  </div>
 					  <div class="lock">
@@ -111,17 +79,7 @@
                 <label>1. level </label>
               </div>
               <div class="cell">
-                <select id="i_group_by" onchange="showThenBy()">
-                  <option value="observation_set">Observation set</option>
-                  <!--<option value="full_path">Path</option>-->
-                  <option value="name" disabled>Condition</option>
-                  <option value="week">Week</option>
-                  <option value="month">Month</option>
-                  <option value="year">Year</option>
-                  <!--<option value="location">Location</option>-->
-                  <option value="target">Target</option>
-                  <option value="source">Vantage point</option>
-                  <option value="no" selected></option>
+                <select id="i_group_by">
                 </select>
               </div>
             </div>
@@ -131,16 +89,7 @@
               </div>
               <div class="cell">
                 <select id="i_then_by">
-                  <option value="observation_set">Observation set</option>
-                  <!--<option value="full_path">Path</option>-->
-                  <option value="name" disabled>Condition</option>
-                  <option value="week">Week</option>
-                  <option value="month">Month</option>
-                  <option value="year">Year</option>
-                  <!--<option value="location">Location</option>-->
-                  <option value="target">Target</option>
-                  <option value="source">Source</option>
-                  <option value="no" selected></option>
+                  
                 </select>
               </div>
             </div>   
@@ -160,7 +109,7 @@
                     <label>Year</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_year_from">
+                    <select onchange="disableDays(true);" id="i_year_from">
                       <option value="2016">2016</option>
                       <option value="2017">2017</option>
                     </select>
@@ -169,7 +118,7 @@
                     <label>Month</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_month_from">
+                    <select onchange="disableDays(true);" id="i_month_from">
                       <!--<option value="Jan">-</option>-->
                       <option value="Jan">January</option>
                       <option value="Feb">February</option>
@@ -190,10 +139,6 @@
                   </div>
 				          <div class="cell">
                     <select id="i_day_from">
-                      <!--<option value="01">-</option>-->
-                      <option value="01">1</option>
-                      <option value="02">2</option>
-                      <option value="03">3</option>
                     </select>
                   </div>
                 </div>
@@ -211,7 +156,7 @@
                     <label>Year</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_year_to">
+                    <select onchange="disableDays(true);" id="i_year_to">
                       <option value="2016">2016</option>
                       <option value="2017"selected>2017</option>
                     </select>
@@ -220,7 +165,7 @@
                     <label>Month</label>
                   </div>
 				          <div class="cell">
-                    <select id="i_month_to">
+                    <select onchange="disableDays(true);" id="i_month_to">
                       <!--<option value="Jan">-</option>-->
                       <option value="Jan" selected>January</option>
                       <option value="Feb">February</option>
@@ -241,13 +186,6 @@
                   </div>
 				          <div class="cell">
                     <select id="i_day_to">
-                      <option value="01">1</option>
-                      <option value="02">2</option>
-                      <option value="03">3</option>
-                      <option value="28">28</option>
-                      <option value="29">29</option>
-                      <option value="30">30</option>
-                      <option value="31">31</option>
                     </select>
                   </div>
                 </div>
