@@ -458,7 +458,7 @@ function runQuery() {
     {"path":["ecn","negotiation_attempt","succeeded"],"id":7},
     {"path":["ecn","negotiation_attempt","failed"],"id":8},
     {"path":["ecn","ipmark","ect_one","seen"],"id":-1},
-    {"path":["ecn","ect_zero","seen"],"id":-1},
+    {"path":["ecn","ipmark","ect_zero","seen"],"id":-1},
     {"path":["ecn","ipmark","ce","seen"],"id":-1},
     {"path":["ecn","site_dependent","strict"],"id":-1},
     {"path":["ecn","site_dependent","strong"],"id":-1},
