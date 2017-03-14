@@ -1,0 +1,90 @@
+# Swagger YAML definition of the PTO API
+
+# WORK POINTER, very in progress
+
+swagger: '2.0'
+
+info:
+  version: "0.3.0"
+  title: MAMI Path Transparency Observatory API (PAPI)
+  description: API for uploading files to the PTO, managing analysis of raw measurement data into observations, and running and caching queries on the resulting observations.
+
+schemes:
+  - https
+
+paths:
+
+  # NOTE: API CHANGE: this is an array, not a map
+  /upload-stats:
+    get:
+      description: Return statistics on raw measurement data uploaded to the PTO.
+      produces: application/json
+      responses:
+        200:
+          description: success
+          schema:
+            title: CampaignSet
+            description: An array of upload statistics by measurement campaign
+            type: array
+            items:
+              title: CampaignInfo
+              description: Statistics for a given campaign
+              properties: 
+                - 
+                  name: name
+                  type: string
+                -
+                  name: file-size
+                  type: float
+                -
+                  name: count
+                  type: integer
+
+  # if we want key management to be part of PAPI, we need to expand this.
+  /revoke-key:
+    get:
+      description: Revoke an API key by removing all permissions from it.
+      parameters:
+        -
+          name: X-API-KEY
+          in: header
+          type: string
+          required: true
+      responses:
+        200:
+          description: API key revoked
+        400:
+          description: API key not found
+
+  /qq/get:
+    get:
+      description: Retrieve a single query queue entry, given an ID
+      produces: appplication/json
+      parameters:
+        -
+          name: id
+          in: query
+          type: string
+          required: true
+          description: ID of the query to retrieve (derived from a hash of the IQL)
+      responses:
+        200:
+          description: success
+          schema:
+            type: object
+            title: QueryQueueEntry
+            description: Query queue entry as a JSON object. JSON schema TBD.
+
+  /qq/pending:
+    get:
+      description: Retrieve all query queue entries for pending queries (those not yet running)
+      produces: appplication/json
+      responses:
+        200:
+          description: success
+          schema:
+            type: array
+            title: QueryQueueEntries
+            description: Array of query queue entries. JSON schema TBD.
+
+# WORK POINTER
