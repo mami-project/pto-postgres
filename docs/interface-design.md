@@ -217,7 +217,8 @@ input, and return with exit status 0 if they are interested, 1 if not
 interested, and any other nonzero exit status otherwise.
 
 Raw analysis modules take files of a given type on standard input, and produce
-observations as newline-delimited JSON, with each line containing one object with the following properties:
+observations as newline-delimited JSON, with each line containing one object
+with the following properties:
 
 - `time`: a 2-array of timestamps as unix epoch UTC seconds
 - `path`: an array of strings representing path elements

@@ -45,6 +45,10 @@ responses:
 
 
 paths:
+
+  #
+  # create a key
+  #
   /api-key/create:
     get:
       description: Create a new API key. *new in PAPI 0.3*
@@ -78,6 +82,9 @@ paths:
         401:
           description: API key not valid, expired, or does not have `X` permission
 
+  #
+  # revoke a key
+  #
   /api-key/revoke:
     get:
       description: Revoke an API key by clearning all its permissions. *changed in PAPI 0.3*
@@ -93,7 +100,10 @@ paths:
           description: Key revoked.
         401:
           description: API key not valid or expired.
-          
+  
+  #
+  # renew/edit a key
+  #
   /api-key/renew:
     get:
       description: Edit an existing API key. *new in PAPI 0.3*
@@ -133,3 +143,129 @@ paths:
         401:
           description: API key not valid, expired, or does not have `X` permission
 
+  #
+  # grant raw download access to a campaign to an API key
+  #
+  /api-key/grant-campaign:
+    get:
+
+  #
+  # upload a raw data file
+  #
+  /raw/upload:
+    post:
+  
+  #
+  # list campaigns and show statistics per campaign
+  #
+  /raw/campaigns:
+    get:
+
+  #
+  # list files in a campaign
+  #
+  /raw/files:
+    get:
+  
+  #
+  # download a raw data file
+  #
+  /raw/download:
+    get:
+  
+  #
+  # submit a query to the queue
+  #
+  /query/submit:
+    post:
+
+  #
+  # retrieve query results given a query ID 
+  #
+  /query/result:
+    get:
+  
+  #
+  # list pending queries in the query queue
+  #
+  /query/pending:
+    get:
+  
+  #
+  # list presently running queries
+  #
+  /query/running:
+    get:
+
+  #
+  # list cached query results
+  #
+  /query/results:
+    get:
+
+  #
+  # cancel a running query
+  #
+  /query/cancel:
+    get:
+  
+  #
+  # list analysis/input pairs ready to run
+  #
+  /analysis/ready:
+    get:
+  
+  #
+  # submit an analysis request to the analysis queue
+  #
+  /analysis/submit:
+    get:
+  
+  #
+  # show pending analysis requests
+  #
+  /analysis/pending:
+    get:
+  
+  #
+  # show presently running analyses
+  #
+  /analysis/running:
+    get:
+  
+  #
+  # show recently run analyses
+  #
+  /analysis/log:
+    get:
+
+  #
+  # show status of analysis/query workers
+  #
+  /workers/list:
+    get:
+
+  #
+  # manage running workers
+  #
+  /workers/run:
+    get:
+
+  #
+  # list reviewable observation sets
+  #
+  /os/reviewable:
+    get:
+
+  #
+  # show observation set details for review
+  #
+  /os/review:
+    get:
+
+  # 
+  # set observation set state
+  #
+  /os/state:
+    get:
+    
