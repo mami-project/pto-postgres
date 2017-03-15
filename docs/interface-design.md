@@ -209,12 +209,12 @@ particular data item.
 Analysis modules are implemented as UNIX executables. Without flags, they read
 appropriate input on standard input, and write appropriate output on standard
 output, returning with a zero exit status if the analysis was successful, and
-any nonzero exit status otherwise. 
+any nonzero exit status otherwise.
 
-With the `-i` flag, they express interest
-read metadata as a JSON object on standard input, and return with exit status 0
-if they are interested, 1 if not interested, and any other nonzero exit status
-otherwise.
+With the `--interest` flag, they express interest in files and/or observation
+sets based on metadata. They read this metadata as a JSON object on standard
+input, and return with exit status 0 if they are interested, 1 if not
+interested, and any other nonzero exit status otherwise.
 
 Raw analysis modules take files of a given type on standard input, and produce
 observations as newline-delimited JSON, with each line containing one object with the following properties:

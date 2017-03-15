@@ -1,90 +1,135 @@
 # Swagger YAML definition of the PTO API
-
-# WORK POINTER, very in progress
-
 swagger: '2.0'
 
 info:
   version: "0.3.0"
   title: MAMI Path Transparency Observatory API (PAPI)
-  description: API for uploading files to the PTO, managing analysis of raw measurement data into observations, and running and caching queries on the resulting observations.
+  description: API for uploading files to the observatory, managing uploaded files, invoking and managing analysis of raw measurement data and observations, reviewing and managing observation sets, and running and caching queries on the resulting observations.
 
 schemes:
   - https
 
+parameters:
+  Permissions:
+    name: permissions
+    in: query
+    type: string
+    required: true
+    description: |
+      A string containing the permission characters for this API key. The following characters are supported:
+      - `r` submit raw data file
+      - `R` manage raw data files
+      - `q` submit queries
+      - `Q` manage query queue and workers
+      - `S` manage observation sets
+      - `a` invoke analyses and observe running analyses
+      - `A` manage analysis queue and workers
+      - `X` manage access control  
+  
+responses:
+  KeyDescription:
+    description: Key updated, details returned.
+    schema:
+        title: KeyDescription
+        type: object
+        properties:
+          key: 
+            type: string
+            description: Newly created API key
+          name:
+            type: string
+            description: Display name for the API key
+          expires:
+            type: string
+            description: Expiration date for the API key in ISO8601/RFC3339 format. 
+
+
 paths:
-
-  # NOTE: API CHANGE: this is an array, not a map
-  /upload-stats:
+  /api-key/create:
     get:
-      description: Return statistics on raw measurement data uploaded to the PTO.
-      produces: application/json
-      responses:
-        200:
-          description: success
-          schema:
-            title: CampaignSet
-            description: An array of upload statistics by measurement campaign
-            type: array
-            items:
-              title: CampaignInfo
-              description: Statistics for a given campaign
-              properties: 
-                - 
-                  name: name
-                  type: string
-                -
-                  name: file-size
-                  type: float
-                -
-                  name: count
-                  type: integer
-
-  # if we want key management to be part of PAPI, we need to expand this.
-  /revoke-key:
-    get:
-      description: Revoke an API key by removing all permissions from it.
+      description: Create a new API key. *new in PAPI 0.3*
+      produces: 
+        -
+          application/json
       parameters:
         -
-          name: X-API-KEY
-          in: header
-          type: string
-          required: true
-      responses:
-        200:
-          description: API key revoked
-        400:
-          description: API key not found
-
-  /qq/get:
-    get:
-      description: Retrieve a single query queue entry, given an ID
-      produces: appplication/json
-      parameters:
-        -
-          name: id
+          name: key
           in: query
           type: string
           required: true
-          description: ID of the query to retrieve (derived from a hash of the IQL)
+          description: API key with `X` permission
+        -
+          name: name
+          in: query
+          type: string
+          required: true
+          description: Display name for the API key
+        -
+          name: expires
+          in: query
+          type: string
+          required: false
+          description: Expiration date for the API key in ISO8601/RFC3339 format. If not present, expiration date will be set thirty days in the future.
+        -
+          $ref: '#/parameters/Permissions'
       responses:
         200:
-          description: success
-          schema:
-            type: object
-            title: QueryQueueEntry
-            description: Query queue entry as a JSON object. JSON schema TBD.
+          $ref: '#/responses/KeyDescription'
+        401:
+          description: API key not valid, expired, or does not have `X` permission
 
-  /qq/pending:
+  /api-key/revoke:
     get:
-      description: Retrieve all query queue entries for pending queries (those not yet running)
-      produces: appplication/json
+      description: Revoke an API key by clearning all its permissions. *changed in PAPI 0.3*
+      parameters:
+        -
+          name: key
+          in: query
+          type: string
+          required: true
+          description: API key to revoke. All keys have implicit permission to self-revoke.
+      responses:
+        200: 
+          description: Key revoked.
+        401:
+          description: API key not valid or expired.
+          
+  /api-key/renew:
+    get:
+      description: Edit an existing API key. *new in PAPI 0.3*
+      produces: 
+        - 
+          application/json
+      parameters:
+        -
+          name: key
+          in: query
+          type: string
+          required: true
+          description: API key with `X` permission
+        -
+          name: subject
+          in: query
+          type: string
+          required: true
+          description: API key to renew
+        -
+          name: name
+          in: query
+          type: string
+          required: false
+          description: If present, new display name for the API key
+        -
+          name: expires
+          in: query
+          type: string
+          required: false
+          description: If present, expiration date for the API key in ISO8601/RFC3339 format.
+        -
+          $ref: '#/parameters/Permissions'
       responses:
         200:
-          description: success
-          schema:
-            type: array
-            title: QueryQueueEntries
-            description: Array of query queue entries. JSON schema TBD.
+          $ref: '#/responses/KeyDescription'
+        401:
+          description: API key not valid, expired, or does not have `X` permission
 
-# WORK POINTER
