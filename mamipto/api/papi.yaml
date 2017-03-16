@@ -107,9 +107,6 @@ paths:
   /api-key/renew:
     get:
       description: Edit an existing API key. *new in PAPI 0.3*
-      produces: 
-        - 
-          application/json
       parameters:
         -
           name: key
@@ -148,12 +145,47 @@ paths:
   #
   /api-key/grant-campaign:
     get:
+      produces: 
+        - 
+          application/json
+      parameters:
+        -
+          name: key
+          in: query
+          type: string
+          required: true
+          description: API key with `X` permission
+        -
+          name: subject
+          in: query
+          type: string
+          required: true
+          description: API key to grant permission to
+        -
+          name: campaign
+          in: query
+          type: string
+          required: true
+          description: Name of campaign to grant raw data access to
+      responses:
+        200: 
+          description: Permission granted.
+        401:
+          description: API key not valid or expired.
+        404:
+          description: Campaign or subject key not found.
 
   #
   # upload a raw data file
-  #
+  # FIXME: split this into metadata upload + PUT: 
+  # see https://philsturgeon.uk/api/2016/01/04/http-rest-api-file-uploads/
+  # metadata upload results in 201 Created with a Location to PUT the file data.
+  # 
   /raw/upload:
     post:
+      responses:
+        201: 
+          description: File created on filesystem; upload data using PUT to the Location in the response header.
   
   #
   # list campaigns and show statistics per campaign
