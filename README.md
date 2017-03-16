@@ -10,6 +10,7 @@ PostgreSQL backend for Path Transparency Observatory and associated utilities
 * mamipto/iql: Interesting Query Language support (and PostgreSQL transpiler)
 * mamipto/query: Query runtime
 * mamipto/analysis: Analysis runtime
+* mamipto/api: Flask implementation of PAPI
 * docs: Design, development, and administrator's documentation
 * tests: Test suites
 
