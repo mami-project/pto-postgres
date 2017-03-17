@@ -20,6 +20,17 @@ CREATE TABLE condition (
   full_name VARCHAR(1024)
 );
 
+-- -------------------------------------------------------------------------- 
+-- -------------------------------------------------------------------------- 
+--                              CAMPAIGNS                                  --
+-- -------------------------------------------------------------------------- 
+-- -------------------------------------------------------------------------- 
+
+CREATE TABLE campaign (
+  campaign_id SERIAL PRIMARY KEY,
+  name VARCHAR(80),     -- Name of the campaign; also used in raw storage path
+  contact VARCHAR(1024) -- URL containing contact information for campaign owner
+)
 
 -- -------------------------------------------------------------------------- 
 -- -------------------------------------------------------------------------- 
@@ -33,7 +44,6 @@ CREATE TABLE analyzer (
     repourl VARCHAR(255) NOT NULL,
     python_class VARCHAR(255) NOT NULL
 )
-
 
 -- -------------------------------------------------------------------------- 
 -- -------------------------------------------------------------------------- 
@@ -84,7 +94,8 @@ CREATE TABLE observation_set (
   -- Contains the name of the measurement campaign, for analysers that take
   -- raw data. May contain additional information for other analysers, or
   -- may be NULL in these cases
-  campaign VARCHAR(255),
+  campaign_id INTEGER NOT NULL,
+  -- Current state of the observation set
   state os_state,
   -- Revision ID when this observation set was created
   roc BIGINT NOT NULL,
@@ -100,7 +111,9 @@ CREATE TABLE observation_set (
   FOREIGN KEY(rod)
     REFERENCES observation_set_revision(revision),
   FOREIGN KEY(aid)
-    REFERENCES analyzer(aid)
+    REFERENCES analyzer(aid),
+  FOREIGN KEY(campaign_id)
+    REFERENCES campaign(campaign_id)
 );
 
 CREATE TABLE observation_set_dependencies (
@@ -118,7 +131,6 @@ CREATE TABLE observation_set_conditions (
     PRIMARY KEY(osid, cid)
     FOREIGN KEY(osid) REFERENCES observation_set(osid),
     FOREIGN KEY(cidn) REFERENCES condition(cid)
-
 )
 
 CREATE TABLE observation_set_metadata (
@@ -138,6 +150,23 @@ CREATE TABLE observation_set_metadata (
 -- -------------------------------------------------------------------------- 
 -- -------------------------------------------------------------------------- 
 
+CREATE TABLE upload (
+  fid BIGSERIAL PRIMARY KEY,
+  campaign_id INTEGER NOT NULL,
+  filetype VARCHAR(255) NOT NULL,
+  path VARCHAR(255) NOT NULL,
+  
+  -- Upload time (i.e., time metadata was POSTed)
+  time_uploaded TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+ 
+  -- Measurement time window
+  start_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+
+  -- Additionally metadata provided with the upload
+  metadata JSONb NOT NULL,
+)
+
 -- -------------------------------------------------------------------------- 
 -- -------------------------------------------------------------------------- 
 --                           ANALYSIS LOG                                  --
@@ -152,10 +181,10 @@ CREATE TYPE analysis_state AS ENUM (
 
 CREATE TABLE raw_analysis_log (
     aid BIGINT NOT NULL,
-    filesystem_path VARCHAR(2048) NOT NULL,
+    fid BIGINT NOT NULL,
     state analysis_state,
     FOREIGN KEY(aid) REFERENCES analyzer(aid),
-    FOREIGN KEY(filesystem_path) REFERENCES uploads(filesystem_path)
+    FOREIGN KEY(fid) REFERENCES upload(fid)
 );
 
 CREATE TABLE derived_analysis_log (
@@ -165,3 +194,21 @@ CREATE TABLE derived_analysis_log (
     FOREIGN KEY(aid) REFERENCES analyzer(aid),
     FOREIGN KEY(osid) REFERENCES observation_set(osid)
 );
+
+-- -------------------------------------------------------------------------- 
+-- -------------------------------------------------------------------------- 
+--                          PAPI AUTHORIZATION                             --
+-- -------------------------------------------------------------------------- 
+-- -------------------------------------------------------------------------- 
+
+CREATE TABLE roles (
+    rid SERIAL PRIMARY KEY,
+    apikey VARCHAR(32) NOT NULL,
+    name VARCHAR(80) NOT NULL,
+    perms VARCHAR(8),
+)
+
+CREATE TABLE role_campaign (
+    rid INTEGER NOT NULL,
+    campaign_id INTEGER NOT NULL
+)
