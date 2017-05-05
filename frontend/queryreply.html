@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<title>PTO - Query Reply</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<script scr="layout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="uploads.js"></script>
+<script src="cfg.js"></script>
+<script src="iql.js"></script>
+<script src="qq.js"></script>
+<script src="results.js"></script>
+<script src="qui.js"></script>
+<script type="text/javascript">
+      function openwin(displayname) {
+        var mainwin = window.open('index.html','PTOMain');
+        mainwin.focus();
+        mainwin.document.getElementById(displayname).style.display='block';
+      }
+</script>
+<body onload="loadResults()">
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card-2 w3-left-align w3-large">
+    <!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>-->
+    <div class="w3-bar-item w3-button w3-padding-large w3-white"  onclick="var mainwin = window.open('index.html','PTOMain');mainwin.focus();">Home<!--<image src="img/pto.png" style="max-height:41px"/>--></div>
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="openwin('runquery')">Run New Query</a>
+    <a href="#queryqueue-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Query Queue</a>
+    <a href="#uploadstats-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'">Upload statistics</a>
+    
+    <div class="w3-display-right">
+   <a href="https://mami-project.eu" class="w3-bar-item w3-button w3-hide-small w3-padding-small w3-white w3-hover-white"><img style="height: 2.7rem" src="logo.png" alt="Go to MAMI project"/></a>
+   </div>
+  </div>
+  
+  <!-- Navbar on small screens -->
+  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="document.getElementById('runquery').style.display='block'">Run New Query</a>
+    <a href="#queryqueue-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Query Queue</a>
+    <a href="#uploadstats-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'">Upload statistics</a>
+  </div>
+</div>
+  
+
+
+<!-- Header -->
+<!--<header class="w3-container w3-theme w3-padding" id="ptoheader">
+  <div class="w3-center">
+  <h4>Path Transparency Observatory</h4>
+  <h1 class="w3-xxxlarge"><b>P</b>ath <b>T</b>ransparency <b>O</b>bservatory</h1>
+    <p><image src="img/pto-black.png" /></p>
+    <p>An open-source, public repository for measurement of path transparency and <br>
+    impairments on new and existing network protocols in the Internet.</p>
+    <div class="w3-padding-32">
+      <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="document.getElementById('runquery').style.display='block'" style="font-weight:900;">Query Observations</button>
+    </div>
+  </div>
+</header>-->
+
+<div class="w3-padding-64">
+<div id="results" style="display: none">
+  <h1>Query Result</h1>
+  <div id="results_msg" style="display: none">
+  </div>
+  <div id="chart_section">
+    <h2>Chart</h2>
+    <div id="figures">
+    </div>
+  </div>
+     
+  <div id="table_section">
+    <h2>Raw table</h2>
+    <div class="auto-overflow" id="tables">
+    </div>
+  </div>
+
+  <div id="raw_query_section">
+    <h2>Query</h2>
+    <div class="auto-overflow">
+      <code id="raw_query"></code>
+    </div>
+  </div>
+
+  <div id="raw_results_section">
+    <h2>Raw response</h2>
+    <div class="auto-overflow" id="raw_results">
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-dark w3-padding-16">
+  <p>The PTO is developed and maintained by the H2020 ICT <a href="mami-project.eu">MAMI project.</a></p>
+  <p class="w3-text-grey w3-tiny">This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant 
+                agreement No 688421, and was supported by the Swiss State Secretariat for Education, Research and
+                Innovation (SERI) under contract number 15.0268. The opinions expressed and
+                arguments employed reflect only the authors' views. The European Commission is
+                not responsible for any use that may be made of that information. Further, the
+                opinions expressed and arguments employed herein do not necessarily reflect
+                the official views of the Swiss Government.
+<img src="img/eu_flag_small.jpg" style="width: 2rem"></p>
+
+              
+</footer>
+
+
+</body>
+</html>

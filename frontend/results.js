@@ -1,5 +1,5 @@
 
-$().ready(loadResults);
+//$().ready(loadResults);
 
 /**
  * loadResults

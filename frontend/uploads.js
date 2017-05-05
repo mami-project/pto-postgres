@@ -7,7 +7,7 @@ function getUploadStats() {
 }
 
 function showError() { 
-  var cell = $('#uploadstats_cell').empty();
+  var cell = $('#uploadstats_err').empty();
   cell.append('There was an error downloading the upload statistics from the server. Please come back later.');
 }
 
@@ -35,7 +35,10 @@ function convertDate(date) {
 
 
 function renderUploadStats(data) {
-  var table = d3.select("#uploadstats");
+  
+  $('#uploadstats-table').empty();
+
+  var table = d3.select("#uploadstats-table");
 
   var cols = Object.keys(data);
   cols.sort();

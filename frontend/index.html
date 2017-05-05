@@ -1,128 +1,594 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Path Transparency Observatory</title>
-    <link rel="stylesheet" href="css.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="cfg.js"></script>
-    <script src="qui.js"></script>
-  </head>
-  <body>
-    <div id="container">
-      <div id="nav" class="clear-float">
-        <ul style="float: left;">
-          <li><a href="/">PTO Home</a></li>
-          <li><a href="qui.html">Run Query</a></li>
-          <li><a href="qq.html">Query Queue</a></li>
-          <li><a href="uploadstats.html">Upload statistics</a></li>
-        </ul>
-        <a href="https://mami-project.eu"> <img style="height: 2rem; float: right;" src="logo.png" alt="Go to MAMI project"/> </a>
+<title>Path Transparency Observatory</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<script scr="layout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="uploads.js"></script>
+<script src="cfg.js"></script>
+<script src="iql.js"></script>
+<script src="qq.js"></script>
+<script src="query.js"></script>
+<!--<script src="results.js"></script>-->
+<!--<script src="qui.js"></script>-->
+<script type="text/javascript">
+function inputDays() {
+
+  // populate the day inputs
+  for(var i = 1; i <= 31; i++) {
+    var i_s = i.toString();
+
+    if(i_s.length < 2)
+      i_s = '0' + i_s;
+
+    $('#i_day_to').append('<option value="' + i_s + '">' + i_s + '</option>');
+    $('#i_day_from').append('<option value="' + i_s + '">' + i_s + '</option>');
+  }
+
+  disableDays(true);
+}
+
+      function disableDays(set) {
+        console.log('disableDays',set);
+        disableDaysFor(set, 'i_day_from', $('#i_year_from').val(), $('#i_month_from').val());
+        disableDaysFor(set, 'i_day_to', $('#i_year_to').val(), $('#i_month_to').val());
+      }
+
+      function disableDaysFor(set, select, year, month) {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        month = months.indexOf(month);
+
+        if(typeof(year) == 'string') year = parseInt(year);
+
+        var lastDay = new Date(Date.UTC(year, month+1,0)).getUTCDate();
+
+        console.log('lastDay', lastDay, year, month);
+
+        for(var i = 1; i <= 31; i++) {
+          var i_s = i.toString();
+          
+          if(i_s.length < 2)
+            i_s = '0' + i_s;
+
+          var prop_value = undefined;
+          if(i <= lastDay)
+            prop_value = false;
+          else
+            prop_value = true;
+          
+          $('#'+select + ' option[value="' + i_s + '"]').prop('disabled', prop_value);
+
+
+
+          if(select == 'i_day_to') {
+            if(i == lastDay) {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', true);
+              }
+            } else {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', false);
+              }
+            }
+          }
+
+          if(select == 'i_day_from') {
+            if(i == 1) {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', true);
+              }
+            } else {
+              if(set) {
+                $('#'+select + ' option[value="' + i_s + '"]').prop('selected', false);
+              }
+            }
+          }
+        }
+      }
+</script>
+<body  onLoad="window.name='PTOMain';inputDays()">
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card-2 w3-left-align w3-large">
+    <!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>-->
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white">Home<!--<image src="img/pto.png" style="max-height:41px"/>--></a>
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="inputDays();document.getElementById('runquery').style.display='block'">Run Query</a>
+    <a href="#queryqueue-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Query Queue</a>
+    <a href="#uploadstats-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'">Upload statistics</a>
+    
+    <div class="w3-display-right">
+    <!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Log In</a>-->
+   <a href="https://mami-project.eu" class="w3-bar-item w3-button w3-hide-small w3-padding-small w3-white w3-hover-white"><img style="height: 2.7rem" src="logo.png" alt="Go to MAMI project"/></a>
+   </div>
+  </div>
+  
+  <!-- Navbar on small screens -->
+  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="inputDays();document.getElementById('runquery').style.display='block'">Run Query</a>
+    <a href="#queryqueue-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Query Queue</a>
+    <a href="#uploadstats-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'">Upload statistics</a>
+    <!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Log In</a>-->
+  </div>
+</div>
+  
+<div id="results_msg_top" style="display: none">
+</div>
+
+<!-- Header -->
+<header class="w3-container w3-theme w3-padding" id="ptoheader">
+  <div class="w3-center">
+  <h4>Path Transparency Observatory</h4>
+  <h1 class="w3-xxxlarge"><b>P</b>ath <b>T</b>ransparency <b>O</b>bservatory</h1>
+    <p><image src="img/pto-black.png" /></p>
+    <p>An open-source, public repository for measurement of path transparency and <br>
+    impairments on new and existing network protocols in the Internet.</p>
+    <div class="w3-padding-32">
+      <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="document.getElementById('runquery').style.display='block'" style="font-weight:900;">Query Observations</button>
+    </div>
+  </div>
+</header>
+
+<!-- Query submitted dialog box -->
+<div id="querysubmitted" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-top">
+      <header class="w3-container w3-theme-l1"> 
+        <span onclick="document.getElementById('querysubmitted').style.display='none'"
+        class="w3-button w3-display-topright">X</span>
+        <h4>Your query</h4>
+      </header>
+      <div id="querysucess" class="w3-padding" style="display:none">
+        <p>Your query has been successfully submitted.</p>
+        <div id="gotoqueryqueue" style="display:none">
+        <p>Your query is not completed yet.</p>
+        <p>You can the status of your query processing in the query queue and retrive your results with the following link:</p>
+        <p id="queryidlink"></p>
+        <a href="#queryqueue-header" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none';getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Go to query queue</a>
+        </div>
+        <a  id="showresults" style="display:none" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none'" target="_blank">Show results</a>
       </div>
-      <div id="main">
-        <div class="jumbo txt-justify">
-          <p class="txt-center txt-huge txt-gray row-margin">Path Transparency Observatory</p>
-          <br>
-          <p class="txt-center txt-info bold-emph">An open-source, public repository for measurement of path transparency and 
-            <br>
-            impairments on new and existing network protocols in the Internet.
-          </p>
-          <div class="">
-            <div class="cell">
-              <h1 class="bold-emph"><i>What it is:</i> Path Transparency and Ossification</h1>
-              <p>
-                Given the increasing deployment of middleboxes in the Internet, we see an ossification of the protocol stack 
-                that makes it difficult to deploy new protocols or protocol extensions. The data provided by this observatory
-                assists to quantify impairments on path transparency when traffic is altered or treated differently on a network
-                path based on the protocol stack in use.
-              </p>
-            </div>
+      <div id="queryfailed" class="w3-padding" style="display:none">
+        <p>Due to a system error your query could not be submitted.</p>
+        <p>Please try later again!</p>
+        <a class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none'" style="font-weight:900;">Okay</a>
+      </div>
+      <!--<footer class="w3-container w3-theme-l1"><p></p></footer>-->
+    </div>
+</div>
+
+
+<!-- Run Query -->
+<div id="runquery" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-top">
+      <header class="w3-container w3-theme-l1"> 
+        <span onclick="document.getElementById('runquery').style.display='none'"
+        class="w3-button w3-display-topright">X</span>
+        <h4>Custom Query</h4>
+      </header>
+      <div class="w3-padding">
+        <p>Please specify your query criteria 
+          and then click on 'Run Query' to submit the query. 
+          Your query will be submitted to a queue and 
+          you'll be provided a link to retrieve the results.</p>
+        <div id="qui">
+          <div id="run_query">
+            <div class="msg" id="query_msg"></div>
           </div>
-          <div class="">
-            <div class="cell">
-              <h1 class="bold-emph"><i>How it works:</i> Data and Observations</h1>
-              <p>
-                The <i>Path Transparency Observatory</i> (PTO) collects measurement data from different sources and generated by 
-                different measurements tools. A data-format-specific, intermediate processing step generates <i>observations</i> of
-                a network <i>condition <b>c</b></i> on a <i>path <b>p</b></i> during a <i>time interval <b>t</b></i>. 
-              </p>
-              <p>
-                We provide the <a href="papi.html"><span class="txt-abbr">P</span>ath Transparency Observatory-<span class="txt-abbr">API</span> (PAPI)</a> to run custom queries on observation data base of the PTO. <br>
-                Use the <a href="qui.html">query web-frontend</a> to get access and graphical rendering of the results!
-              </p>
+        <br>
+        <form action="javascript:runQuery();">
+          <fieldset>
+            <legend>Query</legend>
+              <div class="w3-third">
+                <label>Conditions
+                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popupdialog('conditions')">
+                </label>
+              </div>
+              <div class="w3-twothird">
+                <select id="i_conditions">
+                  <option value="ecn.connectivity">ecn.connectivity.(works, broken, offline, transient)</option>
+                  <option value="ecn.connectivity.super">ecn.connectivity.super.(works, broken, offline, transient, weird)</option>
+                  <option value="ecn.ipmark.ce">ecn.ipmark.ce.(seen)</option>
+                  <option value="ecn.ipmark.ect_one">ecn.ipmark.ect_one.(seen)</option>
+                  <option value="ecn.ipmark.ect_zero">ecn.ipmark.ect_zero.(seen)</option>
+                  <option value="ecn.negotiation_attempt">ecn.negotiation_attempt.(succeeded, failed), </option>
+                  <option value="ecn.site_dependent">ecn.site_dependent.(weak, strict, strong)</option>
+                  <option value="ecn.path_dependent">ecn.path_dependent.(weak, strong)</option>
+                </select>
+              </div>
+              <div class="w3-third">
+                <label>Count</label>
+              </div>
+              <div class="w3-twothird">
+		<select id="i_count" <!--onchange="hideGroups()"-->>
+		  <option value="no" selected>Observations</option>
+		  <!--<option value="full_path">Paths</option>-->
+		  <option value="target">Targets</option>
+		  <option value="source">Vantage points</option>
+		  <!--<option value="observation_set">Observation sets</option>-->
+		  <!--<option value="name">Conditions</option>-->
+		  <!--<option value="no_">Don't count</option>-->
+		</select>
+		<label>per</label>
+		<select id="i_per" disabled onchange="disableSelection()">
+		  <option value="name" selected>Condition</option>
+		  <option value="week">Week</option>
+		  <option value="month">Month</option>
+		  <option value="year">Year</option>
+		  <!--<option value="full_path">Path</option>-->
+		  <option value="target">Target</option>
+		  <option value="source">Vantage point</option>
+		  <!--<option value="no">globally (don't group)</option>-->
+		</select>
+		<img class="clickimg" src="unlock.png" height="20px" onclick="document.getElementById('i_per').prop('disabled', false)">
+              </div>
+            </fieldset>
+            <fieldset>
+            <legend>Grouping (optional)
+            <img class="clickimg" id="hideshow3" src="hide.png" onclick="togglebutton(['hideshow3', 'group_by','then_by', 'group_text'])">
+            </legend>
+            <p id="c_group_text">Select additional criteria to group the results data (in separate rows in results table and as input for graphical representation) or leave empty.<br><br></p>
+            <div id="c_group_by">
+              <div class="w3-third">
+                <label>1. level </label>
+              </div>
+              <div class="w3-twothird">
+                <select id="i_group_by" onchange="showThenBy()">
+                  <option value="observation_set">Observation set</option>
+                  <!--<option value="full_path">Path</option>-->
+                  <option value="name" disabled>Condition</option>
+                  <option value="week">Week</option>
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                  <!--<option value="location">Location</option>-->
+                  <option value="target">Target</option>
+                  <option value="source">Vantage point</option>
+                  <option value="no" selected></option>
+                </select>
+              </div>
             </div>
+            <div id="c_then_by" style="display:none">
+              <div class="w3-third">
+                <label>2. level</label>
+              </div>
+              <div class="w3-twothird">
+                <select id="i_then_by">
+                  <option value="observation_set">Observation set</option>
+                  <!--<option value="full_path">Path</option>-->
+                  <option value="name" disabled>Condition</option>
+                  <option value="week">Week</option>
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                  <!--<option value="location">Location</option>-->
+                  <option value="target">Target</option>
+                  <option value="source">Source</option>
+                  <option value="no" selected></option>
+                </select>
+              </div>
+            </div>   
+          </fieldset>
+          <fieldset>
+            <legend>Time window<!-- (optional)
+            <img class="clickimg" id="hideshow1" src="hide.png" onclick="togglebutton(['hideshow1', 'time_to','time_from'])">-->
+            </legend>
+            <!--<p id="c_time_text">Accepted formats are <i>ISO 8601</i> and <i>RFC 2822</i>.<br><br></p>-->
+            <div id="c_time_from">
+              <div class="w3-third">
+                <label>From</label>
+              </div>
+              <div class="w3-twothird">
+                <div class="w3-third">
+                  <label>Year</label>
+                  <select onchange="disableDays(true);" id="i_year_from">
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                  </select>
+                </div>
+		<div class="w3-third">
+		  <label>Month</label>
+                  <select onchange="disableDays(true);" id="i_month_from">
+                    <!--<option value="Jan">-</option>-->
+                    <option value="Jan">January</option>
+                    <option value="Feb">February</option>
+                    <option value="Mar">March</option>
+                    <option value="Apr">April</option>
+                    <option value="May">May</option>
+                    <option value="Jun">June</option>
+                    <option value="Jul">July</option>
+                    <option value="Aug">August</option>
+                    <option value="Sep">September</option>
+                    <option value="Oct" selected>October</option>
+                    <option value="Nov">November</option>
+                    <option value="Dec">December</option>
+                  </select>
+                </div>
+                <div class="w3-third">
+		  <label>Day</label>
+                  <select id="i_day_from">
+                  </select>
+                </div>
+            </div>
+            <div id="c_time_to">
+              <div class="w3-third">
+                <label>To</label>
+              </div>
+              <div class="w3-twothird">
+		<div class="w3-third">
+		  <label>Year</label>
+                  <select onchange="disableDays(true);" id="i_year_to">
+                    <option value="2016">2016</option>
+                    <option value="2017"selected>2017</option>
+                  </select>
+                </div>
+	        <div class="w3-third">
+		  <label>Month</label>
+                  <select onchange="disableDays(true);" id="i_month_to">
+                    <!--<option value="Jan">-</option>-->
+                    <option value="Jan" selected>January</option>
+                    <option value="Feb">February</option>
+                    <option value="Mar">March</option>
+                    <option value="Apr">April</option>
+                    <option value="May">May</option>
+                    <option value="Jun">June</option>
+                    <option value="Jul">July</option>
+                    <option value="Aug">August</option>
+                    <option value="Sep">September</option>
+                    <option value="Oct">October</option>
+                    <option value="Nov">November</option>
+                    <option value="Dec">December</option>
+                  </select>
+                </div>
+	        <div class="w3-third">
+                  <label>Day</label>
+                  <select id="i_day_to">
+                  </select>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Path criteria (optional)
+            <img class="clickimg" id="hideshow2" src="hide.png" onclick="togglebutton(['hideshow2', 'target','source', 'path_text'])">
+            </legend>
+            <p id="c_path_text">Leave blank for no restriction.<br><br></p>
+            <div id="c_source">
+              <div class="w3-third">
+                <label>Vantage Point</label>
+              </div>
+              <div class="w3-twothird">
+                <div class="w3-half">
+                  <input type="radio" name="source" value="ip"> IP-address <br>
+                  <input type="radio" name="source" value="asn"> AS-number <br>
+                  <input type="radio" name="source" value="id"> Name/identifier string <br>
+                </div>
+	        <div class="w3-half">
+                  <input id="i_source" type="text"/>
+                </div>
+              </div>
+            </div>
+            <div id="c_target">
+              <div class="w3-third">
+                <label>Target</label>
+              </div>
+              <div class="w3-twothird">
+                <div class="w3-half">
+                  <input type="radio" name="target" value="ip"> IP-address <br>
+                  <input type="radio" name="target" value="asn"> AS-number <br>
+                  <input type="radio" name="target" value="id"> Name/identifier string <br>
+                </div>
+                <div class="w3-half">
+                  <input id="i_target" type="text"/>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+          <div class="margin-top-bottom">
+          <!--<footer class="w3-container w3-theme-l1">-->
+          <!--<button type="submit" id="runbutton" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="document.getElementById('querysubmitted').style.display='block'">Run query</button>-->
+          <button type="submit" id="runquerybutton" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('runquery').style.display='none';document.getElementById('querysubmitted').style.display='block'">Run query</button>
+          <!--</footer>-->
           </div>
-          <div class="">
-            <div class="cell">
-              <h1 class="bold-emph"><i>What is new:</i> Explicit Congestion Notification (ECN)</h1>
-              <p>
-                Currently the PTO only host observation on impairments for <a href="https://tools.ietf.org/html/rfc3168">Explicit Congestion Notification (ECN)</a>, an IP/TCP extension 
-                for congestion signaling instead of drop. Despite initial deployment problems blocking ECN usage, we have measurement increasing
-                support of ECN by webservers and Apple announced in April 2016 that iOS and macOS devices will probabilistic attempts to
-                negotiate ECN by default on the client side. 
-              </p>
-              <p>
-                The PTO provides access to our latest measurement data that complements a series of measurement started in 2014. Older data as well 
-                as measurement data exposing impairments on other protocols and protocol extension are currently in processing and will be 
-                successively added to the PTO over the next couple of month. Stay tuned!
-              </p>
-              <div class="figure">
-                <div class="caption">January 2017: Webservers that negotiated ECN successfully</div>
+        </form>
+      </div>
+      </div>
+      
+    </div>
+</div>
+
+<div class="w3-row-padding w3-center w3-margin-top">
+<div class="w3-third">
+  <div class="w3-card-2 w3-container" style="min-height:460px">
+  <h3>Query</h3><br>
+  <image src="img/query.png"/>
+  <p><i>path conditions</i></p>
+  <p>to get access to observations</p>
+  <p>and graphical rendering of the results</p>
+
+  </div>
+</div>
+
+<div class="w3-third">
+  <div class="w3-card-2 w3-container" style="min-height:460px">
+  <h3>Upload</h3><br>
+  <image src="img/upload.png"/>
+  <p><i>raw data</i></p>
+  <p>to contibute measurments</p>
+  <p>on path transparency</p>
+  </div>
+</div>
+
+<div class="w3-third">
+  <div class="w3-card-2 w3-container" style="min-height:460px">
+  <h3>Analyze</h3><br>
+  <image src="img/analyze.png"/>
+  <p><i>measurements</i></p>
+  <p>from different data sets</p>
+  <p>to generate path transparency conditions</p>
+  </div>
+</div>
+</div>
+
+<!--<div class="w3-center">
+  <h2>Path Transparency Observatory</h2>
+  <p>An open-source, public repository for measurement of path transparency and <br>
+  impairments on new and existing network protocols in the Internet.</p>
+</div>--> 
+
+<!-- First Grid -->
+<div class="w3-row-padding w3-padding-64 w3-container">
+  <div class="w3-content">
+    <div class="w3-twothird">
+      <h1>What is Path Transparency?</h1>
+      <h5 class="w3-padding-24 w3-justify">Given the increasing deployment of middleboxes in the Internet, we see an ossification of the protocol stack that makes it difficult to deploy new protocols or protocol extensions. The data provided by this observatory assists to quantify impairments on path transparency when traffic is altered or treated differently on a network path based on the protocol stack in use.</h5>
+      <p class="w3-text-grey w3-justify"> We provide the <a href="papi.html"><span class="txt-abbr">P</span>ath Transparency Observatory-<span class="txt-abbr">API</span> (PAPI)</a> to run custom queries on observation data base of the PTO. <br>
+Use the <a href="qui.html">query web-frontend</a> to get access and graphical rendering of the results!</p>
+    </div>
+    <div class="w3-third w3-center w3-padding-48">
+      <image src="img/path.png" />
+    </div>
+  </div>
+</div>
+
+<!-- Second Grid -->
+<div class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
+  <div class="w3-content">
+    <div style="position:relative;bottom:55px;" class="w3-tooltip w3-right">
+      <span class="w3-text w3-theme-light">Go To Top</span>    
+      <a class="w3-text-black w3-padding" href="#"><span class="w3-xlarge">
+      <i class="fa fa-chevron-circle-up"></i></span></a>
+    </div>
+    <div class="w3-twothird w3-center">
+      <p>
+                <div class="w3-tiny">January 2017: Webservers that negotiated ECN successfully</div>
                 <br>
 <svg viewBox="0 0 720 105" height="auto" width="80%"><g transform="translate(0,0)"><rect fill="salmon" height="30" width="207.13834743771628"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: start" fill="black" dy=".35em" y="15" x="212.13834743771628">ecn.negotiation_attempt.failed [22.3%]</text></g><g transform="translate(0,35)"><rect fill="salmon" height="30" width="720"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: end" fill="white" dy=".35em" y="15" x="715">ecn.negotiat....succeeded [77.7%]</text></g><g><rect x="718" fill="black" height="65" width="2"></rect><rect fill="black" x="0" height="65" width="2"></rect></g><g transform="translate(0,70)"><text fill="black" dy=".35em" y="15" x="0">0</text><text style="text-anchor: end;" fill="black" dy=".35em" y="15" x="720">24367130</text></g></svg>
                 <p>
-                  <a class="linky2" href="qui.html?0e5a21edad8e94a9f3c0c7def6cd1b1f51c78703">Show full query result</a>
+                  <a class="w3-button w3-theme" href="queryreply.html?0e5a21edad8e94a9f3c0c7def6cd1b1f51c78703">Show full query result</a>
                 </p>
-              </div>
-              <div class="figure">
-                <div class="caption">January 2017: Paths with connectivity problems if TCP attempts to negotiate ECN</div>
+              </p>
+              <p>
+                <div class="w3-tiny">January 2017: Paths with connectivity problems if TCP attempts to negotiate ECN</div>
                 <br>
 <svg viewBox="0 0 720 175" height="auto" width="80%"><g transform="translate(0,0)"><rect fill="salmon" height="30" width="0.563824006407392"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: start" fill="black" dy=".35em" y="15" x="5.563824006407392">ecn.connectivity.transient [0.1%]</text></g><g transform="translate(0,35)"><rect fill="salmon" height="30" width="1.6834232870662875"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: start" fill="black" dy=".35em" y="15" x="6.6834232870662875">ecn.connectivity.broken [0.2%]</text></g><g transform="translate(0,70)"><rect fill="salmon" height="30" width="14.832873198008558"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: start" fill="black" dy=".35em" y="15" x="19.832873198008556">ecn.connectivity.offline [2%]</text></g><g transform="translate(0,105)"><rect fill="salmon" height="30" width="720"></rect><text style="font-family: monospace, monospace; font-size: 13px; text-anchor: end" fill="white" dy=".35em" y="15" x="715">ecn.connectivity.works [97.7%]</text></g><g><rect x="718" fill="black" height="135" width="2"></rect><rect fill="black" x="0" height="135" width="2"></rect></g><g transform="translate(0,140)"><text fill="black" dy=".35em" y="15" x="0">0</text><text style="text-anchor: end;" fill="black" dy=".35em" y="15" x="720">31398734</text></g></svg>
                 <p>
-                  <a class="linky2" href="qui.html?59325cabda649298b692af46936a1e444dfb153a">Show full query result</a>
+                  <a href="queryreply.html?59325cabda649298b692af46936a1e444dfb153a" class="w3-button w3-theme">Show full query result</a>
                 </p>
-              </div>
-            </div>
-          </div>
-          <div class="">
-            <div class="cell">
-              <h1 class="bold-emph"><i>How to contribute:</i> GitHub and Data</h1>
-              <p>
-                The PTO is open-source available on <a href="https://github.com/mami-project/pto-postgres">Github</a>. Most measurement data in the 
-                PTO have been collected using <a href="https://pathspider.net">PATHspider</a>, an A/B testing of path transparency with integrated 
-                upload feature to the PTO. If you are interested in contributing and uploading additional data, or in access to our collected raw data, please contact us directly!
               </p>
-            </div>
-          </div>
-          <div class="">
-            <div class="cell">
-              <h1 class="bold-emph"><i>Who we are:</i> The MAMI project</h1>
-              <p>
-                The PTO is developed and maintained by the H2020 ICT <a href="mami-project.eu">MAMI project</a>. 
-                <!--You can contact us at <a href="mailto:pto@something.xy">pto@something.xy</a>-->
-              </p>
-            </div>
-          </div>
-          <div class="row-2 top-margin">
-            <div style="padding-right: 1rem">
-              <img src="img/eu_flag_small.jpg" style="width: 4rem">
-            </div>
-            <div class="cell">
-              <p class="txt-tiny txt-gray">
-                This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant 
+    </div>
+
+    <div class="w3-third">
+      <h1>Explicit Congestion Notification (ECN)</h1>
+      <h5 class="w3-padding-24 w3-justify">Currently the PTO only host observation on impairments for <a href="https://tools.ietf.org/html/rfc3168">Explicit Congestion Notification (ECN)</a>, an IP/TCP extension 
+                for congestion signaling instead of drop. Despite initial deployment problems blocking ECN usage, we have measurement increasing
+                support of ECN by webservers and Apple announced in April 2016 that iOS and macOS devices will probabilistic attempts to
+                negotiate ECN by default on the client side. </h5>
+      <p class="w3-text-grey w3-justify">The PTO provides access to our latest measurement data that complements a series of measurement started in 2014. Older data as well 
+                as measurement data exposing impairments on other protocols and protocol extension are currently in processing and will be 
+                successively added to the PTO over the next couple of month. Stay tuned!</p>
+    </div>
+  </div>
+</div> 
+
+
+<header class="w3-container w3-blue-grey" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'" id="queryqueue-header">
+  <h4>Query Queue</h4>
+</header>
+
+<div class="w3-padding w3-white w3-display-container" id="queryqueue" style="display:none">
+  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright">X</span>
+  <p>Queries submitted to our observatory can be long running and are therefore queued. The table below shows the most recent queries as well as running or queued queries. For running queries duration shows for how long the query has run so far, for queued queries duration refers to how long the query has been waiting so far and for completed queries duration shows how long the query took to execute.</p>
+  <div id="queryqueue_err"></div>
+  <table  class="w3-table w3-striped w3-bordered" id="queryqueue-table">
+  </table>
+</div>
+
+<hr>
+
+<header class="w3-container w3-blue-grey"  onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'" id="uploadstats-header">
+  <h4>Upload statistics</h4>
+</header>
+
+<div class="w3-padding w3-white w3-display-container" id="uploadstats" style="display:none">
+  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright">X</span>
+  <p>The observatory has a pool of raw data. Raw data is uploaded in files where each file is associated
+     with a measurement (or upload) campaign.</p>
+  <div id="uploadstats_err"></div>
+  <table  class="w3-table w3-striped w3-bordered" id="uploadstats-table">
+  </table>
+</div>
+
+<hr>
+
+<!--<footer class="w3-container w3-blue-grey">
+  <h5>Footer</h5>
+  <p class="w3-opacity">Footer information goes here</p>
+</footer>
+<hr>-->
+
+<!--<hr>
+<h2 class="w3-center">Buttons</h2>
+<div class="w3-center">
+  <br>
+  <a class="w3-button w3-theme">Button</a>
+  <a class="w3-button w3-theme">Button</a>
+  <a class="w3-button w3-theme-d3 w3-disabled">Button</a>
+  <br><br>
+  <a class="w3-button w3-circle w3-large w3-black"><i class="fa fa-plus"></i></a>
+  <a class="w3-button w3-circle w3-large w3-theme"><i class="fa fa-plus"></i></a>  
+  <a class="w3-button w3-circle w3-large w3-card-4"><i class="fa fa-plus"></i></a>
+</div>
+<br>
+<div class="w3-center">
+  <div class="w3-dropdown-hover">
+    <button class="w3-button w3-theme">Dropdown <i class="fa fa-caret-down"></i></button>
+    <div class="w3-dropdown-content w3-bar-block w3-border">
+      <a href="#" class="w3-bar-item w3-button">Link 1</a>
+      <a href="#" class="w3-bar-item w3-button">Link 2</a>
+      <a href="#" class="w3-bar-item w3-button">Link 3</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<hr>
+<div class="w3-center">
+  <h2>Pagination</h2>
+
+  <div class="w3-center w3-padding-32">
+    <div class="w3-bar">
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">Â«</a>
+      <a href="#" class="w3-bar-item w3-button w3-theme w3-hover-theme">1</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">2</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">3</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">4</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">5</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">Â»</a>
+    </div>
+  </div>
+</div>
+<br>-->
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-dark w3-padding-16">
+  <p>The PTO is developed and maintained by the H2020 ICT <a href="mami-project.eu">MAMI project.</a></p>
+  <p class="w3-text-grey w3-tiny">This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant 
                 agreement No 688421, and was supported by the Swiss State Secretariat for Education, Research and
                 Innovation (SERI) under contract number 15.0268. The opinions expressed and
                 arguments employed reflect only the authors' views. The European Commission is
                 not responsible for any use that may be made of that information. Further, the
                 opinions expressed and arguments employed herein do not necessarily reflect
                 the official views of the Swiss Government.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+<img src="img/eu_flag_small.jpg" style="width: 2rem"></p>
+
+              
+</footer>
+
+
+</body>
 </html>
-<!--<a href="papi.html" class="linky">Use PAPI for custom queries</a>
-              Use the <span class="txt-abbr">P</span>ath Transparency Observatory-<span class="txt-abbr">API</span> to run custom queries.-->
