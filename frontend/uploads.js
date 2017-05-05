@@ -56,10 +56,10 @@ function renderUploadStats(data) {
     var row = table.append("tr");
     console.log(data[cols[i]]);
     row.append("td").text(cols[i]);
-    row.append("td").text(data[cols[i]]['count']).attr("style","text-align: right;");
+    row.append("td").text(data[cols[i]]['count']);
     row.append("td").text(convertDate(data[cols[i]]['first_msmnt']));
     row.append("td").text(convertDate(data[cols[i]]['last_msmnt']));
-    row.append("td").text(sizeToStr(data[cols[i]]['file_size'])).attr("style","text-align: right;");
+    row.append("td").text(sizeToStr(data[cols[i]]['file_size']));
     console.log('row added');
   }
 
