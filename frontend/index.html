@@ -99,7 +99,7 @@ function inputDays() {
   <div class="w3-bar w3-black w3-card-2 w3-left-align w3-large">
     <!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>-->
     <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white">Home<!--<image src="img/pto.png" style="max-height:41px"/>--></a>
-    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="inputDays();document.getElementById('runquery').style.display='block'">Run Query</a>
+    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="document.getElementById('runquery').style.display='block'">Run Query</a>
     <a href="#queryqueue-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Query Queue</a>
     <a href="#uploadstats-header" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'">Upload statistics</a>
     
@@ -445,8 +445,8 @@ function inputDays() {
     <div class="w3-twothird">
       <h1>What is Path Transparency?</h1>
       <h5 class="w3-padding-24 w3-justify">Given the increasing deployment of middleboxes in the Internet, we see an ossification of the protocol stack that makes it difficult to deploy new protocols or protocol extensions. The data provided by this observatory assists to quantify impairments on path transparency when traffic is altered or treated differently on a network path based on the protocol stack in use.</h5>
-      <p class="w3-text-grey w3-justify"> We provide the <a href="papi.html"><span class="txt-abbr">P</span>ath Transparency Observatory-<span class="txt-abbr">API</span> (PAPI)</a> to run custom queries on observation data base of the PTO. <br>
-Use the <a href="qui.html">query web-frontend</a> to get access and graphical rendering of the results!</p>
+      <p class="w3-text-grey w3-justify">You can use the <a href="#" onclick="document.getElementById('runquery').style.display='block'">query web-frontend</a> to query our observation database and get graphical rendering of the results!<p>
+      <p class="w3-text-grey w3-justify">We also provide a Path Transparency Observatory API (PAPI) to run custom queries on the observation data base of the PTO based on a custom-tailored query language, called <a href="https://github.com/mami-project/pto-postgres/blob/master/IQL.md" target=_blank">Interesting Query Language (IQL)</a>. PAPI offers additional functionality enabling more complex queries than provided by our web-frontend. Some API methods are not public and require an API key. To receive an API key please <a href="mailto:mami@corvid.ch">contact us</a>.</p>
     </div>
     <div class="w3-third w3-center w3-padding-48">
       <image src="img/path.png" />
