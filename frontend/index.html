@@ -149,14 +149,14 @@ function inputDays() {
         <p>Your query is not completed yet.</p>
         <p>You can the status of your query processing in the query queue and retrive your results with the following link:</p>
         <p id="queryidlink"></p>
-        <a href="#queryqueue-header" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none';getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Go to query queue</a>
+        <a href="#queryqueue-header" class="w3-button w3-theme w3-hover-grey w3-center" onclick="document.getElementById('querysubmitted').style.display='none';getSummaryQQ();document.getElementById('queryqueue').style.display='block'">Go to query queue</a>
         </div>
         <a  id="showresults" style="display:none" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none'" target="_blank">Show results</a>
       </div>
       <div id="queryfailed" class="w3-padding" style="display:none">
         <p>Due to a system error your query could not be submitted.</p>
         <p>Please try later again!</p>
-        <a class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('querysubmitted').style.display='none'" style="font-weight:900;">Okay</a>
+        <a class="w3-button w3-theme w3-hover-grey w3-center" onclick="document.getElementById('querysubmitted').style.display='none'" style="font-weight:900;">Okay</a>
       </div>
       <!--<footer class="w3-container w3-theme-l1"><p></p></footer>-->
     </div>
@@ -388,7 +388,7 @@ function inputDays() {
               </div>
             </div>
           </fieldset>
-          <div class="margin-top-bottom">
+          <div class="margin-top-bottom w3-padding w3-center">
           <!--<footer class="w3-container w3-theme-l1">-->
           <!--<button type="submit" id="runbutton" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="document.getElementById('querysubmitted').style.display='block'">Run query</button>-->
           <button type="submit" id="runquerybutton" class="w3-button w3-theme w3-hover-grey" onclick="document.getElementById('runquery').style.display='none';document.getElementById('querysubmitted').style.display='block'">Run query</button>
