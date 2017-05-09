@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Path Transparency Observatory</title>
-    <link rel="stylesheet" href="css.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="cfg.js"></script>
-    <script type="text/javascript">
+<title>Path Transparency Observatory - Query</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="css.css">
+<script scr="layout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="cfg.js"></script>
+<script type="text/javascript">
       function disableDays(set) {
         console.log('disableDays',set);
         disableDaysFor(set, 'i_day_from', $('#i_year_from').val(), $('#i_month_from').val());
@@ -65,12 +70,62 @@
           }
         }
       }
-    </script>
-    <script src="iql.js"></script>
-    <script src="results.js"></script>
-    <script src="qui.js"></script>
-  </head>
-  <body>
+</script>
+<script src="iql.js"></script>
+<script src="results.js"></script>
+<script src="qui.js"></script>
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card-2 w3-left-align w3-large">
+    <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="index.html" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Home<!--<image src="img/pto.png" style="max-height:41px"/>--></a>
+    <a href="qui.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white">Run Query</a>
+    <a href="qq.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Query Queue</a>
+    <a href="uploadstats.html" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Upload statistics</a>
+  </div>
+  
+  <!-- Navbar on small screens -->
+  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+    <a href="qui.html" class="w3-bar-item w3-button w3-padding-large">Run Query</a>
+    <a href="qq.html" class="w3-bar-item w3-button w3-padding-large">Query Queue</a>
+    <a href="uploadstats.html" class="w3-bar-item w3-button w3-padding-large">Upload statistics</a>
+  </div>
+</div>
+  
+
+<!--
+<header class="w3-container w3-theme w3-padding" id="myHeader">
+  <div class="w3-center">
+  <h4>Path Transparency Observatory</h4>
+  <h1 class="w3-xxxlarge"><b>P</b>ath <b>T</b>ransparency <b>O</b>bservatory</h1>
+    <p><image src="img/pto-black.png" /></p>
+    <p>An open-source, public repository for measurement of path transparency and <br>
+    impairments on new and existing network protocols in the Internet.</p>
+    <div class="w3-padding-32">
+      <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="document.getElementById('id01').style.display='block'" style="font-weight:900;">Query Observations</button>
+    </div>
+  </div>
+</header>
+
+<div id="id01" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-top">
+      <header class="w3-container w3-theme-l1"> 
+        <span onclick="document.getElementById('id01').style.display='none'"
+        class="w3-button w3-display-topright">X</span>
+        <h4>Query</h4>
+      </header>
+      <div class="w3-padding">
+        <p>Query</p>
+        <p><a class="w3-btn" href="/w3css/default.asp">conditions</a></p>
+      </div>
+      <footer class="w3-container w3-theme-l1">
+        <p>Done</p>
+      </footer>
+    </div>
+</div>-->
+
     <div id="dialog-overlay"></div>
 	<div id="dialog-box">
 	  <a href="#close" title="Close" class="close">x</a>
@@ -108,16 +163,10 @@ the target succeeded.</td></tr>
 	    </div>
 	  </div>
 	</div>
+
+
+<br>
     <div id="container">
-      <div id="nav" class="clear-float">
-        <ul style="float: left;">
-          <li><a href="/">PTO Home</a></li>
-          <li><a href="#">Run Query</a></li>
-          <li><a href="qq.html">Query Queue</a></li>
-          <li><a href="uploadstats.html">Upload statistics</a></li>
-        </ul>
-        <a href="https://mami-project.eu"><img style="height: 2rem; float: right;" src="logo.png" alt="Go to MAMI project"/></a>
-      </div>
       <div id="main">
       <div id="qui">
         <div id="run_query">
@@ -413,5 +462,63 @@ the target succeeded.</td></tr>
       </div>
       </div>
     </div>
-  </body>
+
+<hr>
+<h2 class="w3-center">Buttons</h2>
+<div class="w3-center">
+  <br>
+  <a class="w3-button w3-theme">Button</a>
+  <a class="w3-button w3-theme">Button</a>
+  <a class="w3-button w3-theme-d3 w3-disabled">Button</a>
+  <br><br>
+  <a class="w3-button w3-circle w3-large w3-black"><i class="fa fa-plus"></i></a>
+  <a class="w3-button w3-circle w3-large w3-theme"><i class="fa fa-plus"></i></a>  
+  <a class="w3-button w3-circle w3-large w3-card-4"><i class="fa fa-plus"></i></a>
+</div>
+<br>
+<div class="w3-center">
+  <div class="w3-dropdown-hover">
+    <button class="w3-button w3-theme">Dropdown <i class="fa fa-caret-down"></i></button>
+    <div class="w3-dropdown-content w3-bar-block w3-border">
+      <a href="#" class="w3-bar-item w3-button">Link 1</a>
+      <a href="#" class="w3-bar-item w3-button">Link 2</a>
+      <a href="#" class="w3-bar-item w3-button">Link 3</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<hr>
+<div class="w3-center">
+  <h2>Pagination</h2>
+  <!-- Pagination -->
+  <div class="w3-center w3-padding-32">
+    <div class="w3-bar">
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">Â«</a>
+      <a href="#" class="w3-bar-item w3-button w3-theme w3-hover-theme">1</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">2</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">3</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">4</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">5</a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-theme">Â»</a>
+    </div>
+  </div>
+</div>
+<br>
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-dark w3-padding-16">
+  <h3>Footer</h3>
+  <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+  <div style="position:relative;bottom:55px;" class="w3-tooltip w3-right">
+    <span class="w3-text w3-theme-light w3-padding">Go To Top</span>    
+    <a class="w3-text-white" href="#myHeader"><span class="w3-xlarge">
+    <i class="fa fa-chevron-circle-up"></i></span></a>
+  </div>
+  <p>Remember to check out our  <a href="w3css_references.asp" class="w3-btn w3-theme-light" target="_blank">W3.CSS Reference</a></p>
+</footer>
+
+
+</body>
 </html>

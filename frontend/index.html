@@ -163,6 +163,7 @@ function inputDays() {
 </div>
 
 
+
 <!-- Run Query -->
 <div id="runquery" class="w3-modal">
     <div class="w3-modal-content w3-card-4 w3-animate-top">
@@ -186,7 +187,7 @@ function inputDays() {
             <legend>Query</legend>
               <div class="w3-third">
                 <label>Conditions
-                <img  class="clickimg" src="information-circle.jpg" height="15px" onclick="popupdialog('conditions')">
+                <img class="clickimg" src="information-circle.jpg" height="15px" onclick="document.getElementById('dialog-conditions').style.display='block'" style="cursor: pointer;">
                 </label>
               </div>
               <div class="w3-twothird">
@@ -225,12 +226,12 @@ function inputDays() {
 		  <option value="source">Vantage point</option>
 		  <!--<option value="no">globally (don't group)</option>-->
 		</select>
-		<img class="clickimg" src="unlock.png" height="20px" onclick="document.getElementById('i_per').prop('disabled', false)">
+		<img src="unlock.png" height="20px" onclick="document.getElementById('i_per').disabled=false;" style="cursor: pointer;">
               </div>
             </fieldset>
             <fieldset>
             <legend>Grouping (optional)
-            <img class="clickimg" id="hideshow3" src="hide.png" onclick="togglebutton(['hideshow3', 'group_by','then_by', 'group_text'])">
+            <!--<img class="clickimg" id="hideshow3" src="hide.png" onclick="togglebutton(['hideshow3', 'group_by','then_by', 'group_text'])">-->
             </legend>
             <p id="c_group_text">Select additional criteria to group the results data (in separate rows in results table and as input for graphical representation) or leave empty.<br><br></p>
             <div id="c_group_by">
@@ -238,7 +239,7 @@ function inputDays() {
                 <label>1. level </label>
               </div>
               <div class="w3-twothird">
-                <select id="i_group_by" onchange="showThenBy()">
+                <select id="i_group_by" onchange="document.getElementById('c_then_by').style.display='block'"">
                   <option value="observation_set">Observation set</option>
                   <!--<option value="full_path">Path</option>-->
                   <option value="name" disabled>Condition</option>
@@ -353,7 +354,7 @@ function inputDays() {
           </fieldset>
           <fieldset>
             <legend>Path criteria (optional)
-            <img class="clickimg" id="hideshow2" src="hide.png" onclick="togglebutton(['hideshow2', 'target','source', 'path_text'])">
+            <!--<img class="clickimg" id="hideshow2" src="hide.png" onclick="togglebutton(['hideshow2', 'target','source', 'path_text'])">-->
             </legend>
             <p id="c_path_text">Leave blank for no restriction.<br><br></p>
             <div id="c_source">
@@ -398,6 +399,38 @@ function inputDays() {
       </div>
       
     </div>
+</div>
+
+<!---Show conditions modal--->
+<div id="dialog-conditions" class="w3-modal">
+    <div class="w3-modal-content w3-card-4">
+      <header class="w3-container w3-theme-l1"> 
+        <span onclick="document.getElementById('dialog-conditions').style.display='none'"
+        class="w3-button w3-display-topright">X</span>
+        <h4>Overview of current conditions for observations in the PTO</h4>
+      </header>
+      <table class="w3-table w3-striped w3-bordered"
+      <tr><td colspan=2><b>Condition</b></td><td><b>Description</b></td></tr>
+      <tr><td rowspan=4 valign=top>ecn.connectivity.</td><td>works</td><td>TCP connections with and without ECN were established successfully.</td></tr>
+      <tr><td>broken</td><td>A TCP connection without ECN negotiation attempt was established, but not with ECN.</td></tr>
+      <tr><td>transient</td><td>A TCP connection with ECN negotiation was established, but not without. Since there is no reasonable model for a host that only responds
+to ECN-enable TCP handshakes at this time, we clearly consider this case as a transient measurement error.</td></tr>
+      <tr><td>offline</td><td>No connection attempt to
+the target succeeded.</td></tr>
+      <tr><td rowspan=2 valign=top>ecn.connectivity.super</td><td>works, broken, transient, offline</td><td>Each corresponding condition has been observed three times in three parallel trials.</td></tr>
+      <tr><td>weird</td><td>Different conditions have been observed in the three parallel trials.</td></tr>
+      <tr><td rowspan=2 valign=top>ecn.negotiation_attempt.</td><td>succeeded</td><td>ECN was successfully negotiated.</td></tr>
+      <tr><td>failed</td><td>A TCP connection with ECN negotiation attempt was established, but ECN was not successfully negotiated.</td></tr>
+      <tr><td rowspan=3 valign=top>ecn.ipmark.</td><td>ce.seen</td><td>At least one CE mark observed on this connection.</td></tr>
+      <tr><td>ect_zero.seen</td><td>At least one ECT(0) mark observed on this connection.</td></tr>
+      <tr><td>ect_zero.seen</td><td>At least one ECT(1) mark observed on this connection.</td></tr>
+      <tr><td rowspan=3 valign=top>ecn.path_dependent.</td><td>weak</td><td>A host is flagged as weakly path dependent if their is at least one <i>works</i> and at least one <i>broken</i> super condition for it from different vantage points.</td></tr>
+      <tr><td>strict</td><td>A host is flagged as strictly path dependent if it is weakly path dependent and there are no <i>transient</i>, <i>offline</i>, or <i>weird</i> super conditions for it.</td></tr>
+      <tr><td>strong</td><td>A host is flagged as strongly path dependent if it is strictly path dependent but there are at least two <i>broken</i> super conditions associated with it.</td></tr>
+      <tr><td rowspan=2 valign=top>ecn.side_dependent.</td><td>weak</td><td>A host is flagged as weakly site dependent, if there are <i>broken</i> but no <i>works</i> and no <i>transient</i> super conditions associated with it.</td></tr>
+      <tr><td>strong</td><td>A host is flagged as strongly site dependent, if there are only <i>broken</i> super conditions for it.</td></tr>
+      </table>
+   </div>
 </div>
 
 <div class="w3-row-padding w3-center w3-margin-top">
@@ -496,30 +529,44 @@ function inputDays() {
 
 
 <header class="w3-container w3-blue-grey" onclick="getSummaryQQ();document.getElementById('queryqueue').style.display='block'" id="queryqueue-header">
-  <h4>Query Queue</h4>
+  <div class=w3-button><h4>Query Queue <i class="fa fa-chevron-right"></i></h4></div>
+  <div style="position:relative;right:135px;" class="w3-tooltip w3-right">
+      <span class="w3-text w3-theme-light">Go To Top</span>    
+      <a class="w3-text-black w3-padding" href="#"><span class="w3-xlarge">
+      <i class="fa fa-chevron-circle-up"></i></span></a>
+  </div>
 </header>
 
 <div class="w3-padding w3-white w3-display-container" id="queryqueue" style="display:none">
-  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright">X</span>
+<div class="w3-padding w3-card-4">
+  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright w3-white">X</span>
   <p>Queries submitted to our observatory can be long running and are therefore queued. The table below shows the most recent queries as well as running or queued queries. For running queries duration shows for how long the query has run so far, for queued queries duration refers to how long the query has been waiting so far and for completed queries duration shows how long the query took to execute.</p>
   <div id="queryqueue_err"></div>
   <table  class="w3-table w3-striped w3-bordered" id="queryqueue-table">
   </table>
 </div>
+</div>
 
 <hr>
 
 <header class="w3-container w3-blue-grey"  onclick="getUploadStats();document.getElementById('uploadstats').style.display='block'" id="uploadstats-header">
-  <h4>Upload statistics</h4>
+  <div class=w3-button><h4>Upload statistics <i class="fa fa-chevron-right"></i></h4></div>
+  <div style="position:relative;right:135px;" class="w3-tooltip w3-right">
+      <span class="w3-text w3-theme-light">Go To Top</span>    
+      <a class="w3-text-black w3-padding" href="#"><span class="w3-xlarge">
+      <i class="fa fa-chevron-circle-up"></i></span></a>
+  </div>
 </header>
 
 <div class="w3-padding w3-white w3-display-container" id="uploadstats" style="display:none">
-  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright">X</span>
+<div class="w3-padding w3-card-4">
+  <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright w3-white">X</span>
   <p>The observatory has a pool of raw data. Raw data is uploaded in files where each file is associated
      with a measurement (or upload) campaign.</p>
   <div id="uploadstats_err"></div>
   <table  class="w3-table w3-striped w3-bordered" id="uploadstats-table">
   </table>
+</div>
 </div>
 
 <hr>
